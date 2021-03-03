@@ -18,12 +18,12 @@ export class AppService {
   ) {}
 
   /**
-   * Fetches and logs the APP_URL environment variable from a configuration file.
+   * Fetches and logs the APPLICATION_URL environment variable from a configuration file.
    * @returns {string} the application url
    */
   root(): string {
-    const appURL = this.config.get('APP_URL');
-    this.logger.info('Logging the APP_URL -> ' + appURL);
+    const appURL = this.config.get('APPLICATION_URL');
+    this.logger.info('Logging the APPLICATION_URL -> ' + appURL);
     return appURL;
   }
 }

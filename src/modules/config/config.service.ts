@@ -38,21 +38,15 @@ export class ConfigService {
      * A schema to validate envConfig against
      */
     const envVarsSchema: joi.ObjectSchema = joi.object({
-      APP_ENV: joi
-        .string()
-        .valid('dev', 'prod')
-        .required(),
-      APP_URL: joi.string().uri({
+      APPLICATION_ENV: joi.string().valid('dev', 'prod').required(),
+      APPLICATION_URL: joi.string().uri({
         scheme: [/https?/],
       }),
       WEBTOKEN_SECRET_KEY: joi.string().required(),
       WEBTOKEN_EXPIRATION_TIME: joi.number().default(1800),
       DB_TYPE: joi.string().default('mariadb'),
-      DB_USERNAME: joi.string().default('root'),
-      DB_PASSWORD: joi
-        .string()
-        .allow('')
-        .default(''),
+      DB_USERNAME: joi.string().allow('').default(''),
+      DB_PASSWORD: joi.string().allow('').default(''),
       DB_HOST: joi.string().default('localhost'),
       DB_PORT: joi.number().default('8889'),
       DB_DATABASE: joi.string().default('nest'),
@@ -85,6 +79,6 @@ export class ConfigService {
    * @returns {boolean} Whether or not the environment variable matches the application environment
    */
   isEnv(env: string): boolean {
-    return this.envConfig.APP_ENV === env;
+    return this.envConfig.APPLICATION_ENV === env;
   }
 }

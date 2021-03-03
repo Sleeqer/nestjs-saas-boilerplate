@@ -27,7 +27,9 @@ import { roles } from './app.roles';
           database: configService.get('DB_DATABASE'),
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
           synchronize: configService.isEnv('dev'),
+          useNewUrlParser: true,
           keepConnectionAlive: true,
+          logging: true,
         } as TypeOrmModuleAsyncOptions;
       },
     }),
