@@ -5,12 +5,9 @@ import { Logger } from 'winston';
 /**
  * Import local level objects
  */
-import {
-  EntityCreatedEvent,
-  EntityDestroyedEvent,
-  EntityUpdatedEvent,
-} from '../event';
+import { EntityEvent } from '../event';
 import { EntityEventEnum } from '../enum';
+import { Entity } from '../entity.entity';
 import { EntityService } from '../entity.service';
 
 /**
@@ -30,28 +27,28 @@ export class EntityListener {
 
   /**
    * Entity Created Event Listener
-   * @param {EntityCreatedEvent} payload
+   * @param {EntityEvent} payload
    */
   @OnEvent(EntityEventEnum.CREATED)
-  _created(payload: EntityCreatedEvent): void {
+  _created(payload: EntityEvent<Entity>): void {
     this.logger.info(`[${payload.title}]: _`);
   }
 
   /**
    * Entity Updated Event Listener
-   * @param {EntityCreatedEvent} payload
+   * @param {EntityEvent} payload
    */
   @OnEvent(EntityEventEnum.UPDATED)
-  _updated(payload: EntityUpdatedEvent): void {
+  _updated(payload: EntityEvent<Entity>): void {
     this.logger.info(`[${payload.title}]: _`);
   }
 
   /**
-   * Entity Destroyed Event Listener
+   * Entity Deleted Event Listener
    * @param {EntityCreatedEvent} payload
    */
-  @OnEvent(EntityEventEnum.DESTROYED)
-  _destroyed(payload: EntityDestroyedEvent): void {
+  @OnEvent(EntityEventEnum.DELETED)
+  _deleted(payload: EntityEvent<Entity>): void {
     this.logger.info(`[${payload.title}]: _`);
   }
 }

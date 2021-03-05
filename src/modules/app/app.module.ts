@@ -12,6 +12,7 @@ import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
 import { EntityModule } from '../entity/entity.module';
 import { AccessControlModule } from 'nest-access-control';
+import { ParseIdPipeOptions } from '../common/pipes/parse.id.pipe';
 import { roles } from './app.roles';
 
 @Module({

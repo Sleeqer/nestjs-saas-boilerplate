@@ -1,4 +1,4 @@
-import { DeleteResult, ObjectID } from 'typeorm';
+import { ObjectID } from 'typeorm';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -28,6 +28,8 @@ import {
 } from './payload';
 import { Entity } from './entity.entity';
 import { EntityService } from './entity.service';
+import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { ParseIdPipe } from '../common/pipes';
 
 /**
  * Entity Controller Class
@@ -43,8 +45,9 @@ export class EntityController {
   constructor(protected readonly service: EntityService) {}
 
   /**
-   * Paginate Entity objects
-   * @returns {Promise<any} Paginated Entity Entities
+   * Paginate Entity objects by parameters
+   * @param {QueryPagination} parameters Pagination query parameters
+   * @returns {Promise<Pagination<Entity>>} Paginated Entity objects
    */
   @Get('')
   @ApiOperation({ summary: 'Paginate Entity objects.' })
@@ -56,8 +59,10 @@ export class EntityController {
     status: 400,
     description: 'Entity List Request Failed.',
   })
-  async index(@Query() options: any): Promise<any> {
-    return this.service.paginate(options);
+  async index(
+    @Query() parameters: QueryPagination,
+  ): Promise<Pagination<Entity>> {
+    return this.service.paginate(parameters);
   }
 
   /**
@@ -72,7 +77,10 @@ export class EntityController {
     description: 'Entity Retrieve Request Received.',
   })
   @ApiResponse({ status: 400, description: 'Entity Retrieve Request Failed.' })
-  async get(@Param('id') id: number | string | ObjectID): Promise<Entity> {
+  async get(
+    @Param('id', ParseIdPipe)
+    id: number | string | ObjectID,
+  ): Promise<Entity> {
     return await this.service.get(id);
   }
 
@@ -90,7 +98,7 @@ export class EntityController {
   @ApiResponse({ status: 200, description: 'Entity Replace Request Received.' })
   @ApiResponse({ status: 400, description: 'Entity Replace Request Failed.' })
   async replace(
-    @Param('id') id: number | string | ObjectID,
+    @Param('id', ParseIdPipe) id: number | string | ObjectID,
     @Body() payload: EntityReplacePayload,
   ): Promise<Entity> {
     return await this.service.replace(id, payload);
@@ -113,7 +121,7 @@ export class EntityController {
     description: 'Entity Update Request Failed.',
   })
   async update(
-    @Param('id') id: number | string | ObjectID,
+    @Param('id', ParseIdPipe) id: number | string | ObjectID,
     @Body() payload: EntityUpdatePayload,
   ): Promise<Entity> {
     await this.service.update(id, payload);
@@ -134,9 +142,10 @@ export class EntityController {
   })
   @ApiResponse({ status: 400, description: 'Entity Destroy Request Failed.' })
   async destory(
-    @Param('id') id: number | string | ObjectID,
-  ): Promise<DeleteResult> {
-    return await this.service.destroy(id);
+    @Param('id', ParseIdPipe) id: number | string | ObjectID,
+  ): Promise<object> {
+    await this.service.destroy(id);
+    return {};
   }
 
   /**

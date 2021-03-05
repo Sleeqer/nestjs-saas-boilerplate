@@ -71,7 +71,7 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
     timeWindow: '1 minute',
   });
 
-  application.useGlobalPipes(new ValidationPipe());
+  application.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   /**
    * Startup

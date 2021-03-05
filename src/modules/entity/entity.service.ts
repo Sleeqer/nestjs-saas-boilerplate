@@ -1,17 +1,21 @@
 import { DeleteResult, Repository, UpdateResult, ObjectID } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
 import { ObjectID as CastObjectID } from 'mongodb';
+import { Injectable } from '@nestjs/common';
 
 /**
- * Import local level objects
+ * Import local modules
  */
 import {
   EntityCreatePayload,
   EntityReplacePayload,
   EntityUpdatePayload,
 } from './payload';
+import { EntityEvent } from './event';
 import { Entity } from './entity.entity';
+import { EntityEventEnum } from './enum';
+import { Pagination, Query } from '../entity/pagination';
 
 /**
  * Entity Service Class
@@ -25,12 +29,40 @@ export class EntityService {
 
   /**
    * Constructor of Entity Service Class
-   * @param {Repository<Entity>} repository
+   * @param {Repository<Entity>} repository Entity repository
+   * @param {EventEmitter2} emitter Event emitter
    */
   constructor(
     @InjectRepository(Entity)
     protected readonly repository: Repository<Entity>,
+    private readonly emitter: EventEmitter2,
   ) {}
+
+  /**
+   * Paginate Entity objects by parameters
+   * @param {Query} parameters Pagination query parameters
+   * @returns {Promise<Pagination<Entity>>} Paginated Entity objects
+   */
+  async paginate({ page, limit, order }: Query): Promise<Pagination<Entity>> {
+    /**
+     * Find entities
+     */
+    const [results, total] = await this.repository.findAndCount({
+      take: limit,
+      skip: (page - 1) * limit,
+      order,
+    });
+
+    /**
+     * Paginated Entity objects
+     */
+    return new Pagination<Entity>({
+      results,
+      total,
+      page,
+      limit,
+    });
+  }
 
   /**
    * Retrieve Entity by id
@@ -42,30 +74,20 @@ export class EntityService {
   }
 
   /**
-   * Paginate Entity entities by options
-   * @param {PaginationOptionsInterface} options Pagination options
-   * @returns {Promise<Pagination<Entity>>} Data of paginated Entity entities
+   * Create Entity by payload
+   * @param {EntityCreatePayload} payload Entity's payload
+   * @returns {Promise<Entity>} Entity object
    */
-  async paginate({ page, limit, order }: any): Promise<any> {
+  async create(payload: EntityCreatePayload): Promise<Entity> {
+    const entity: Entity = await this.repository.save(
+      this.repository.create(payload),
+    );
+
     /**
-     * Find entities
+     * Entity Created Event Emit
      */
-    const [results, total] = await this.repository.findAndCount({
-      take: limit,
-      skip: (page - 1) * limit,
-      order,
-    });
-
-    return results;
-  }
-
-  /**
-   * Destroy Entity by id
-   * @param {number | string | ObjectID} id Entity's id
-   * @returns {Promise<DeleteResult>} Delete result
-   */
-  async destroy(id: number | string | ObjectID): Promise<DeleteResult> {
-    return this.repository.delete(id);
+    this._created(entity);
+    return entity;
   }
 
   /**
@@ -78,7 +100,13 @@ export class EntityService {
     id: number | string | ObjectID,
     payload: EntityUpdatePayload,
   ): Promise<UpdateResult> {
-    return await this.repository.update(id, payload);
+    const entity = await this.repository.update(id, payload);
+
+    /**
+     * Entity Updated Event Emit
+     */
+    this._updated(id);
+    return entity;
   }
 
   /**
@@ -92,15 +120,57 @@ export class EntityService {
     payload: EntityReplacePayload,
   ): Promise<Entity> {
     if (id) payload._id = new CastObjectID(id);
-    return await this.repository.save(payload);
+    const entity = await this.repository.save(payload);
+
+    /**
+     * Entity Updated Event Emit
+     */
+    this._updated(entity);
+    return entity;
   }
 
   /**
-   * Create Entity by payload
-   * @param {EntityCreatePayload} payload Entity's payload
-   * @returns {Promise<Entity>} Entity object
+   * Destroy Entity by id
+   * @param {number | string | ObjectID} id Entity's id
+   * @returns {Promise<DeleteResult>} Delete result
    */
-  async create(payload: EntityCreatePayload): Promise<Entity> {
-    return this.repository.save(this.repository.create(payload));
+  async destroy(id: number | string | ObjectID): Promise<DeleteResult> {
+    const entity = await this.repository.delete(id);
+
+    /**
+     * Entity Deleted Event Emit
+     */
+    this._deleted(id);
+    return entity;
+  }
+
+  /**
+   * Entity Created Event Emitter
+   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @returns {Promise<void>} Void
+   */
+  async _created(entity: Entity | number | string | ObjectID): Promise<void> {
+    const event = new EntityEvent<Entity>(EntityEventEnum.CREATED, entity);
+    this.emitter.emit(event.title, event);
+  }
+
+  /**
+   * Entity Updated Event Emitter
+   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @returns {Promise<void>} Void
+   */
+  async _updated(entity: Entity | number | string | ObjectID): Promise<void> {
+    const event = new EntityEvent<Entity>(EntityEventEnum.UPDATED, entity);
+    this.emitter.emit(event.title, event);
+  }
+
+  /**
+   * Entity Deleted Event Emitter
+   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @returns {Promise<void>} Void
+   */
+  async _deleted(entity: Entity | number | string | ObjectID): Promise<void> {
+    const event = new EntityEvent<Entity>(EntityEventEnum.DELETED, entity);
+    this.emitter.emit(event.title, event);
   }
 }
