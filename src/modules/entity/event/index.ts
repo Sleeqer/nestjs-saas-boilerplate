@@ -1,7 +1,7 @@
 import { ObjectID } from 'typeorm';
 
 /**
- * Import local level objects
+ * Import local objects
  */
 import { EntityEventEnum } from '../enum';
 

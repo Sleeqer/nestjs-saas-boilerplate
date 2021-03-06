@@ -22,8 +22,8 @@ export class AppService {
    * @returns {string} the application url
    */
   root(): string {
-    const appURL = this.config.get('APPLICATION_URL');
-    this.logger.info('Logging the APPLICATION_URL -> ' + appURL);
-    return appURL;
+    const url = this.config.get('APPLICATION_URL');
+    this.logger.info('Logging the APPLICATION_URL -> ' + url);
+    return url;
   }
 }

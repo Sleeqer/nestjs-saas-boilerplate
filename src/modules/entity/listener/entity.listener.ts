@@ -3,7 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Logger } from 'winston';
 
 /**
- * Import local level objects
+ * Import local objects
  */
 import { EntityEvent } from '../event';
 import { EntityEventEnum } from '../enum';
@@ -31,7 +31,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.CREATED)
   _created(payload: EntityEvent<Entity>): void {
-    this.logger.info(`[${payload.title}]: _`);
+    this.logger.info(`[${payload.title}] -> _`);
   }
 
   /**
@@ -40,7 +40,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.UPDATED)
   _updated(payload: EntityEvent<Entity>): void {
-    this.logger.info(`[${payload.title}]: _`);
+    this.logger.info(`[${payload.title}] -> _`);
   }
 
   /**
@@ -49,6 +49,6 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.DELETED)
   _deleted(payload: EntityEvent<Entity>): void {
-    this.logger.info(`[${payload.title}]: _`);
+    this.logger.info(`[${payload.title}] -> _`);
   }
 }

@@ -22,7 +22,7 @@ export class ConfigService {
    * Constructor
    * @param {string} filePath
    */
-  constructor(filePath: string) {
+  constructor(filePath: string = '.env') {
     const config = parse(fs.readFileSync(filePath));
     this.envConfig = ConfigService.validateInput(config);
   }
@@ -38,18 +38,37 @@ export class ConfigService {
      * A schema to validate envConfig against
      */
     const envVarsSchema: joi.ObjectSchema = joi.object({
+      // APPLICAITON
+      APPLICATION_PORT: joi.number().allow('').default(8000),
       APPLICATION_ENV: joi.string().valid('dev', 'prod').required(),
       APPLICATION_URL: joi.string().uri({
         scheme: [/https?/],
       }),
       WEBTOKEN_SECRET_KEY: joi.string().required(),
       WEBTOKEN_EXPIRATION_TIME: joi.number().default(1800),
-      DB_TYPE: joi.string().default('mariadb'),
+      // DATABASE
+      DB_TYPE: joi.string().allow('').default('mongodb'),
       DB_USERNAME: joi.string().allow('').default(''),
       DB_PASSWORD: joi.string().allow('').default(''),
-      DB_HOST: joi.string().default('localhost'),
-      DB_PORT: joi.number().default('8889'),
-      DB_DATABASE: joi.string().default('nest'),
+      DB_HOST: joi.string().allow('').default('localhost'),
+      DB_PORT: joi.number().allow('').default('8889'),
+      DB_DATABASE: joi.string().allow('').default('nest'),
+      // RABBITMQ
+      RABBITMQ_HOST: joi.string().allow('').default('127.0.0.1'),
+      RABBITMQ_PORT: joi.number().allow('').default(15672),
+      RABBITMQ_USERNAME: joi.string().allow('').default('guest'),
+      RABBITMQ_PASSWORD: joi.string().allow('').default('guest'),
+      RABBITMQ_VHOST: joi.string().allow('').default('/'),
+      // REDIS
+      REDIS_HOST: joi.string().allow('').default('127.0.0.1'),
+      REDIS_PORT: joi.number().allow('').default(6379),
+      REDIS_USERNAME: joi.string().allow('').default(''),
+      REDIS_PASSWORD: joi.string().allow('').default(''),
+      // WEBSOCKET
+      WEBSOCKET_PING_INTERVAL: joi.number().allow('').default(3000),
+      WEBSOCKET_PING_TIMEOUT: joi.number().allow('').default(10000),
+      WEBSOCKET_PORT: joi.number().allow('').default(9000),
+      WEBSOCKET_PATH: joi.string().allow('').default('/websockets'),
     });
 
     /**
@@ -58,19 +77,18 @@ export class ConfigService {
     const { error, value: validatedEnvConfig } = envVarsSchema.validate(
       envConfig,
     );
-    if (error) {
-      throw new Error(`Config validation error: ${error.message}`);
-    }
+    if (error) throw new Error(`Config validation error: ${error.message}`);
     return validatedEnvConfig;
   }
 
   /**
    * Fetches the key from the configuration file
    * @param {string} key
+   * @param {string} defaults Default to value
    * @returns {string} the associated value for a given key
    */
-  get(key: string): string {
-    return this.envConfig[key];
+  get(key: string, defaults?: string): string {
+    return this.envConfig[key] || defaults;
   }
 
   /**

@@ -2,7 +2,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 
 /**
- * Import local level objects
+ * Import local objects
  */
 import { EntityListener } from './listener/entity.listener';
 import { EntityController } from './entity.controller';

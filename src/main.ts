@@ -1,14 +1,28 @@
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as fastifyRateLimiter from 'fastify-rate-limit';
+import { AppModule } from './modules/app/app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import * as headers from 'fastify-helmet';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import * as headers from 'fastify-helmet';
-import * as fastifyRateLimiter from 'fastify-rate-limit';
-import { AppModule } from './modules/app/app.module';
 import cors from 'fastify-cors';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+/**
+ * Import local objects
+ */
+import { ConfigService } from './modules/config/config.service';
+import { SocketStateAdapter } from './adapters/socket/state/socket.state.adapter';
+import { SocketStateService } from './adapters/socket/state/socket.state.service';
+import { RedisPropagatorService } from './adapters/redis/propagator/redis.propgator.service';
+
+/**
+ * Current config
+ * @type {ConfigService}
+ */
+const config: ConfigService = new ConfigService();
 
 /**
  * The endpoint for open api ui
@@ -40,12 +54,15 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
     ignoreTrailingSlash: true,
   });
 
+  core.getInstance().decorateRequest('locals', () => {});
   core.register(cors);
 
   const application = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     core,
   );
+
+  application.setGlobalPrefix('api/v1');
 
   /**
    * Swagger's options
@@ -60,8 +77,6 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
   const document = SwaggerModule.createDocument(application, options);
   SwaggerModule.setup(SWAGGER_API_ROOT, application, document);
 
-  application.setGlobalPrefix('api');
-
   application.getHttpAdapter().getInstance().register(headers, {
     contentSecurityPolicy: false,
   });
@@ -74,7 +89,17 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
   application.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   /**
+   * Websockets
+   */
+  const socket = application.get(SocketStateService);
+  const redis = application.get(RedisPropagatorService);
+  application.useWebSocketAdapter(
+    new SocketStateAdapter(application, socket, redis),
+  );
+
+  /**
    * Startup
    */
-  await application.listen(9000, '0.0.0.0');
+  const PORT = Number(config.get('APPLICATION_PORT', '9000'));
+  await application.listen(PORT, '0.0.0.0');
 })();

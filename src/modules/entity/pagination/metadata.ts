@@ -3,9 +3,9 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 /**
- * Query Class
+ * Metadata Class
  */
-export class Query {
+export class Metadata {
   /**
    * Limit field
    */
@@ -28,17 +28,14 @@ export class Query {
   page: number = 1;
 
   /**
-   * Order field
+   * Total field
    */
-  @ApiPropertyOptional({
-    default: {
-      id: 'DESC',
-    },
-  })
-  @IsObject()
-  order?: object = {
-    id: 'DESC',
-  };
+  @ApiPropertyOptional({ default: 0 })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  total: number = 0;
 
   /**
    * Key field

@@ -4,6 +4,7 @@ import {
   ApiTags,
   ApiResponse,
   ApiOperation,
+  ApiProperty,
 } from '@nestjs/swagger';
 import {
   Controller,
@@ -16,10 +17,11 @@ import {
   HttpCode,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common';
 
 /**
- * Import local level objects
+ * Import local objects
  */
 import {
   EntityCreatePayload,
@@ -27,9 +29,22 @@ import {
   EntityUpdatePayload,
 } from './payload';
 import { Entity } from './entity.entity';
-import { EntityService } from './entity.service';
-import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { EntityLoadByIdPipe } from './pipe';
 import { ParseIdPipe } from '../common/pipes';
+import { EntityService } from './entity.service';
+import { FastifyRequestInterface } from '../common/interfaces';
+import { Pagination, Query as QueryPagination } from '../entity/pagination';
+
+/**
+ * Entity Paginate Response Class
+ */
+export class EntityPaginateResponse extends Pagination<Entity> {
+  /**
+   * Results field
+   */
+  @ApiProperty({ type: [Entity] })
+  results: Entity[];
+}
 
 /**
  * Entity Controller Class
@@ -54,6 +69,7 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: `Entity List Request Received.`,
+    type: EntityPaginateResponse,
   })
   @ApiResponse({
     status: 400,
@@ -75,10 +91,15 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Retrieve Request Received.',
+    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Retrieve Request Failed.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Entity Retrieve Request Failed (Not found).',
+  })
   async get(
-    @Param('id', ParseIdPipe)
+    @Param('id', EntityLoadByIdPipe)
     id: number | string | ObjectID,
   ): Promise<Entity> {
     return await this.service.get(id);
@@ -95,7 +116,11 @@ export class EntityController {
     summary: 'Replace Entity By id.',
     description: '**Inserts** Entity If It does not exists By id.',
   })
-  @ApiResponse({ status: 200, description: 'Entity Replace Request Received.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Entity Replace Request Received.',
+    type: Entity,
+  })
   @ApiResponse({ status: 400, description: 'Entity Replace Request Failed.' })
   async replace(
     @Param('id', ParseIdPipe) id: number | string | ObjectID,
@@ -115,21 +140,28 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Update Request Received.',
+    type: Entity,
   })
   @ApiResponse({
     status: 400,
     description: 'Entity Update Request Failed.',
   })
+  @ApiResponse({
+    status: 404,
+    description: 'Entity Update Request Failed (Not found).',
+  })
   async update(
-    @Param('id', ParseIdPipe) id: number | string | ObjectID,
+    @Param('id', EntityLoadByIdPipe) id: number | string | ObjectID,
     @Body() payload: EntityUpdatePayload,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
+    console.log(request.locals.entity);
     await this.service.update(id, payload);
     return await this.service.get(id);
   }
 
   /**
-   * Destroy Entity by id
+   * Delete Entity by id
    * @param {number | string} id Entity's id
    * @returns {Promise<DeleteResult>} Data of deleted result
    */
@@ -138,11 +170,16 @@ export class EntityController {
   @ApiOperation({ summary: 'Delete Entity By id.' })
   @ApiResponse({
     status: 204,
-    description: 'Entity Destroy Request Received.',
+    description: 'Entity Delete Request Received.',
+    type: Object,
   })
-  @ApiResponse({ status: 400, description: 'Entity Destroy Request Failed.' })
+  @ApiResponse({ status: 400, description: 'Entity Delete Request Failed.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Entity Delete Request Failed (Not found).',
+  })
   async destory(
-    @Param('id', ParseIdPipe) id: number | string | ObjectID,
+    @Param('id', EntityLoadByIdPipe) id: number | string | ObjectID,
   ): Promise<object> {
     await this.service.destroy(id);
     return {};
@@ -155,7 +192,11 @@ export class EntityController {
    */
   @Post()
   @ApiOperation({ summary: 'Create Entity.' })
-  @ApiResponse({ status: 201, description: 'Entity Create Request Received.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Entity Create Request Received.',
+    type: Entity,
+  })
   @ApiResponse({ status: 400, description: 'Entity Create Request Failed.' })
   async create(@Body() payload: EntityCreatePayload): Promise<Entity> {
     return await this.service.create(payload);
