@@ -2,6 +2,7 @@ import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
 import * as rotateFile from 'winston-daily-rotate-file';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
 
@@ -94,6 +95,10 @@ import { SharedModule } from '../../adapters/shared/shared.module';
       verboseMemoryLeak: false,
       // Disable throwing uncaughtException if an error event is emitted and it has no listeners
       ignoreErrors: false,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
     }),
     AccessControlModule.forRoles(roles),
     ConfigModule,

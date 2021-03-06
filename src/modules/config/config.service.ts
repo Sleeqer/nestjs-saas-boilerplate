@@ -39,7 +39,7 @@ export class ConfigService {
      */
     const envVarsSchema: joi.ObjectSchema = joi.object({
       // APPLICAITON
-      APPLICATION_PORT: joi.number().allow('').default(8000),
+      APPLICATION_PORT: joi.number().empty('').default(8000),
       APPLICATION_ENV: joi.string().valid('dev', 'prod').required(),
       APPLICATION_URL: joi.string().uri({
         scheme: [/https?/],
@@ -47,28 +47,35 @@ export class ConfigService {
       WEBTOKEN_SECRET_KEY: joi.string().required(),
       WEBTOKEN_EXPIRATION_TIME: joi.number().default(1800),
       // DATABASE
-      DB_TYPE: joi.string().allow('').default('mongodb'),
-      DB_USERNAME: joi.string().allow('').default(''),
-      DB_PASSWORD: joi.string().allow('').default(''),
-      DB_HOST: joi.string().allow('').default('localhost'),
-      DB_PORT: joi.number().allow('').default('8889'),
-      DB_DATABASE: joi.string().allow('').default('nest'),
+      DB_TYPE: joi.string().empty('').default('mongodb'),
+      DB_USERNAME: joi.string().empty('').default(''),
+      DB_PASSWORD: joi.string().empty('').default(''),
+      DB_HOST: joi.string().empty('').default('localhost'),
+      DB_PORT: joi.number().empty('').default('8889'),
+      DB_DATABASE: joi.string().empty('').default('nest'),
       // RABBITMQ
-      RABBITMQ_HOST: joi.string().allow('').default('127.0.0.1'),
-      RABBITMQ_PORT: joi.number().allow('').default(15672),
-      RABBITMQ_USERNAME: joi.string().allow('').default('guest'),
-      RABBITMQ_PASSWORD: joi.string().allow('').default('guest'),
-      RABBITMQ_VHOST: joi.string().allow('').default('/'),
+      RABBITMQ_HOST: joi.string().empty('').default('127.0.0.1'),
+      RABBITMQ_PORT: joi.number().empty('').default(5672),
+      RABBITMQ_USERNAME: joi.string().empty('').default('guest'),
+      RABBITMQ_PASSWORD: joi.string().empty('').default('guest'),
+      RABBITMQ_VHOST: joi.string().empty('').default('/'),
+      RABBITMQ_RECONNECT_TIMEOUT: joi.number().default(10000),
+      RABBITMQ_EXCHANGE: joi.string().empty('').default('RABBITMQ_EXCHANGE'),
+      RABBITMQ_EXCHANGE_TYPE: joi
+        .string()
+        .empty('')
+        .default('RABBITMQ_EXCHANGE_TYPE'),
+      RABBITMQ_PREFETCH: joi.number().default(10),
       // REDIS
-      REDIS_HOST: joi.string().allow('').default('127.0.0.1'),
-      REDIS_PORT: joi.number().allow('').default(6379),
-      REDIS_USERNAME: joi.string().allow('').default(''),
-      REDIS_PASSWORD: joi.string().allow('').default(''),
+      REDIS_HOST: joi.string().empty('').default('127.0.0.1'),
+      REDIS_PORT: joi.number().empty('').default(6379),
+      REDIS_USERNAME: joi.string().empty('').default(''),
+      REDIS_PASSWORD: joi.string().empty('').default(''),
       // WEBSOCKET
-      WEBSOCKET_PING_INTERVAL: joi.number().allow('').default(3000),
-      WEBSOCKET_PING_TIMEOUT: joi.number().allow('').default(10000),
-      WEBSOCKET_PORT: joi.number().allow('').default(9000),
-      WEBSOCKET_PATH: joi.string().allow('').default('/websockets'),
+      WEBSOCKET_PING_INTERVAL: joi.number().empty('').default(3000),
+      WEBSOCKET_PING_TIMEOUT: joi.number().empty('').default(10000),
+      WEBSOCKET_PORT: joi.number().empty('').default(9000),
+      WEBSOCKET_PATH: joi.string().empty('').default('/websockets'),
     });
 
     /**

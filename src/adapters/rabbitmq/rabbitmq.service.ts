@@ -18,13 +18,19 @@ import subscriptions from './handler';
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService('.env');
+const config: ConfigService = new ConfigService();
 
 /**
  * RabbitMQ Service Class
  */
 @Injectable()
 export class RabbitMQService {
+  /**
+   * Log headline
+   * @type {string}
+   */
+  private readonly log: string = `[RabbitMQService]`;
+
   /**
    * Channel
    * @type {Channel}
@@ -43,64 +49,76 @@ export class RabbitMQService {
    * Create channel connection
    */
   private create() {
-    connection().then((channel) => {
-      this.logger.info(`[RabbitMQService] -> Channel create`);
-      this.channel = channel;
+    this.logger.info(`${this.log} -> Create channel connection`);
 
-      /**
-       * Channel error
-       */
-      this.channel.on('error', (error) => {
-        this.logger.error(`[RabbitMQService] -> Error \n ${error.message}`);
+    connection()
+      .then((channel) => {
+        this.channel = channel;
 
-        setTimeout(() => {
-          this.create();
-        }, (config.get('RABBITMQ_RECONNECT_TIMEOUT') as unknown) as number);
-      });
-
-      /**
-       * Channel close
-       */
-      this.channel.on('close', (error) => {
-        this.logger.warn(`[RabbitMQService] -> Close \n ${error.message}`);
-
-        setTimeout(() => {
-          this.create();
-        }, (config.get('RABBITMQ_RECONNECT_TIMEOUT') as unknown) as number);
-      });
-
-      /**
-       * Channel assert
-       */
-      this.channel
-        .assertExchange(
-          config.get('RABBITMQ_EXCHANGE'),
-          config.get('RABBITMQ_EXCHANGE_TYPE'),
-          {
-            durable: true,
-          },
-        )
-        .then((response) => {
-          this.logger.warn(
-            `[RabbitMQService] -> Assert exchange "${response.exchange}"`,
+        /**
+         * Channel error
+         */
+        this.channel.on('error', (error) => {
+          this.logger.error(
+            `${this.log} -> Error on channel (${error.message})`,
           );
 
-          /**
-           * Subscribe to handlers
-           */
-          subscriptions.forEach(
-            async (subscription) =>
-              await this.subscribe(subscription.options, subscription.handler),
-          );
+          setTimeout(() => {
+            this.create();
+          }, (config.get('RABBITMQ_RECONNECT_TIMEOUT') as unknown) as number);
         });
 
-      /**
-       * Channel prefetching
-       */
-      this.channel.prefetch(
-        (config.get('RABBITMQ_PREFETCH') as unknown) as number,
-      );
-    });
+        /**
+         * Channel close
+         */
+        this.channel.on('close', (error) => {
+          this.logger.warn(`${this.log} -> Channel close (${error})`);
+
+          setTimeout(() => {
+            this.create();
+          }, (config.get('RABBITMQ_RECONNECT_TIMEOUT') as unknown) as number);
+        });
+
+        /**
+         * Channel assert
+         */
+        this.channel
+          .assertExchange(
+            config.get('RABBITMQ_EXCHANGE'),
+            config.get('RABBITMQ_EXCHANGE_TYPE'),
+            {
+              durable: true,
+            },
+          )
+          .then((response) => {
+            this.logger.info(
+              `${this.log} -> Assert exchange "${response.exchange}"`,
+            );
+
+            /**
+             * Subscribe to handlers
+             */
+            subscriptions.forEach(
+              async (subscription) =>
+                await this.subscribe(
+                  subscription.options,
+                  subscription.handler,
+                ),
+            );
+          });
+
+        /**
+         * Channel prefetching
+         */
+        this.channel.prefetch(
+          (config.get('RABBITMQ_PREFETCH') as unknown) as number,
+        );
+      })
+      .catch((error) => {
+        this.logger.error(
+          `${this.log} -> Error on create channel connection (${error.message})`,
+        );
+      });
   }
 
   /**
@@ -123,12 +141,12 @@ export class RabbitMQService {
           durable: true,
         })
         .then((response) => {
-          this.logger.warn(
-            `[RabbitMQService] -> Assert exchange "${response.exchange}"`,
+          this.logger.info(
+            `${this.log} -> Assert exchange "${response.exchange}"`,
           );
         });
       await this.channel.bindQueue(queue, options.exchange.title, options.key);
-      this.logger.warn(`[RabbitMQService] -> Bind queue "${options.queue}"`);
+      this.logger.info(`${this.log} -> Bind queue "${options.queue}"`);
 
       /**
        * Channel consumer
@@ -138,7 +156,7 @@ export class RabbitMQService {
 
         const content = message.content.toString();
         const messager = JSON.parse(JSON.stringify(content));
-        this.logger.warn(`[RabbitMQService] -> Consume "${options.key}"`);
+        this.logger.info(`${this.log} -> Consume "${options.key}"`);
         const response = await handler(messager);
 
         /**
@@ -153,7 +171,7 @@ export class RabbitMQService {
         return this.channel.ack(message, false);
       });
     } catch (error) {
-      this.logger.error(`[RabbitMQService] -> Error \n ${error.message}`);
+      this.logger.error(`${this.log} -> Error on subscribe (${error.message})`);
     }
   }
 
@@ -176,7 +194,7 @@ export class RabbitMQService {
         Buffer.from(JSON.stringify(message)),
       );
     } catch (error) {
-      this.logger.error(`[RabbitMQService] -> Error \n ${error.message}`);
+      this.logger.error(`${this.log} -> Error on send (${error.message})`);
     }
   }
 }

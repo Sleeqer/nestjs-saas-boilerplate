@@ -13,7 +13,7 @@ import { ConfigService } from '../../modules/config/config.service';
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService('.env');
+const config: ConfigService = new ConfigService();
 
 /**
  * Redis Adapter Class
@@ -30,7 +30,7 @@ export class RedisAdapter extends IoAdapter {
     private readonly subscriber: Redis,
     private readonly publisher: Redis,
   ) {
-    super();
+    super(application);
   }
 
   /**

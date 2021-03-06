@@ -18,7 +18,7 @@ import { ConfigService } from '../../modules/config/config.service';
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService('.env');
+const config: ConfigService = new ConfigService();
 
 /**
  * Socket Gateway Class
@@ -30,6 +30,12 @@ const config: ConfigService = new ConfigService('.env');
 })
 export class SocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  /**
+   * Log headline
+   * @type {string}
+   */
+  private readonly log: string = `[SocketGateway]`;
+
   /**
    * IO Server
    */
@@ -46,7 +52,7 @@ export class SocketGateway
    * @param {any} server
    */
   afterInit(server: any) {
-    this.logger.info(`[Socket] -> Init`);
+    this.logger.info(`${this.log} -> Init`);
   }
 
   /**
@@ -54,13 +60,13 @@ export class SocketGateway
    * @param {io.Socket} client
    */
   public async handleConnection(client: io.Socket) {
-    this.logger.info(`[Socket] -> Connect ${client.id}`);
+    this.logger.info(`${this.log} -> Connect ${client.id}`);
 
     try {
       return this.server.emit('event', client.id);
     } catch (error) {
       this.logger.error(
-        `[Socket] -> Error \n${error.message} - handleConnection`,
+        `${this.log} -> Error on connection handler (${error.message})`,
       );
       return;
     }
@@ -71,13 +77,13 @@ export class SocketGateway
    * @param {io.Socket} client
    */
   public async handleDisconnect(client: io.Socket) {
-    this.logger.info(`[Socket] -> Disconnect ${client.id}`);
+    this.logger.info(`${this.log} -> Disconnect ${client.id}`);
 
     try {
       return this.server.emit('event', { disconnected: client.id });
     } catch (error) {
       this.logger.error(
-        `[Socket] -> Error \n${error.message} - handleDisconnect`,
+        `${this.log} -> Error on disconnect handler (${error.message})`,
       );
       return;
     }

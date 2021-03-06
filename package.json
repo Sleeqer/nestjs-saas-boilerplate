@@ -2,7 +2,7 @@
   "name": "nest-rest-typeorm-boilerplate",
   "version": "0.0.1",
   "description": "nest typeorm boilerplate",
-  "author": "msanvarov",
+  "author": "dorin.musteata",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
@@ -29,6 +29,7 @@
     "@nestjs/platform-fastify": "7.6.13",
     "@nestjs/platform-socket.io": "^7.6.13",
     "@nestjs/swagger": "4.7.15",
+    "@nestjs/throttler": "^1.1.1",
     "@nestjs/typeorm": "7.1.5",
     "@nestjs/websockets": "^7.6.13",
     "amqplib": "^0.7.0",

@@ -155,7 +155,6 @@ export class EntityController {
     @Body() payload: EntityUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
-    console.log(request.locals.entity);
     await this.service.update(id, payload);
     return await this.service.get(id);
   }

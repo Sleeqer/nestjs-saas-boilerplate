@@ -140,7 +140,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('/api/profile (PATCH) update created account information', () => {
-    console.log(payload);
     return request(app.getHttpServer())
       .patch('/api/profile')
       .set('Authorization', `Bearer ${bearer}`)

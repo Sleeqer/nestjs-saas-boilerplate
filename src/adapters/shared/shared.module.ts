@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
  */
 import { RedisPropagatorModule } from '../redis/propagator/redis.propagator.module';
 import { SocketStateModule } from '../socket/state/socket.state.module';
+import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { SocketModule } from '../socket/socket.module';
 import { RedisModule } from '../redis/redis.module';
 
@@ -17,12 +18,7 @@ import { RedisModule } from '../redis/redis.module';
     RedisPropagatorModule,
     SocketModule,
     SocketStateModule,
-  ],
-  exports: [
-    RedisModule,
-    RedisPropagatorModule,
-    SocketModule,
-    SocketStateModule,
+    RabbitMQModule,
   ],
 })
 

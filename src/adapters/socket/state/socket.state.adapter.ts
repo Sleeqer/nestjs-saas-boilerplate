@@ -32,6 +32,12 @@ export interface AuthenticatedSocket extends socketio.Socket {
  */
 export class SocketStateAdapter extends IoAdapter implements WebSocketAdapter {
   /**
+   * Log headline
+   * @type {string}
+   */
+  private readonly log: string = `[Socket-Adapter]`;
+
+  /**
    * Constructor of Socket State Adapter Class
    * @param {INestApplicationContext} application Application
    * @param {SocketStateService} socket Socket State Service
@@ -44,15 +50,7 @@ export class SocketStateAdapter extends IoAdapter implements WebSocketAdapter {
     private readonly redis: RedisPropagatorService,
     @Inject('winston') private readonly logger?: Logger,
   ) {
-    super();
-  }
-
-  bindClientDisconnect(client: any, callback: Function) {
-    throw new Error('Method not implemented.');
-  }
-
-  close(server: any) {
-    throw new Error('Method not implemented.');
+    super(application);
   }
 
   /**
@@ -89,7 +87,7 @@ export class SocketStateAdapter extends IoAdapter implements WebSocketAdapter {
 
         return next();
       } catch (error) {
-        this.logger.error(`[Socket] -> Error \n${error.message}`);
+        this.logger.error(`${this.log} -> Error on create (${error.message})`);
         return next(error);
       }
     });

@@ -1,5 +1,4 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as fastifyRateLimiter from 'fastify-rate-limit';
 import { AppModule } from './modules/app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -55,6 +54,7 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
   });
 
   core.getInstance().decorateRequest('locals', () => {});
+
   core.register(cors);
 
   const application = await NestFactory.create<NestFastifyApplication>(
@@ -79,11 +79,6 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
 
   application.getHttpAdapter().getInstance().register(headers, {
     contentSecurityPolicy: false,
-  });
-
-  application.register(fastifyRateLimiter.default, {
-    max: 100,
-    timeWindow: '1 minute',
   });
 
   application.useGlobalPipes(new ValidationPipe({ transform: true }));
