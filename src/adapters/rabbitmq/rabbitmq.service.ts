@@ -18,7 +18,7 @@ import subscriptions from './handler';
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService();
+const config: ConfigService = ConfigService.getInstance();
 
 /**
  * RabbitMQ Service Class
@@ -131,6 +131,7 @@ export class RabbitMQService {
     handler: (message: unknown) => Promise<RabbitMQResponseType>,
   ) {
     try {
+      console.log(options, '<<<<');
       const { queue } = await this.channel.assertQueue(options.queue || '');
 
       /**

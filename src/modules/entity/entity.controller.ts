@@ -34,6 +34,7 @@ import { ParseIdPipe } from '../common/pipes';
 import { EntityService } from './entity.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { request } from 'http';
 
 /**
  * Entity Paginate Response Class
@@ -101,8 +102,9 @@ export class EntityController {
   async get(
     @Param('id', EntityLoadByIdPipe)
     id: number | string | ObjectID,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
-    return await this.service.get(id);
+    return request.locals.entity;
   }
 
   /**
@@ -155,8 +157,7 @@ export class EntityController {
     @Body() payload: EntityUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
-    await this.service.update(id, payload);
-    return await this.service.get(id);
+    return await this.service.save(request.locals.entity, payload);
   }
 
   /**
@@ -177,10 +178,11 @@ export class EntityController {
     status: 404,
     description: 'Entity Delete Request Failed (Not found).',
   })
-  async destory(
+  async destroy(
     @Param('id', EntityLoadByIdPipe) id: number | string | ObjectID,
-  ): Promise<object> {
-    await this.service.destroy(id);
+    @Req() request: FastifyRequestInterface,
+  ): Promise<any> {
+    await this.service.remove(request.locals.entity);
     return {};
   }
 

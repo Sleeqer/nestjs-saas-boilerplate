@@ -1,6 +1,6 @@
+import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './modules/app/app.module';
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as headers from 'fastify-helmet';
 import {
@@ -21,13 +21,13 @@ import { RedisPropagatorService } from './adapters/redis/propagator/redis.propga
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService();
+const config: ConfigService = ConfigService.getInstance();
 
 /**
  * The endpoint for open api ui
  * @type {string}
  */
-export const SWAGGER_API_ROOT: string = 'api/docs';
+export const SWAGGER_API_ROOT: string = 'api/v1/docs';
 
 /**
  * The name given to the api
@@ -51,6 +51,7 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
   const core = new FastifyAdapter({
     logger: true,
     ignoreTrailingSlash: true,
+    trustProxy: true,
   });
 
   core.getInstance().decorateRequest('locals', () => {});
@@ -81,7 +82,12 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
     contentSecurityPolicy: false,
   });
 
-  application.useGlobalPipes(new ValidationPipe({ transform: true }));
+  application.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: (errors) => new BadRequestException(errors),
+    }),
+  );
 
   /**
    * Websockets

@@ -2,9 +2,12 @@ import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
 import * as rotateFile from 'winston-daily-rotate-file';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { GraphQLModule } from '@nestjs/graphql';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
+import * as WinstonMongoDB from 'winston-mongodb';
 
 /**
  * Import local objects
@@ -18,6 +21,7 @@ import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
+import { HttpExceptionFilter } from '../common/filters';
 import { SharedModule } from '../../adapters/shared/shared.module';
 
 @Module({
@@ -45,8 +49,8 @@ import { SharedModule } from '../../adapters/shared/shared.module';
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return configService.isEnv('dev')
+      useFactory: (config: ConfigService) => {
+        return config.isEnv('dev')
           ? {
               level: 'info',
               format: winston.format.json(),
@@ -54,6 +58,18 @@ import { SharedModule } from '../../adapters/shared/shared.module';
               transports: [
                 new winston.transports.Console({
                   format: winston.format.simple(),
+                }),
+                new WinstonMongoDB.MongoDB({
+                  db: `mongodb://${
+                    config.get('LOGGER_DB_USERNAME') &&
+                    config.get('LOGGER_DB_PASSWORD')
+                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
+                          'LOGGER_DB_PASSWORD',
+                        )}@`
+                      : ``
+                  }${config.get('LOGGER_DB_HOST')}:${config.get(
+                    'LOGGER_DB_PORT',
+                  )}/${config.get('LOGGER_DB_DATABASE')}`,
                 }),
               ],
             }
@@ -75,6 +91,21 @@ import { SharedModule } from '../../adapters/shared/shared.module';
                   zippedArchive: true,
                   maxSize: '20m',
                   maxFiles: '14d',
+                }),
+                new WinstonMongoDB.MongoDB({
+                  options: {
+                    includeIds: true,
+                  },
+                  db: `mongodb://${
+                    config.get('LOGGER_DB_USERNAME') &&
+                    config.get('LOGGER_DB_PASSWORD')
+                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
+                          'LOGGER_DB_PASSWORD',
+                        )}@`
+                      : ``
+                  }${config.get('LOGGER_DB_HOST')}:${config.get(
+                    'LOGGER_DB_PORT',
+                  )}/${config.get('LOGGER_DB_DATABASE')}`,
                 }),
               ],
             };
@@ -98,8 +129,9 @@ import { SharedModule } from '../../adapters/shared/shared.module';
     }),
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 10,
+      limit: 1000,
     }),
+    GraphQLModule.forRoot({ autoSchemaFile: true, path: 'api/v1/graphql' }),
     AccessControlModule.forRoles(roles),
     ConfigModule,
     AuthModule,
@@ -108,6 +140,20 @@ import { SharedModule } from '../../adapters/shared/shared.module';
     SharedModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
+
+/**
+ * Export module
+ */
 export class AppModule {}

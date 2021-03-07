@@ -14,7 +14,7 @@ import {
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService();
+const config: ConfigService = ConfigService.getInstance();
 
 /**
  * Current config

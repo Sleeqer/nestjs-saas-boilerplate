@@ -19,12 +19,29 @@ export class ConfigService {
   private readonly envConfig: EnvConfig;
 
   /**
+   * Singleton instance
+   */
+  private static instance: ConfigService;
+
+  /**
    * Constructor
    * @param {string} filePath
    */
   constructor(filePath: string = '.env') {
     const config = parse(fs.readFileSync(filePath));
     this.envConfig = ConfigService.validateInput(config);
+  }
+
+  /**
+   * The static method that controls the access to the singleton instance.
+   * @param {string} filePath
+   */
+  public static getInstance(filePath: string = '.env'): ConfigService {
+    if (!ConfigService.instance) {
+      ConfigService.instance = new ConfigService(filePath);
+    }
+
+    return ConfigService.instance;
   }
 
   /**
@@ -51,7 +68,7 @@ export class ConfigService {
       DB_USERNAME: joi.string().empty('').default(''),
       DB_PASSWORD: joi.string().empty('').default(''),
       DB_HOST: joi.string().empty('').default('localhost'),
-      DB_PORT: joi.number().empty('').default('8889'),
+      DB_PORT: joi.number().empty('').default(27017),
       DB_DATABASE: joi.string().empty('').default('nest'),
       // RABBITMQ
       RABBITMQ_HOST: joi.string().empty('').default('127.0.0.1'),
@@ -76,6 +93,14 @@ export class ConfigService {
       WEBSOCKET_PING_TIMEOUT: joi.number().empty('').default(10000),
       WEBSOCKET_PORT: joi.number().empty('').default(9000),
       WEBSOCKET_PATH: joi.string().empty('').default('/websockets'),
+      // LOGGER
+      LOGGER_HTTP: joi.boolean().empty('').default(false),
+      LOGGER_DB_TYPE: joi.string().empty('').default('mongodb'),
+      LOGGER_DB_USERNAME: joi.string().empty('').default(''),
+      LOGGER_DB_PASSWORD: joi.string().empty('').default(''),
+      LOGGER_DB_HOST: joi.string().empty('').default('localhost'),
+      LOGGER_DB_PORT: joi.number().empty('').default(27017),
+      LOGGER_DB_DATABASE: joi.string().empty('').default('nest-logger'),
     });
 
     /**

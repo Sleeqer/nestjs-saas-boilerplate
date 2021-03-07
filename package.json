@@ -24,6 +24,7 @@
     "@nestjs/common": "7.6.13",
     "@nestjs/core": "7.6.13",
     "@nestjs/event-emitter": "^0.0.3",
+    "@nestjs/graphql": "^7.9.11",
     "@nestjs/jwt": "7.2.0",
     "@nestjs/passport": "7.1.5",
     "@nestjs/platform-fastify": "7.6.13",
@@ -33,6 +34,8 @@
     "@nestjs/typeorm": "7.1.5",
     "@nestjs/websockets": "^7.6.13",
     "amqplib": "^0.7.0",
+    "apollo-server-fastify": "next-v3",
+    "change-case": "^4.1.2",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
     "crypto": "1.0.1",
@@ -41,6 +44,8 @@
     "fastify-helmet": "5.2.0",
     "fastify-rate-limit": "5.4.1",
     "fastify-swagger": "4.3.3",
+    "graphql": "^15.5.0",
+    "graphql-tools": "^7.0.4",
     "gravatar": "1.8.1",
     "ioredis": "^4.23.0",
     "mongodb": "^3.6.4",
@@ -56,7 +61,8 @@
     "typeorm": "0.2.31",
     "uuid": "^8.3.2",
     "winston": "3.3.3",
-    "winston-daily-rotate-file": "4.5.0"
+    "winston-daily-rotate-file": "4.5.0",
+    "winston-mongodb": "^5.0.7"
   },
   "devDependencies": {
     "@compodoc/compodoc": "1.1.11",

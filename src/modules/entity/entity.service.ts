@@ -74,11 +74,26 @@ export class EntityService {
   }
 
   /**
+   * Retrieve Entity objects
+   * @returns {Promise<Entity[]>} Entity objects
+   */
+  async all(): Promise<Entity[]> {
+    /**
+     * Entity objects
+     */
+    return this.repository.find();
+  }
+
+  /**
    * Paginate Entity objects by parameters
    * @param {Query} parameters Pagination query parameters
    * @returns {Promise<Pagination<Entity>>} Paginated Entity objects
    */
-  async paginate({ page, limit, order }: Query): Promise<Pagination<Entity>> {
+  async paginate({
+    page = 1,
+    limit = 15,
+    order = {},
+  }: Query): Promise<Pagination<Entity>> {
     /**
      * Find entities
      */
@@ -145,6 +160,22 @@ export class EntityService {
   }
 
   /**
+   * Update Entity
+   * @param {Entity} entity Entity
+   * @param {EntityUpdatePayload} payload Entity's payload
+   * @returns {Promise<Entity} Updated Entity
+   */
+  async save(entity: Entity, payload: EntityUpdatePayload): Promise<Entity> {
+    entity = await this.repository.save({ ...entity, ...payload });
+
+    /**
+     * Entity Updated Event Emit
+     */
+    this._updated(entity);
+    return entity;
+  }
+
+  /**
    * Replace Entity by id
    * @param {number | string | ObjectID} id Entity's id
    * @param {EntityReplacePayload} payload Entity's payload
@@ -176,6 +207,21 @@ export class EntityService {
      * Entity Deleted Event Emit
      */
     this._deleted(id);
+    return entity;
+  }
+
+  /**
+   * Destroy Entity by id
+   * @param {Entity} entity Entity
+   * @returns {Promise<Entity>} Deleted Entity
+   */
+  async remove(entity: Entity): Promise<Entity> {
+    await this.repository.remove({ ...entity });
+
+    /**
+     * Deleted Entity
+     */
+    this._deleted(entity);
     return entity;
   }
 

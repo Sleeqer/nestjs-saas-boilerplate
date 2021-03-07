@@ -43,7 +43,7 @@ export class EntityLoadByIdPipe implements PipeTransform {
      * Check if entity exists & attach to request locals
      */
     if (!entity) throw this.service._NotFoundException();
-    this.request.locals = entity;
+    this.request.locals.entity = entity;
     return value;
   }
 }

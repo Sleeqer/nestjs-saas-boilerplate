@@ -18,7 +18,7 @@ import { ConfigService } from '../../modules/config/config.service';
  * Current config
  * @type {ConfigService}
  */
-const config: ConfigService = new ConfigService();
+const config: ConfigService = ConfigService.getInstance();
 
 /**
  * Socket Gateway Class

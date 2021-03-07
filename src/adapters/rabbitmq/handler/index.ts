@@ -1,6 +1,6 @@
-import MessageHandlers from './message.handler';
+import EntityHandlers from '../../../modules/entity/handler/entity.handler';
 
 /**
  * Handlers of messages
  */
-export default [...MessageHandlers];
+export default [...EntityHandlers];
