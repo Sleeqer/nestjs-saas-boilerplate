@@ -232,7 +232,7 @@ Nest is an MIT-licensed open source project with its ongoing development made po
 
 ---
 
-## 📄 License
+### 📄 License
 
 Nest is [MIT licensed](LICENSE).
 
@@ -240,6 +240,6 @@ Nest is [MIT licensed](LICENSE).
 
 ---
 
-## 💬 Special Thanks
+### 💬 Special Thanks
 
 Thanks to [msanvarov](https://github.com/msanvarov/) for the [inspiration](https://github.com/msanvarov/nest-rest-mongo-boilerplate) ;)
