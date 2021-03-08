@@ -53,6 +53,8 @@ $ docker-compose up -d
 
 - The following command will set up and run the docker project for quick use. Then the web application, Nginx, and MYSQL will be exposed to http://localhost:9000, http://localhost:80, and http://localhost:3306 respectively.
 
+---
+
 ### 🔒 Environment Configuration
 
 By default, the application comes with a config module that can read in every environment variable from the `.env` file.
@@ -77,7 +79,7 @@ By default, the application comes with a config module that can read in every en
 
 **DB_DATABASE** - the actual database name to perform operations on.
 
-[WIP]
+**WORK IN PROGRESS**
 
 ---
 
@@ -165,7 +167,7 @@ $ docker exec -it nest yarn test:e2e
 $ docker exec -it nest yarn test:cov
 ```
 
-#### Non-Docker
+#### Non-Docker 👽
 
 ```bash
 # unit tests
@@ -215,7 +217,7 @@ This boilerplate comes with a Winston module for logging, the configurations for
 
 ---
 
-## Progress
+## 🚧 Progress
 
 |                                                Branches | Status |
 | ------------------------------------------------------: | :----- |
@@ -226,13 +228,18 @@ This boilerplate comes with a Winston module for logging, the configurations for
 ### 👥 Support
 
 PRs are appreciated.
-Nest is an MIT-licensed open source project with its ongoing development made possible thanks to the support by the community. This framework is a result of the long road, full of sleepless nights, working after hours, and busy weekends.
+Nest is an MIT-licensed open source project with its ongoing development made possible thanks to the support by the community.
 
 ---
 
-## License
+## 📄 License
 
 Nest is [MIT licensed](LICENSE).
 
 [Author](https://github.com/dorin-musteata)
-[Inspiration](https://github.com/msanvarov/nest-rest-mongo-boilerplate)
+
+---
+
+## 💬 Special Thanks
+
+Thanks to [msanvarov](https://github.com/msanvarov/) for the [inspiration](https://github.com/msanvarov/nest-rest-mongo-boilerplate) ;)
