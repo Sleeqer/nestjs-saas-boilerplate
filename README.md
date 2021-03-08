@@ -63,9 +63,9 @@ By default, the application comes with a config module that can read in every en
 
 **WEBTOKEN_SECRET_KEY** - the secret key to encrypt/decrypt web tokens with. Make sure to generate a random alphanumeric string for this.
 
-**WEBTOKEN_EXPIRATION_TIME** - **the time in seconds** indicating when the web token will expire; by default, it's 2400 seconds which is 40 mins.
+**WEBTOKEN_EXPIRATION_TIME** - **the time in seconds** indicating when the web token will expire; by default, it's 1209600 seconds which is 14 days.
 
-**DB_TYPE** - the type of [database connection to use](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md).
+**DB_TYPE** - the type of database
 
 **DB_USERNAME** - username for authenticating against the database.
 
@@ -77,13 +77,15 @@ By default, the application comes with a config module that can read in every en
 
 **DB_DATABASE** - the actual database name to perform operations on.
 
+[WIP]
+
 ---
 
 ### 🏗 Choosing a Web Framework
 
 This boilerplate comes with [Fastify](https://github.com/fastify/fastify) out of the box as it offers [performance benefits](https://github.com/nestjs/nest/blob/master/benchmarks/all_output.txt) over Express. But this can be changed to use [Express](https://expressjs.com/) framework instead of Fastify. Please proceed with the steps below to change between the two.
 
-- Replace the following lines of code in the [main.ts file](https://github.com/msanvarov/nest-rest-typeorm-boilerplate/blob/master/src/main.ts) with the ones detailed below.
+- Replace the following lines of code in the [main.ts file](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/main.ts) with the ones detailed below.
 
 Fastify:
 
@@ -124,16 +126,16 @@ app.use(
 );
 ```
 
-**Note**: The boilerplate comes with production dependencies for both Express and Fastify to support moving between two. But this is going to leave it bloated especially when only **one web framework is used at a time**. Thus, **it is recommended that when deploying to production, unused dependencies are purged.**
+**Note**: The boilerplate comes with production dependencies for Fastify.
 
-If you choose to **use Fastify**, this command will **purge all of the Express dependencies**:
+If you choose to **use Express**, this command will **install all of the Express dependencies**:
 
 ```bash
-# removing Express dependencies
-$ npm rm @nestjs/platform-express express-rate-limit helmet swagger-ui-express @types/express --save
+# installing Express dependencies
+$ npm i @nestjs/platform-express express-rate-limit helmet swagger-ui-express @types/express --save
 ```
 
-If you choose to **use Express**, this command will **purge all of the Fastify dependencies**:
+Finally remove Fastify dependencies:
 
 ```bash
 # removing Fastify dependencies
@@ -144,10 +146,7 @@ $ npm rm @nestjs/platform-fastify fastify-helmet fastify-rate-limit fastify-swag
 
 ### 💾 Choosing a Database
 
-By default **MYSQL/MariaDB** are the database of choice but TypeORM supports other database types like SQLite, Postgres, MongoDB, and MSSQL. To use anything other than MYSQL/MariaDB, change the configuration in the `.env` file, and download the corresponding wrapper library, like [SQLite3](https://www.npmjs.com/package/sqlite3) if necessary. Of course that is assuming a proper
-setup of the database has been completed on a local machine.
-
-**Note: For MongoDB, TypeORM is not as feature-rich as Mongoose. Therefore I created another boilerplate only for [Nest and Mongoose](https://github.com/msanvarov/nest-rest-mongo-boilerplate)**.
+By default **MongoDB** is the database of choice but TypeORM dependencies are present here to support other database types like SQLite, Postgres, MongoDB, and MSSQL. To use anything other than **MongoDB**, you'll need to configure entities for TypeORM under modules.
 
 ---
 
@@ -198,36 +197,35 @@ $ npm run typedocs
 
 Out of the box, the web app comes with Swagger; an [open api specification](https://swagger.io/specification/), that is used to describe RESTful APIs. Nest provides a [dedicated module to work with it](https://docs.nestjs.com/recipes/swagger).
 
-The configuration for Swagger can be found at this [location](https://github.com/msanvarov/nest-rest-typeorm-boilerplate/blob/master/src/main.ts#L12-L61).
+The configuration for Swagger can be found at this [location](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/main.ts#L12-L61).
 
 ---
 
-### ✨ TypeORM
+### ✨ Mongoose
 
-TypeORM is an object-relational mapping that acts as an abstraction layer over operations on databases. Please view the [documentation](https://typeorm.io/#/) for further details.
+Mongoose provides a straight-forward, schema-based solution to model your application data. It includes built-in type casting, validation, query building, business logic hooks and more, out of the box. Please view the [documentation](https://mongoosejs.com) for further details.
 
-The configuration for TypeORM can be found in the [app module](https://github.com/msanvarov/nest-rest-typeorm-boilerplate/blob/master/src/modules/app/app.module.ts#L17-L33).
+The configuration for Mongoose can be found in the [app module](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/modules/app/app.module.ts#L17).
 
 ---
 
 ### 🔊 Logs
 
-This boilerplate comes with a Winston module for logging, the configurations for Winston can be found in the [app module](https://github.com/msanvarov/nest-rest-typeorm-boilerplate/blob/master/src/modules/app/app.module.ts#L34-L71).
+This boilerplate comes with a Winston module for logging, the configurations for Winston can be found in the [app module](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/modules/app/app.module.ts#L34-L71).
 
 ---
 
 ## Progress
 
-|                                                                     Branches | Status |
-| ---------------------------------------------------------------------------: | :----- |
-|         [Master](https://github.com/msanvarov/nest-rest-typeorm-boilerplate) | ✅     |
-| [RXJS](https://github.com/msanvarov/nest-rest-typeorm-boilerplate/tree/rxjs) | 🚧     |
+|                                                Branches | Status |
+| ------------------------------------------------------: | :----- |
+| [Master](https://github.com/Sleeqer/nestjs-boilerplate) | ✅     |
 
 ---
 
 ### 👥 Support
 
-PR are appreciated, I fully rely on the goodness ❤️ of the people.
+PRs are appreciated.
 Nest is an MIT-licensed open source project with its ongoing development made possible thanks to the support by the community. This framework is a result of the long road, full of sleepless nights, working after hours, and busy weekends.
 
 ---
@@ -236,4 +234,5 @@ Nest is an MIT-licensed open source project with its ongoing development made po
 
 Nest is [MIT licensed](LICENSE).
 
-[Author](https://msanvarov.github.io/personal-portfolio/)
+[Author](https://github.com/dorin-musteata)
+[Inspiration](https://github.com/msanvarov/nest-rest-mongo-boilerplate)
