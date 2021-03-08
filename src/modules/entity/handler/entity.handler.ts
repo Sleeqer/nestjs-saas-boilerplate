@@ -1,49 +1,76 @@
+import { Inject } from '@nestjs/common';
+import { Logger } from 'winston';
+import { getRepository } from 'typeorm';
+
 /**
  * Import local objects
  */
+import { Entity } from '../entity.entity';
 import {
   RabbitMQEnum,
   RabbitMQExchangeTypeEnum,
 } from '../../../adapters/rabbitmq/interface';
+import { EXCHANGE, KEY, QUEUE } from './entity.handler.enum';
+import { ConfigService } from '../../../modules/config/config.service';
+import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
+import { RabbitMQOptionInterface } from '../../../adapters/rabbitmq/interface/rabbitmq.option.interface';
+import { MessageHandler } from 'src/adapters/rabbitmq/handler/message.handler';
+
+/**
+ * Current config
+ * @type {ConfigService}
+ */
+const config: ConfigService = ConfigService.getInstance();
 
 /**
  * Queue
  */
-export const _QUEUE: string = `messages_queue`;
+export const _QUEUE: string = `${config.get('APPLICATION_NAME')}-entities`;
 
 /**
  * Messages handler
- * @param {any} message
+ * @param {unknown} message
  */
-const handler = async (message: any): Promise<RabbitMQEnum> => {
-  console.log(message, 'handlerx');
+const handler = async (
+  message: unknown | any,
+  propagator?: RedisPropagatorService,
+  logger?: Logger,
+): Promise<RabbitMQEnum> => {
+  try {
+    const parsed = JSON.parse(message);
 
-  return RabbitMQEnum.ACK;
+    if (propagator)
+      propagator.EMIT_ALL({
+        event: parsed?.title || '',
+        data: parsed?.entity || {},
+      });
+
+    return RabbitMQEnum.ACK;
+  } catch (error) {
+    if (logger)
+      logger.error(`[EntityHandler] -> Error on handler (${error.message})`);
+
+    return RabbitMQEnum.NACK;
+  }
 };
 
 /**
  * Format Response Exception Class
  */
-export class FormatResponseException {
-  protected options: object = {
-    exchange: {
-      title: 'exchangg',
-      type: RabbitMQExchangeTypeEnum.DIRECT,
-    },
-    key: 'x',
-    queue: 'extends',
-  };
-
-  protected handler: Function;
-
+export class EntityHandler extends MessageHandler {
   /**
    * Constructor of Format Response Exception Class
-   * @param {string} message Message
-   * @param {string} property Property of message
-   * @param {object} details Details
+   * @param {Function} handler Handler of incomming message
    */
-  constructor(handler: Function) {
-    this.handler = Function;
+  constructor(
+    handler: (
+      message: unknown,
+      propagator?: RedisPropagatorService,
+      logger?: Logger,
+    ) => Promise<RabbitMQEnum>,
+    options: RabbitMQOptionInterface,
+  ) {
+    super(handler, options);
   }
 }
 
@@ -51,15 +78,12 @@ export class FormatResponseException {
  * Export handler
  */
 export default [
-  {
-    options: {
-      exchange: {
-        title: 'exchangg',
-        type: RabbitMQExchangeTypeEnum.DIRECT,
-      },
-      key: 'x',
-      queue: 'extends',
+  new EntityHandler(handler, {
+    exchange: {
+      title: EXCHANGE.CREATED,
+      type: RabbitMQExchangeTypeEnum.DIRECT,
     },
-    handler,
-  },
+    key: KEY.CREATED,
+    queue: QUEUE.CREATED,
+  }),
 ];

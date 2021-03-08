@@ -9,8 +9,8 @@ import { EntityEvent } from '../event';
 import { EntityEventEnum } from '../enum';
 import { Entity } from '../entity.entity';
 import { EntityService } from '../entity.service';
+import { EXCHANGE, KEY } from '../handler/entity.handler.enum';
 import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
-import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
 
 /**
  * Entity Listener Class
@@ -24,7 +24,6 @@ export class EntityListener {
    * @param {Logger} logger Logger
    */
   constructor(
-    private readonly propagator: RedisPropagatorService,
     private readonly service: EntityService,
     private readonly rabbit: RabbitMQService,
     @Inject('winston') private readonly logger: Logger,
@@ -36,8 +35,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.CREATED)
   _created(payload: EntityEvent<Entity>): void {
-    this.rabbit.send(payload, 'x', 'exchangg');
-    this.propagator.EMIT_ALL({ event: payload.title, data: payload.entity });
+    this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -47,6 +45,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.UPDATED)
   _updated(payload: EntityEvent<Entity>): void {
+    this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -56,6 +55,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.DELETED)
   _deleted(payload: EntityEvent<Entity>): void {
+    this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

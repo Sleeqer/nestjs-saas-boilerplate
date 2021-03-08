@@ -10,9 +10,11 @@ import {
   RabbitMQResponseType,
   RabbitMQEnum,
 } from './interface';
-import { ConfigService } from '../../modules/config/config.service';
-import { connection } from './rabbitmq.connect';
 import subscriptions from './handler';
+import { connection } from './rabbitmq.connect';
+import { MessageHandler } from './handler/message.handler';
+import { ConfigService } from '../../modules/config/config.service';
+import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
 
 /**
  * Current config
@@ -39,9 +41,16 @@ export class RabbitMQService {
 
   /**
    * Constructor of RabbitMQ Service Class
+   * @param {RedisPropagatorService} propagator Redis Propagator Service
    * @param {Logger} logger Logger Service
    */
-  constructor(@Inject('winston') private readonly logger: Logger) {
+  constructor(
+    private readonly propagator: RedisPropagatorService,
+    @Inject('winston') private readonly logger: Logger,
+  ) {
+    /**
+     * Create channel connection
+     */
     this.create();
   }
 
@@ -98,13 +107,12 @@ export class RabbitMQService {
             /**
              * Subscribe to handlers
              */
-            subscriptions.forEach(
-              async (subscription) =>
-                await this.subscribe(
-                  subscription.options,
-                  subscription.handler,
-                ),
-            );
+            subscriptions.forEach(async (subscription) => {
+              return await this.subscribe(
+                subscription.options,
+                subscription.handler,
+              );
+            });
           });
 
         /**
@@ -128,10 +136,13 @@ export class RabbitMQService {
    */
   private async subscribe(
     options: RabbitMQOptionInterface,
-    handler: (message: unknown) => Promise<RabbitMQResponseType>,
+    handler: (
+      message: unknown,
+      propagator?: RedisPropagatorService,
+      logger?: Logger,
+    ) => Promise<RabbitMQResponseType>,
   ) {
     try {
-      console.log(options, '<<<<');
       const { queue } = await this.channel.assertQueue(options.queue || '');
 
       /**
@@ -158,7 +169,7 @@ export class RabbitMQService {
         const content = message.content.toString();
         const messager = JSON.parse(JSON.stringify(content));
         this.logger.info(`${this.log} -> Consume "${options.key}"`);
-        const response = await handler(messager);
+        const response = await handler(messager, this.propagator, this.logger);
 
         /**
          * NAcknowledge message

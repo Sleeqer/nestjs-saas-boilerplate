@@ -56,6 +56,7 @@ export class ConfigService {
      */
     const envVarsSchema: joi.ObjectSchema = joi.object({
       // APPLICAITON
+      APPLICATION_NAME: joi.string().empty('').default('nestify'),
       APPLICATION_PORT: joi.number().empty('').default(8000),
       APPLICATION_ENV: joi.string().valid('dev', 'prod').required(),
       APPLICATION_URL: joi.string().uri({

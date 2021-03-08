@@ -40,7 +40,7 @@ export class EntityService {
   constructor(
     @InjectRepository(Entity)
     protected readonly repository: Repository<Entity>,
-    private readonly emitter: EventEmitter2,
+    private readonly emitter?: EventEmitter2,
   ) {}
 
   /**
@@ -231,6 +231,7 @@ export class EntityService {
    * @returns {Promise<void>} Void
    */
   async _created(entity: Entity | number | string | ObjectID): Promise<void> {
+    if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.CREATED, entity);
     this.emitter.emit(event.title, event);
   }
@@ -241,6 +242,7 @@ export class EntityService {
    * @returns {Promise<void>} Void
    */
   async _updated(entity: Entity | number | string | ObjectID): Promise<void> {
+    if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.UPDATED, entity);
     this.emitter.emit(event.title, event);
   }
@@ -251,6 +253,7 @@ export class EntityService {
    * @returns {Promise<void>} Void
    */
   async _deleted(entity: Entity | number | string | ObjectID): Promise<void> {
+    if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.DELETED, entity);
     this.emitter.emit(event.title, event);
   }

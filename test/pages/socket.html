@@ -33,6 +33,8 @@
             path: '/websockets',
             transports: ['websocket', 'polling', 'flashsocket'],
             query: {
+              encoding: 'binary',
+              events: true,
               room_id: 1,
               user_id: Math.random(),
             },

@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
  */
 import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
 import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
+import { EntityHandler } from './handler/entity.handler';
 import { EntityListener } from './listener/entity.listener';
 import { EntityController } from './entity.controller';
 import { EntityResolver } from './entity.resolver';
@@ -21,7 +22,7 @@ import { Entity } from './entity.entity';
     RabbitMQModule,
     RedisPropagatorModule,
   ],
-  providers: [EntityService, EntityListener, EntityResolver],
+  providers: [EntityService, EntityListener, EntityResolver, EntityHandler],
   exports: [EntityService],
   controllers: [EntityController],
 })

@@ -1,36 +1,53 @@
+import { Inject } from '@nestjs/common';
+import { Logger } from 'winston';
+
 /**
  * Import local objects
  */
-import { RabbitMQEnum, RabbitMQExchangeTypeEnum } from '../interface';
+import {
+  RabbitMQEnum,
+  RabbitMQOptionInterface,
+} from '../interface/rabbitmq.option.interface';
+import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
 
 /**
- * Queue
+ * Message Handler Class
  */
-export const _QUEUE: string = `messages_queue`;
+export class MessageHandler {
+  /**
+   * @type {RabbitMQOptionInterface}
+   */
+  public options: RabbitMQOptionInterface;
 
-/**
- * Messages handler
- * @param {any} message
- */
-const handler = async (message: any): Promise<RabbitMQEnum> => {
-  console.log(message, 'handler');
+  /**
+   * @type {Function}
+   */
+  public handler: (
+    message: unknown,
+    propagator?: RedisPropagatorService,
+    logger?: Logger,
+  ) => Promise<RabbitMQEnum>;
 
-  return RabbitMQEnum.ACK;
-};
+  /**
+   * Log headline
+   * @type {string}
+   */
+  protected readonly log: string = `[Handler]`;
 
-/**
- * Export handler
- */
-export default [
-  {
-    options: {
-      exchange: {
-        title: 'exchangg',
-        type: RabbitMQExchangeTypeEnum.DIRECT,
-      },
-      key: 'x',
-      queue: 'extends',
-    },
-    handler,
-  },
-];
+  /**
+   * Constructor of Message Handler Class
+   * @param {Function} handler Handler of incomming messages
+   * @param {RabbitMQOptionInterface} options Options
+   */
+  constructor(
+    handler: (
+      message: unknown,
+      propagator?: RedisPropagatorService,
+      logger?: Logger,
+    ) => Promise<RabbitMQEnum>,
+    options: RabbitMQOptionInterface,
+  ) {
+    this.handler = handler;
+    this.options = options;
+  }
+}
