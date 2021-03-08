@@ -12,6 +12,7 @@ import { ApplicationController } from './application.controller';
 import { ApplicationResolver } from './application.resolver';
 import { ApplicationService } from './application.service';
 import { Application, ApplicationSchema } from './application.entity';
+import { ApplicationStrategy } from './strategy/application.strategy';
 
 /**
  * Define module
@@ -29,6 +30,7 @@ import { Application, ApplicationSchema } from './application.entity';
     ApplicationListener,
     ApplicationResolver,
     ApplicationHandler,
+    ApplicationStrategy,
   ],
   exports: [ApplicationService],
   controllers: [ApplicationController],

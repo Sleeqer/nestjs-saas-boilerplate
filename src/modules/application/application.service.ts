@@ -126,6 +126,16 @@ export class ApplicationService {
   }
 
   /**
+   * Retrieve Application by dynamic key
+   * @param {any} value Application's value
+   * @param {string} key Application's key
+   * @returns {Promise<Application>} Application object
+   */
+  async by(value: any, key: string = 'key'): Promise<Application> {
+    return this.repository.findOne({ [key]: value }).exec();
+  }
+
+  /**
    * Create Application by payload
    * @param {ApplicationCreatePayload} payload Application's payload
    * @returns {Promise<Application>} Application object

@@ -17,6 +17,7 @@ import {
   Delete,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 
 /**
@@ -33,6 +34,7 @@ import { Application } from './application.entity';
 import { ApplicationService } from './application.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { AuthGuard } from '@nestjs/passport';
 
 /**
  * Application Paginate Response Class
