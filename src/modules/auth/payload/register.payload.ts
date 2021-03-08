@@ -27,7 +27,6 @@ export class RegisterPayload {
   @ApiProperty({
     required: true,
   })
-  @IsAlphanumeric()
   @IsNotEmpty()
   username: string;
 

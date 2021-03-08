@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, ObjectIdColumn, Column, ManyToOne } from 'typeorm';
+
+/**
+ * Import local objects
+ */
+
+import { ObjectID } from 'mongodb';
 import { AppRoles } from './app.roles';
 import { Profile } from '../profile/profile.entity';
 
@@ -8,10 +14,10 @@ import { Profile } from '../profile/profile.entity';
 @Entity()
 export class Roles {
   /**
-   * UUID column
+   * Id column
    */
-  @PrimaryGeneratedColumn()
-  id: number;
+  @ObjectIdColumn()
+  _id: number | string | ObjectID;
 
   /**
    * Column for role based access
@@ -20,13 +26,7 @@ export class Roles {
   @Column({
     type: 'enum',
     enum: AppRoles,
-    default: AppRoles.ADMIN,
+    default: AppRoles.DEFAULT,
   })
-  role: AppRoles;
-
-  /**
-   * Column to represent a many to one relationship with the profile entity
-   */
-  @ManyToOne(type => Profile, profile => profile.roles, { onDelete: 'CASCADE' })
-  profile: Profile;
+  role: AppRoles = AppRoles.DEFAULT;
 }

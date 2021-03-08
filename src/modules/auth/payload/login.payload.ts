@@ -11,7 +11,6 @@ export class LoginPayload {
   @ApiProperty({
     required: true,
   })
-  @IsAlphanumeric()
   @IsNotEmpty()
   username: string;
 

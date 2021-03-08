@@ -7,17 +7,17 @@ import { ValueTransformer } from 'typeorm';
 export class PasswordTransformer implements ValueTransformer {
   /**
    * Value to transform to
-   * @param value string to hash
+   * @param {string} value string to hash
    */
-  to(value) {
+  to(value: string) {
     return crypto.createHmac('sha256', value).digest('hex');
   }
 
   /**
    * Grabs the string to hash
-   * @param value value to return
+   * @param {string} value value to return
    */
-  from(value) {
+  from(value: string) {
     return value;
   }
 }

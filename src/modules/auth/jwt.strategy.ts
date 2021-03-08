@@ -29,20 +29,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   /**
    * Checks if the bearer token is a valid token
    * @param {any} jwtPayload validation method for jwt token
+   * @param {any} done callback to resolve the request user with
    * @returns {Promise<object>} a object to be signed
    */
-  async validate({ iat, exp, id }: any): Promise<object> {
+  async validate({ iat, exp, _id }: any, done: any): Promise<object> {
     const timeDiff = exp - iat;
     if (timeDiff <= 0) {
       throw new UnauthorizedException();
     }
 
-    const profile = await this.profileService.get(id);
+    const profile = await this.profileService.get(_id);
     if (!profile) {
       throw new UnauthorizedException();
     }
 
     delete profile.password;
-    return { ...profile, roles: profile.roles.map(role => role.role) };
+    done(null, profile);
+    return { ...profile };
   }
 }

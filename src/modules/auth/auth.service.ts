@@ -1,9 +1,17 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ProfileService } from '../profile/profile.service';
-import { ConfigService } from '../config/config.service';
 import { JwtService } from '@nestjs/jwt';
+import * as dayjs from 'dayjs';
+import * as relative from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relative);
+
+/**
+ * Import local objects
+ */
 import { Profile } from '../profile/profile.entity';
 import { LoginPayload } from './payload/login.payload';
+import { ConfigService } from '../config/config.service';
+import { ProfileService } from '../profile/profile.service';
 
 /**
  * Models a typical Login/Register route return body
@@ -49,12 +57,12 @@ export class AuthService {
   }
 
   /**
-   * Creates a signed jwt token based on IProfile payload
+   * Creates a signed jwt token based on Profile payload
    * @param {Profile} param dto to generate token from
    * @returns {Promise<ITokenReturnBody>} token body
    */
   async createToken({
-    id,
+    _id,
     username,
     name,
     email,
@@ -63,7 +71,7 @@ export class AuthService {
       expires: this.expiration,
       expiresPrettyPrint: AuthService.prettyPrintSeconds(this.expiration),
       token: this.jwtService.sign({
-        id,
+        _id,
         username,
         name,
         email,
@@ -77,14 +85,8 @@ export class AuthService {
    * @returns {string} hrf time
    */
   private static prettyPrintSeconds(time: string): string {
-    const ntime = Number(time);
-    const hours = Math.floor(ntime / 3600);
-    const minutes = Math.floor((ntime % 3600) / 60);
-    const seconds = Math.floor((ntime % 3600) % 60);
-
-    return `${hours > 0 ? hours + (hours === 1 ? ' hour,' : ' hours,') : ''} ${
-      minutes > 0 ? minutes + (minutes === 1 ? ' minute' : ' minutes') : ''
-    } ${seconds > 0 ? seconds + (seconds === 1 ? ' second' : ' seconds') : ''}`;
+    const future = dayjs().add(Number(time), 'seconds');
+    return future.fromNow(true);
   }
 
   /**
@@ -97,11 +99,12 @@ export class AuthService {
       username,
       password,
     );
-    if (!user) {
+
+    if (!user)
       throw new UnauthorizedException(
         'Could not authenticate. Please try again',
       );
-    }
+
     return user;
   }
 }

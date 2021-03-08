@@ -34,7 +34,6 @@ import { ParseIdPipe } from '../common/pipes';
 import { EntityService } from './entity.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Pagination, Query as QueryPagination } from '../entity/pagination';
-import { request } from 'http';
 
 /**
  * Entity Paginate Response Class
@@ -43,7 +42,7 @@ export class EntityPaginateResponse extends Pagination<Entity> {
   /**
    * Results field
    */
-  @ApiProperty({ type: [Entity] })
+  @ApiProperty({ type: [] })
   results: Entity[];
 }
 
@@ -92,7 +91,6 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Retrieve Request Received.',
-    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Retrieve Request Failed.' })
   @ApiResponse({
@@ -101,7 +99,7 @@ export class EntityController {
   })
   async get(
     @Param('id', EntityLoadByIdPipe)
-    id: number | string | ObjectID,
+    id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
     return request.locals.entity;
@@ -121,11 +119,10 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Replace Request Received.',
-    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Replace Request Failed.' })
   async replace(
-    @Param('id', ParseIdPipe) id: number | string | ObjectID,
+    @Param('id', ParseIdPipe) id: number | string,
     @Body() payload: EntityReplacePayload,
   ): Promise<Entity> {
     return await this.service.replace(id, payload);
@@ -142,7 +139,6 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Update Request Received.',
-    type: Entity,
   })
   @ApiResponse({
     status: 400,
@@ -153,7 +149,7 @@ export class EntityController {
     description: 'Entity Update Request Failed (Not found).',
   })
   async update(
-    @Param('id', EntityLoadByIdPipe) id: number | string | ObjectID,
+    @Param('id', EntityLoadByIdPipe) id: number | string,
     @Body() payload: EntityUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
@@ -179,7 +175,7 @@ export class EntityController {
     description: 'Entity Delete Request Failed (Not found).',
   })
   async destroy(
-    @Param('id', EntityLoadByIdPipe) id: number | string | ObjectID,
+    @Param('id', EntityLoadByIdPipe) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<any> {
     await this.service.remove(request.locals.entity);
@@ -196,7 +192,6 @@ export class EntityController {
   @ApiResponse({
     status: 201,
     description: 'Entity Create Request Received.',
-    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Create Request Failed.' })
   async create(@Body() payload: EntityCreatePayload): Promise<Entity> {

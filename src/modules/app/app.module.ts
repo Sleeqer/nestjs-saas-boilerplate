@@ -1,13 +1,12 @@
-import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
+import { MongooseModule, MongooseModuleAsyncOptions } from '@nestjs/mongoose';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
 import * as rotateFile from 'winston-daily-rotate-file';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { GraphQLModule } from '@nestjs/graphql';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import * as WinstonMongoDB from 'winston-mongodb';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
-import * as WinstonMongoDB from 'winston-mongodb';
 
 /**
  * Import local objects
@@ -16,35 +15,33 @@ import { roles } from './app.roles';
 import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
 import { AppController } from './app.controller';
+import { OrganizationModule } from '../organization';
 import { EntityModule } from '../entity/entity.module';
 import { ConfigModule } from '../config/config.module';
+import { HttpExceptionFilter } from '../common/filters';
 import { ConfigService } from '../config/config.service';
 import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
-import { HttpExceptionFilter } from '../common/filters';
 import { SharedModule } from '../../adapters/shared/shared.module';
+import { ApplicationModule } from '../application/application.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
+    MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: configService.get('DB_TYPE'),
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_DATABASE'),
-          entities: [__dirname + './../**/**.entity{.ts,.js}'],
-          synchronize: configService.isEnv('dev'),
+      useFactory: (config: ConfigService) =>
+        ({
+          uri: `${config.get('DB_TYPE')}://${
+            config.get('DB_USERNAME') && config.get('DB_PASSWORD')
+              ? `${config.get('DB_USERNAME')}:${config.get('DB_PASSWORD')}@`
+              : ``
+          }${config.get('DB_HOST')}:${config.get('DB_PORT')}/${config.get(
+            'DB_DATABASE',
+          )}`,
           useNewUrlParser: true,
           useUnifiedTopology: true,
-          keepConnectionAlive: true,
-          logging: true,
-        } as TypeOrmModuleAsyncOptions;
-      },
+        } as MongooseModuleAsyncOptions),
     }),
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
@@ -131,13 +128,14 @@ import { SharedModule } from '../../adapters/shared/shared.module';
       ttl: 60,
       limit: 1000,
     }),
-    GraphQLModule.forRoot({ autoSchemaFile: true, path: 'api/v1/graphql' }),
     AccessControlModule.forRoles(roles),
     ConfigModule,
     AuthModule,
     ProfileModule,
     EntityModule,
     SharedModule,
+    ApplicationModule,
+    OrganizationModule,
   ],
   controllers: [AppController],
   providers: [

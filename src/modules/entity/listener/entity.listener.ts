@@ -19,7 +19,7 @@ import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
 export class EntityListener {
   /**
    * Constructor of Entity Listener Class
-   * @param {EntityService} service Entity Service
+   * @param {EntityService<Entity>} service Entity Service
    * @param {RabbitMQService} rabbit RabbitMQ Service
    * @param {Logger} logger Logger
    */
@@ -35,7 +35,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.CREATED)
   _created(payload: EntityEvent<Entity>): void {
-    this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
+    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -45,7 +45,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.UPDATED)
   _updated(payload: EntityEvent<Entity>): void {
-    this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
+    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -55,7 +55,7 @@ export class EntityListener {
    */
   @OnEvent(EntityEventEnum.DELETED)
   _deleted(payload: EntityEvent<Entity>): void {
-    this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
+    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

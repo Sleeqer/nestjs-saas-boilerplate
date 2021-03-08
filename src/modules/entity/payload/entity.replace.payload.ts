@@ -7,11 +7,6 @@ import { ObjectID } from 'mongodb';
  */
 export class EntityReplacePayload {
   /**
-   * Id field
-   */
-  _id: number | string | ObjectID;
-
-  /**
    * Title field
    */
   @ApiProperty({

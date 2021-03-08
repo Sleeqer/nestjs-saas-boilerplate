@@ -1,3 +1,5 @@
+import { ACGuard, UseRoles } from 'nest-access-control';
+import { AuthGuard } from '@nestjs/passport';
 import {
   BadRequestException,
   Body,
@@ -7,26 +9,55 @@ import {
   Param,
   Patch,
   UseGuards,
+  Req,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ACGuard, UseRoles } from 'nest-access-control';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ProfileService, IGenericMessageBody } from './profile.service';
-import { PatchProfilePayload } from './payload/patch.profile.payload';
+import {
+  ApiBearerAuth,
+  ApiResponse,
+  ApiTags,
+  ApiOperation,
+} from '@nestjs/swagger';
+
+/**
+ * Import local objects
+ */
 import { Profile } from './profile.entity';
+import { FastifyRequestInterface } from '../common/interfaces';
+import { PatchProfilePayload } from './payload/patch.profile.payload';
+import { ProfileService, IGenericMessageBody } from './profile.service';
 
 /**
  * Profile Controller
  */
 @ApiBearerAuth()
-@ApiTags('profile')
-@Controller('api/profile')
+@ApiTags('profiles')
+@Controller('profiles')
 export class ProfileController {
   /**
    * Constructor
    * @param profileService
    */
   constructor(private readonly profileService: ProfileService) {}
+
+  /**
+   * Retrieves current user profile
+   * @param {Req} request Request
+   * @returns {Promise<Profile>} Profile
+   */
+  @Get('@me')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @ApiOperation({ summary: 'Get current user profile.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieve User Profile Request Received.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Retrieve User Profile Request Failed.',
+  })
+  async profile(@Req() request: FastifyRequestInterface): Promise<Profile> {
+    return request.user;
+  }
 
   /**
    * Retrieves a particular profile

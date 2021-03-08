@@ -1,59 +1,47 @@
-import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { PasswordTransformer } from './password.transformer';
-import { Roles } from '../app/roles.entity';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 
 /**
- * Profile Entity Class
+ * Import local objects
  */
-@Entity({
-  name: 'profiles',
-})
-export class Profile {
-  /**
-   * UUID column
-   */
-  @PrimaryGeneratedColumn()
-  id: number;
+import { AppRoles } from '../app/app.roles';
+import { Organization } from '../organization/organization.entity';
 
-  /**
-   * Username column
-   */
-  @Column({ unique: true })
+/**
+ * Profile Document
+ */
+export type ProfileDocument = Profile & Document;
+
+/**
+ * Profile Schema
+ */
+@Schema()
+export class Profile {
+  readonly _id: string;
+
+  @Prop({ required: false })
   username: string;
 
-  /**
-   * Name column
-   */
-  @Column()
-  name: string;
-
-  /**
-   * Email column
-   */
-  @Column()
+  @Prop({ required: true })
   email: string;
 
-  /**
-   * Avatar column (gravatar url)
-   */
-  @Column()
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ required: true })
   avatar: string;
 
-  /**
-   * Column to represent a one to many relationship with the roles entity
-   */
-  @OneToMany(type => Roles, role => role.profile)
-  roles: Roles[];
+  @Prop({ type: [{ type: String }] })
+  roles: AppRoles;
 
-  /**
-   * Column that employs the PasswordTransformer to hash passwords before writing to database
-   */
-  @Column({
-    name: 'password',
-    length: 255,
-    transformer: new PasswordTransformer(),
-  })
-  @Exclude()
-  password: string;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Organization' }] })
+  organizations: Organization[];
 }
+
+/**
+ * Export Profile Schema
+ */
+export const ProfileSchema = SchemaFactory.createForClass(Profile);

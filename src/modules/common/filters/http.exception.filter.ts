@@ -8,6 +8,8 @@ import {
   ArgumentsHost,
   HttpException,
   Inject,
+  HttpStatus,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 /**
@@ -72,7 +74,7 @@ export class FormatResponseExceptionMessages {
         const details = {};
         const constraints = Object.keys(message?.constraints) || [];
         constraints.forEach((constraint) => {
-          details[ChangeCase.constantCase(constraint)] =
+          details[ChangeCase.constantCase(constraint || '')] =
             message?.constraints[constraint];
         });
 
@@ -103,8 +105,8 @@ export class FormatResponseExceptionMessages {
       this.object.error.message = data.message;
     }
 
-    this.object.error.status = ChangeCase.constantCase(data.error);
-    this.object.error.code = data.statusCode;
+    this.object.error.status = ChangeCase.constantCase(data.error || '');
+    this.object.error.code = data.status || data.statusCode;
   }
 
   public getObject() {
@@ -115,7 +117,7 @@ export class FormatResponseExceptionMessages {
 /**
  * Http Exception Filter Class
  */
-@Catch(HttpException)
+@Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Log headline
@@ -131,16 +133,27 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   /**
    * Catch incomming http exception
-   * @param {HttpException} exception
+   * @param {unknown | HttpException} exception
    * @param {ArgumentsHost} host
    * @returns {FastifyReply}
    */
-  catch(exception: HttpException, host: ArgumentsHost): FastifyReply {
+  catch(exception: unknown | HttpException, host: ArgumentsHost): FastifyReply {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
     const request = ctx.getRequest<FastifyRequest>();
-    const status = exception.getStatus();
-    const data: any = exception.getResponse();
+    const internal = !(exception instanceof HttpException)
+      ? new InternalServerErrorException()
+      : undefined;
+
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : internal.getStatus();
+
+    const data: any =
+      exception instanceof HttpException
+        ? exception.getResponse()
+        : internal.getResponse();
 
     /**
      * Formatted response exception
@@ -151,6 +164,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
 
     /**
+     * Add stack for development
+     */
+    if (config.isEnv('dev')) object.stack = (exception as any)?.stack || '';
+
+    /**
      * Log errors , only if required by environment
      */
     if ((config.get('LOGGER_HTTP') as unknown) as boolean)
@@ -158,6 +176,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         `${this.log} -> Error ${object.error.code} on ${
           request.ip
         } (${JSON.stringify(object)})`,
+        (exception as any)?.stack || '',
       );
 
     /**

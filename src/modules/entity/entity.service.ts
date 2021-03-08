@@ -1,7 +1,7 @@
-import { DeleteResult, Repository, UpdateResult, ObjectID } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectID as CastObjectID } from 'mongodb';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import {
   Injectable,
   NotFoundException,
@@ -18,9 +18,9 @@ import {
   EntityUpdatePayload,
 } from './payload';
 import { EntityEvent } from './event';
-import { Entity } from './entity.entity';
 import { EntityEventEnum } from './enum';
 import { Pagination, Query } from '../entity/pagination';
+import { Entity, EntityDocument } from './entity.entity';
 
 /**
  * Entity Service Class
@@ -34,12 +34,12 @@ export class EntityService {
 
   /**
    * Constructor of Entity Service Class
-   * @param {Repository<Entity>} repository Entity repository
+   * @param {Model<Entity>} repository Entity repository
    * @param {EventEmitter2} emitter Event emitter
    */
   constructor(
-    @InjectRepository(Entity)
-    protected readonly repository: Repository<Entity>,
+    @InjectModel(Entity.name)
+    private readonly repository: Model<EntityDocument>,
     private readonly emitter?: EventEmitter2,
   ) {}
 
@@ -81,7 +81,7 @@ export class EntityService {
     /**
      * Entity objects
      */
-    return this.repository.find();
+    return this.repository.find().exec();
   }
 
   /**
@@ -97,11 +97,13 @@ export class EntityService {
     /**
      * Find entities
      */
-    const [results, total] = await this.repository.findAndCount({
-      take: limit,
-      skip: (page - 1) * limit,
-      order,
-    });
+    const total = await this.repository.estimatedDocumentCount().exec();
+    const results = await this.repository
+      .find()
+      .sort(order)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
 
     /**
      * Paginated Entity objects
@@ -116,11 +118,11 @@ export class EntityService {
 
   /**
    * Retrieve Entity by id
-   * @param {number | string | ObjectID} id Entity's id
+   * @param {number | string } id Entity's id
    * @returns {Promise<Entity>} Entity object
    */
-  async get(id: number | string | ObjectID): Promise<Entity> {
-    return this.repository.findOne(id);
+  async get(id: number | string): Promise<Entity> {
+    return this.repository.findById(id).exec();
   }
 
   /**
@@ -129,9 +131,7 @@ export class EntityService {
    * @returns {Promise<Entity>} Entity object
    */
   async create(payload: EntityCreatePayload): Promise<Entity> {
-    const entity: Entity = await this.repository.save(
-      this.repository.create(payload),
-    );
+    const entity: Entity = await new this.repository(payload).save();
 
     /**
      * Entity Created Event Emit
@@ -142,21 +142,21 @@ export class EntityService {
 
   /**
    * Update Entity by id
-   * @param {number | string | ObjectID} id Entity's id
+   * @param {number | string } id Entity's id
    * @param {EntityUpdatePayload} payload Entity's payload
    * @returns {Promise<UpdateResult>} Update result
    */
   async update(
-    id: number | string | ObjectID,
+    id: number | string,
     payload: EntityUpdatePayload,
-  ): Promise<UpdateResult> {
-    const entity = await this.repository.update(id, payload);
+  ): Promise<Entity> {
+    const entity = await this.repository.updateOne({ id }, payload).exec();
 
     /**
      * Entity Updated Event Emit
      */
     this._updated(id);
-    return entity;
+    return this.get(id);
   }
 
   /**
@@ -166,7 +166,11 @@ export class EntityService {
    * @returns {Promise<Entity} Updated Entity
    */
   async save(entity: Entity, payload: EntityUpdatePayload): Promise<Entity> {
-    entity = await this.repository.save({ ...entity, ...payload });
+    entity = await this.repository.findOneAndUpdate(
+      { _id: entity._id },
+      payload,
+      { new: true },
+    );
 
     /**
      * Entity Updated Event Emit
@@ -177,16 +181,22 @@ export class EntityService {
 
   /**
    * Replace Entity by id
-   * @param {number | string | ObjectID} id Entity's id
+   * @param {number | string } id Entity's id
    * @param {EntityReplacePayload} payload Entity's payload
    * @returns {Promise<Entity>} Entity object
    */
   async replace(
-    id: number | string | ObjectID,
+    id: number | string,
     payload: EntityReplacePayload,
   ): Promise<Entity> {
-    if (id) payload._id = new CastObjectID(id);
-    const entity = await this.repository.save(payload);
+    const entity = await this.repository.findOneAndUpdate(
+      { _id: new CastObjectID(id) } as any,
+      { ...payload },
+      {
+        new: true,
+        upsert: true,
+      },
+    );
 
     /**
      * Entity Updated Event Emit
@@ -197,17 +207,17 @@ export class EntityService {
 
   /**
    * Destroy Entity by id
-   * @param {number | string | ObjectID} id Entity's id
+   * @param {number | string } id Entity's id
    * @returns {Promise<DeleteResult>} Delete result
    */
-  async destroy(id: number | string | ObjectID): Promise<DeleteResult> {
-    const entity = await this.repository.delete(id);
+  async destroy(id: number | string): Promise<Entity> {
+    const entity = await this.repository.deleteOne({ id }).exec();
 
     /**
      * Entity Deleted Event Emit
      */
     this._deleted(id);
-    return entity;
+    return;
   }
 
   /**
@@ -216,7 +226,7 @@ export class EntityService {
    * @returns {Promise<Entity>} Deleted Entity
    */
   async remove(entity: Entity): Promise<Entity> {
-    await this.repository.remove({ ...entity });
+    await this.repository.deleteOne(entity);
 
     /**
      * Deleted Entity
@@ -227,10 +237,10 @@ export class EntityService {
 
   /**
    * Entity Created Event Emitter
-   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @param {Entity | number | string } id Entity's id | object
    * @returns {Promise<void>} Void
    */
-  async _created(entity: Entity | number | string | ObjectID): Promise<void> {
+  async _created(entity: Entity | number | string): Promise<void> {
     if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.CREATED, entity);
     this.emitter.emit(event.title, event);
@@ -238,10 +248,10 @@ export class EntityService {
 
   /**
    * Entity Updated Event Emitter
-   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @param {Entity | number | string } id Entity's id | object
    * @returns {Promise<void>} Void
    */
-  async _updated(entity: Entity | number | string | ObjectID): Promise<void> {
+  async _updated(entity: Entity | number | string): Promise<void> {
     if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.UPDATED, entity);
     this.emitter.emit(event.title, event);
@@ -249,10 +259,10 @@ export class EntityService {
 
   /**
    * Entity Deleted Event Emitter
-   * @param {Entity | number | string | ObjectID} id Entity's id | object
+   * @param {Entity | number | string } id Entity's id | object
    * @returns {Promise<void>} Void
    */
-  async _deleted(entity: Entity | number | string | ObjectID): Promise<void> {
+  async _deleted(entity: Entity | number | string): Promise<void> {
     if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.DELETED, entity);
     this.emitter.emit(event.title, event);

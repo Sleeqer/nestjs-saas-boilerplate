@@ -8,8 +8,8 @@ import { ProfileService } from '../profile/profile.service';
 /**
  * Authentication Controller
  */
-@ApiTags('authentication')
-@Controller('api/auth')
+@ApiTags('auth')
+@Controller('auth')
 export class AuthController {
   /**
    * Constructor
