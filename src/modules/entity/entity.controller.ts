@@ -1,4 +1,3 @@
-import { ObjectID } from 'typeorm';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -18,6 +17,7 @@ import {
   Delete,
   Query,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 
 /**
@@ -34,6 +34,7 @@ import { ParseIdPipe } from '../common/pipes';
 import { EntityService } from './entity.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
 
 /**
  * Entity Paginate Response Class
@@ -42,13 +43,14 @@ export class EntityPaginateResponse extends Pagination<Entity> {
   /**
    * Results field
    */
-  @ApiProperty({ type: [] })
+  @ApiProperty({ type: [Entity] })
   results: Entity[];
 }
 
 /**
  * Entity Controller Class
  */
+@UseInterceptors(TransformInterceptor)
 @ApiBearerAuth()
 @ApiTags('entities')
 @Controller('entities')
@@ -91,6 +93,7 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Retrieve Request Received.',
+    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Retrieve Request Failed.' })
   @ApiResponse({
@@ -119,6 +122,7 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Replace Request Received.',
+    type: Entity,
   })
   @ApiResponse({ status: 400, description: 'Entity Replace Request Failed.' })
   async replace(
@@ -139,6 +143,7 @@ export class EntityController {
   @ApiResponse({
     status: 200,
     description: 'Entity Update Request Received.',
+    type: Entity,
   })
   @ApiResponse({
     status: 400,
@@ -153,7 +158,7 @@ export class EntityController {
     @Body() payload: EntityUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Entity> {
-    return await this.service.save(request.locals.entity, payload);
+    return await this.service.update(request.locals.entity, payload);
   }
 
   /**
@@ -178,7 +183,7 @@ export class EntityController {
     @Param('id', EntityLoadByIdPipe) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<any> {
-    await this.service.remove(request.locals.entity);
+    await this.service.destroy(request.locals.entity._id);
     return {};
   }
 

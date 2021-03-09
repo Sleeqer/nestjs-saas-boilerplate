@@ -8100,6 +8100,11 @@ nest-access-control@2.0.2:
   dependencies:
     accesscontrol "^2.2.1"
 
+nest-router@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/nest-router/-/nest-router-1.0.9.tgz#cbe814dadf90b765e0a5b77c562479d5d523a485"
+  integrity sha512-ZyRdSVs9GczI+39B7tNXsxfBXQOYnEF6l/q2aLYG8wSEvRHRDXAlzZ1SIosDibM02pLahGkDNLFC+nZ8uzJGDQ==
+
 next-tick@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"

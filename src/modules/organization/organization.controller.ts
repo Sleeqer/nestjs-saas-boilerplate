@@ -68,6 +68,7 @@ export class OrganizationController {
    * @returns {Promise<Pagination<Organization>>} Paginated Organization objects
    */
   @Get('')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Paginate Organization objects.' })
   @ApiResponse({
     status: 200,

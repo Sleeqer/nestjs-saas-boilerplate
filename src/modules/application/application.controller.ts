@@ -66,6 +66,7 @@ export class ApplicationController {
    * @returns {Promise<Pagination<Application>>} Paginated Application objects
    */
   @Get('')
+  @UseGuards(AuthGuard('application'), AuthGuard('jwt'))
   @ApiOperation({ summary: 'Paginate Application objects.' })
   @ApiResponse({
     status: 200,

@@ -84,6 +84,8 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
 
   application.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
       transform: true,
       exceptionFactory: (errors) => new BadRequestException(errors),
     }),

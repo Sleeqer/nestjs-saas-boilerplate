@@ -7,9 +7,8 @@ import { Logger } from 'winston';
  */
 import { EntityEvent } from '../event';
 import { EntityEventEnum } from '../enum';
-import { Entity } from '../entity.entity';
 import { EntityService } from '../entity.service';
-import { EXCHANGE, KEY } from '../handler/entity.handler.enum';
+import { Entity, EntityDocument } from '../entity.entity';
 import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
 
 /**
@@ -19,7 +18,7 @@ import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
 export class EntityListener {
   /**
    * Constructor of Entity Listener Class
-   * @param {EntityService<Entity>} service Entity Service
+   * @param {EntityService} service Entity Service
    * @param {RabbitMQService} rabbit RabbitMQ Service
    * @param {Logger} logger Logger
    */

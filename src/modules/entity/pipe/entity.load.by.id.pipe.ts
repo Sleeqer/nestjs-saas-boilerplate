@@ -6,6 +6,7 @@ import { ObjectID } from 'typeorm';
  * Import local objects
  */
 import { EntityService } from '../entity.service';
+import { EntityDocument } from '../entity.entity';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
