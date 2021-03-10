@@ -18,7 +18,7 @@ import {
  */
 import { EntityEvent } from '../../../entity/event';
 import { EntityEventEnum } from '../../../entity/enum';
-import { Pagination, Query } from '../../../entity/pagination';
+import { Pagination, Query } from '../pagination';
 
 /**
  * Schema Type for FilterQuery
@@ -36,10 +36,10 @@ export type Schema = {
 };
 
 /**
- * Entity Service Class
+ * Base Entity Service Class
  */
 @Injectable()
-export class EntityService<Entity extends Document> {
+export class BaseEntityService<Entity extends Document> {
   /**
    * Entity
    */
@@ -105,13 +105,14 @@ export class EntityService<Entity extends Document> {
     page = 1,
     limit = 15,
     order = {},
+    filter = {},
   }: Query): Promise<Pagination<Entity>> {
     /**
      * Find entities
      */
     const total = await this.repository.estimatedDocumentCount().exec();
     const results = await this.repository
-      .find()
+      .find(filter)
       .sort(order)
       .skip((page - 1) * limit)
       .limit(limit)
@@ -129,8 +130,23 @@ export class EntityService<Entity extends Document> {
   }
 
   /**
+   * Retrieve Entity by key value
+   * @param {number | string | string[]} id Entity's value
+   * @param {string} id Entity's key
+   * @returns {Promise<Entity>} Entity object
+   */
+  async by(
+    value: number | string | string[],
+    key: string = 'key',
+  ): Promise<Entity> {
+    return this.repository
+      .findOne({ [key]: value } as FilterQuery<Schema>)
+      .exec();
+  }
+
+  /**
    * Retrieve Entity by id
-   * @param {number | string } id Entity's id
+   * @param {number | string} id Entity's id
    * @returns {Promise<Entity>} Entity object
    */
   async get(id: number | string): Promise<Entity> {
@@ -176,7 +192,7 @@ export class EntityService<Entity extends Document> {
 
   /**
    * Replace Entity by id
-   * @param {number | string } _id Entity's id
+   * @param {number | string} _id Entity's id
    * @param {UpdateQuery<Entity>} payload Entity's payload
    * @returns {Promise<Entity>} Entity object
    */
@@ -202,7 +218,7 @@ export class EntityService<Entity extends Document> {
 
   /**
    * Destroy Entity by _id
-   * @param {number | string } _id Entity's _id
+   * @param {number | string} _id Entity's _id
    * @returns {Promise<void>} Void
    */
   async destroy(_id: number | string): Promise<void> {
@@ -217,7 +233,7 @@ export class EntityService<Entity extends Document> {
 
   /**
    * Entity Created Event Emitter
-   * @param {Entity | number | string } entity Entity's _id || object
+   * @param {Entity | number | string} entity Entity's _id || object
    * @returns {Promise<void>} Void
    */
   async _created(entity: Entity | number | string): Promise<void> {
@@ -229,7 +245,7 @@ export class EntityService<Entity extends Document> {
 
   /**
    * Entity Updated Event Emitter
-   * @param {Entity | number | string } entity Entity's _id || object
+   * @param {Entity | number | string} entity Entity's _id || object
    * @returns {Promise<void>} Void
    */
   async _updated(entity: Entity | number | string): Promise<void> {
@@ -241,7 +257,7 @@ export class EntityService<Entity extends Document> {
 
   /**
    * Entity Deleted Event Emitter
-   * @param {Entity | number | string } entity Entity's _id || object
+   * @param {Entity | number | string} entity Entity's _id || object
    * @returns {Promise<void>} Void
    */
   async _deleted(entity: Entity | number | string): Promise<void> {

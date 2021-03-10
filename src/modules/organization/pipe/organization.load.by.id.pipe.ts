@@ -11,7 +11,7 @@ import { FastifyRequestInterface } from '../../common/interfaces';
 /**
  * Organization Load By Id Pipe Class
  */
-export class OrganizationLoadByIdPipe implements PipeTransform {
+export class Loader implements PipeTransform {
   /**
    * Constructor of Organization Load By Id Pipe Class
    * @param {OrganizationService} service Organization Service
@@ -31,12 +31,14 @@ export class OrganizationLoadByIdPipe implements PipeTransform {
     /**
      * Retrieve entity by id , if isn't undefined
      */
-    const { id } = this.request.params as any;
-    if (!id) return value;
+    const { id, organization } = this.request.params as any;
+    const identifier = organization || id;
+    console.log(identifier, '<<');
+    if (!identifier) return value;
     let entity = undefined;
 
     try {
-      entity = await this.service.get(id);
+      entity = await this.service.get(identifier);
     } catch {}
 
     /**

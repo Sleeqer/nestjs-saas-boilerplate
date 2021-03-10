@@ -1,6 +1,4 @@
-import { ACGuard } from 'nest-access-control';
 import { AuthGuard } from '@nestjs/passport';
-import { ObjectID } from 'typeorm';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -20,6 +18,7 @@ import {
   Delete,
   Query,
   Req,
+  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 
@@ -31,12 +30,17 @@ import {
   OrganizationReplacePayload,
   OrganizationUpdatePayload,
 } from './payload';
-import { Organization } from './organization.entity';
-import { OrganizationLoadByIdPipe } from './pipe';
+import { Loader } from './pipe';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import { ParseIdPipe } from '../common/pipes';
 import { OrganizationService } from './organization.service';
 import { FastifyRequestInterface } from '../common/interfaces';
-import { Pagination, Query as QueryPagination } from '../entity/pagination';
+import { Organization, OrganizationDocument } from './organization.entity';
+import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
 
 /**
  * Organization Paginate Response Class
@@ -45,26 +49,33 @@ export class OrganizationPaginateResponse extends Pagination<Organization> {
   /**
    * Results field
    */
-  @ApiProperty({ type: [] })
+  @ApiProperty({ type: [Organization] })
   results: Organization[];
 }
 
 /**
  * Organization Controller Class
  */
+@UseInterceptors(TransformInterceptor)
 @ApiBearerAuth()
 @ApiTags('organizations')
-@Controller('organizations')
-export class OrganizationController {
+@Controller('/')
+export class OrganizationController extends BaseEntityController<
+  Organization,
+  OrganizationDocument
+> {
   /**
    * Constructor of Organization Controller Class
    * @param {OrganizationService} service Organization Service
    */
-  constructor(protected readonly service: OrganizationService) {}
+  constructor(protected readonly service: OrganizationService) {
+    super(service);
+  }
 
   /**
    * Paginate Organization objects by parameters
    * @param {QueryPagination} parameters Pagination query parameters
+   * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<Pagination<Organization>>} Paginated Organization objects
    */
   @Get('')
@@ -81,6 +92,7 @@ export class OrganizationController {
   })
   async index(
     @Query() parameters: QueryPagination,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Organization>> {
     return this.service.paginate(parameters);
   }
@@ -88,13 +100,16 @@ export class OrganizationController {
   /**
    * Retrieve Organization by id
    * @param {number | string} id Organization's id
-   * @returns {Promise<Organization>} Organization object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Organization>} Organization's object
    */
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Retrieve Organization By id.' })
   @ApiResponse({
     status: 200,
     description: 'Organization Retrieve Request Received.',
+    type: Organization,
   })
   @ApiResponse({
     status: 400,
@@ -105,20 +120,22 @@ export class OrganizationController {
     description: 'Organization Retrieve Request Failed (Not found).',
   })
   async get(
-    @Param('id', OrganizationLoadByIdPipe)
+    @Param('id', Loader)
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return request.locals.entity;
+    return request.locals.organization;
   }
 
   /**
    * Replace Organization by id
    * @param {number | string} id Organization's id
    * @param {OrganizationReplacePayload} payload Organization's payload
-   * @returns {Promise<Organization>} Organization object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Organization>} Organization's object
    */
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Replace Organization By id.',
     description: '**Inserts** Organization If It does not exists By id.',
@@ -126,6 +143,7 @@ export class OrganizationController {
   @ApiResponse({
     status: 200,
     description: 'Organization Replace Request Received.',
+    type: Organization,
   })
   @ApiResponse({
     status: 400,
@@ -134,6 +152,7 @@ export class OrganizationController {
   async replace(
     @Param('id', ParseIdPipe) id: number | string,
     @Body() payload: OrganizationReplacePayload,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
     return await this.service.replace(id, payload);
   }
@@ -142,13 +161,16 @@ export class OrganizationController {
    * Update Organization by id
    * @param {number | string} id Organization's id
    * @param {OrganizationUpdatePayload} payload Organization's payload
-   * @returns {Promise<Organization>} Organization object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Organization>} Organization's object
    */
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update Organization by id.' })
   @ApiResponse({
     status: 200,
     description: 'Organization Update Request Received.',
+    type: Organization,
   })
   @ApiResponse({
     status: 400,
@@ -159,17 +181,18 @@ export class OrganizationController {
     description: 'Organization Update Request Failed (Not found).',
   })
   async update(
-    @Param('id', OrganizationLoadByIdPipe) id: number | string,
+    @Param('id', Loader) id: number | string,
     @Body() payload: OrganizationUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return await this.service.save(request.locals.entity, payload);
+    return await this.service.update(request.locals.organization, payload);
   }
 
   /**
    * Delete Organization by id
    * @param {number | string} id Organization's id
-   * @returns {Promise<DeleteResult>} Data of deleted result
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
   @HttpCode(204)
@@ -188,20 +211,21 @@ export class OrganizationController {
     description: 'Organization Delete Request Failed (Not found).',
   })
   async destroy(
-    @Param('id', OrganizationLoadByIdPipe) id: number | string,
+    @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
-  ): Promise<any> {
-    await this.service.remove(request.locals.entity);
+  ): Promise<object> {
+    await this.service.destroy(request.locals.organization._id);
     return {};
   }
 
   /**
    * Create Organization by payload
    * @param {OrganizationCreatePayload} payload Organization's payload
+   * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<Organization>} Organization object
    */
   @Post()
-  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create Organization.' })
   @ApiResponse({
     status: 201,
@@ -217,9 +241,10 @@ export class OrganizationController {
   ): Promise<Organization> {
     const organization = await this.service.create(payload);
 
-    // Add organization to current user
+    /**
+     * Attach organization to profile
+     */
     request.user.organizations.addToSet(organization);
-    await request.user.save();
 
     return organization;
   }

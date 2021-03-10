@@ -1,6 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Exclude } from 'class-transformer';
+import { Document, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * Import local objects
+ */
+import { Organization } from '../organization/organization.entity';
+import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 
 /**
  * Application Document
@@ -10,10 +17,8 @@ export type ApplicationDocument = Application & Document;
 /**
  * Application Schema
  */
-@Schema()
-export class Application {
-  readonly _id: string;
-
+@Schema(SchemaOptions)
+export class Application extends BaseEntity {
   @Prop({ required: true })
   title: string;
 
@@ -21,7 +26,10 @@ export class Application {
   description: string;
 
   @Prop()
-  key: string;
+  key?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Organization' })
+  organization?: Organization;
 }
 
 /**

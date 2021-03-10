@@ -1,3 +1,4 @@
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -17,6 +18,7 @@ import {
   Delete,
   Query,
   Req,
+  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 
@@ -28,13 +30,18 @@ import {
   ApplicationReplacePayload,
   ApplicationUpdatePayload,
 } from './payload';
+import { Loader } from './pipe';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import { ParseIdPipe } from '../common/pipes';
-import { ApplicationLoadByIdPipe } from './pipe';
-import { Application } from './application.entity';
 import { ApplicationService } from './application.service';
 import { FastifyRequestInterface } from '../common/interfaces';
-import { Pagination, Query as QueryPagination } from '../entity/pagination';
-import { AuthGuard } from '@nestjs/passport';
+import { Application, ApplicationDocument } from './application.entity';
+import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { OrganizationInterceptor } from '../organization/interceptor/organization.interceptor';
 
 /**
  * Application Paginate Response Class
@@ -50,23 +57,30 @@ export class ApplicationPaginateResponse extends Pagination<Application> {
 /**
  * Application Controller Class
  */
+@UseInterceptors(TransformInterceptor, OrganizationInterceptor)
 @ApiBearerAuth()
 @ApiTags('applications')
-@Controller('applications')
-export class ApplicationController {
+@Controller('/')
+export class ApplicationController extends BaseEntityController<
+  Application,
+  ApplicationDocument
+> {
   /**
    * Constructor of Application Controller Class
    * @param {ApplicationService} service Application Service
    */
-  constructor(protected readonly service: ApplicationService) {}
+  constructor(protected readonly service: ApplicationService) {
+    super(service);
+  }
 
   /**
    * Paginate Application objects by parameters
    * @param {QueryPagination} parameters Pagination query parameters
+   * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<Pagination<Application>>} Paginated Application objects
    */
   @Get('')
-  @UseGuards(AuthGuard('application'), AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Paginate Application objects.' })
   @ApiResponse({
     status: 200,
@@ -79,20 +93,31 @@ export class ApplicationController {
   })
   async index(
     @Query() parameters: QueryPagination,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Application>> {
+    const { organization } = request.locals;
+
+    /**
+     * Filtering by organization
+     */
+    parameters.filter = { organization: organization._id };
+
     return this.service.paginate(parameters);
   }
 
   /**
    * Retrieve Application by id
    * @param {number | string} id Application's id
-   * @returns {Promise<Application>} Application object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Application>} Application's object
    */
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Retrieve Application By id.' })
   @ApiResponse({
     status: 200,
     description: 'Application Retrieve Request Received.',
+    type: Application,
   })
   @ApiResponse({
     status: 400,
@@ -103,20 +128,22 @@ export class ApplicationController {
     description: 'Application Retrieve Request Failed (Not found).',
   })
   async get(
-    @Param('id', ApplicationLoadByIdPipe)
+    @Param('id', Loader)
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Application> {
-    return request.locals.entity;
+    return request.locals.application;
   }
 
   /**
    * Replace Application by id
    * @param {number | string} id Application's id
    * @param {ApplicationReplacePayload} payload Application's payload
-   * @returns {Promise<Application>} Application object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Application>} Application's object
    */
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Replace Application By id.',
     description: '**Inserts** Application If It does not exists By id.',
@@ -124,6 +151,7 @@ export class ApplicationController {
   @ApiResponse({
     status: 200,
     description: 'Application Replace Request Received.',
+    type: Application,
   })
   @ApiResponse({
     status: 400,
@@ -132,6 +160,7 @@ export class ApplicationController {
   async replace(
     @Param('id', ParseIdPipe) id: number | string,
     @Body() payload: ApplicationReplacePayload,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Application> {
     return await this.service.replace(id, payload);
   }
@@ -140,13 +169,16 @@ export class ApplicationController {
    * Update Application by id
    * @param {number | string} id Application's id
    * @param {ApplicationUpdatePayload} payload Application's payload
-   * @returns {Promise<Application>} Application object
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Application>} Application's object
    */
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update Application by id.' })
   @ApiResponse({
     status: 200,
     description: 'Application Update Request Received.',
+    type: Application,
   })
   @ApiResponse({
     status: 400,
@@ -157,19 +189,21 @@ export class ApplicationController {
     description: 'Application Update Request Failed (Not found).',
   })
   async update(
-    @Param('id', ApplicationLoadByIdPipe) id: number | string,
+    @Param('id', Loader) id: number | string,
     @Body() payload: ApplicationUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Application> {
-    return await this.service.save(request.locals.entity, payload);
+    return await this.service.update(request.locals.application, payload);
   }
 
   /**
    * Delete Application by id
    * @param {number | string} id Application's id
-   * @returns {Promise<DeleteResult>} Data of deleted result
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Application By id.' })
   @ApiResponse({
@@ -186,19 +220,22 @@ export class ApplicationController {
     description: 'Application Delete Request Failed (Not found).',
   })
   async destroy(
-    @Param('id', ApplicationLoadByIdPipe) id: number | string,
+    @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
-  ): Promise<any> {
-    await this.service.remove(request.locals.entity);
+  ): Promise<object> {
+    await this.service.destroy(request.locals.application._id);
     return {};
   }
 
   /**
    * Create Application by payload
+   * @param {number | string} organization Organization's id
    * @param {ApplicationCreatePayload} payload Application's payload
+   * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<Application>} Application object
    */
-  @Post()
+  @Post('')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create Application.' })
   @ApiResponse({
     status: 201,
@@ -210,7 +247,17 @@ export class ApplicationController {
   })
   async create(
     @Body() payload: ApplicationCreatePayload,
+    @Req() request: FastifyRequestInterface,
   ): Promise<Application> {
-    return await this.service.create(payload);
+    const { organization } = request.locals;
+    let application = await this.service.create(payload);
+
+    /**
+     * Attach organization to application
+     */
+    application.organization = organization;
+    application = await application.save();
+
+    return application;
   }
 }

@@ -6,12 +6,13 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  ImATeapotException,
 } from '@nestjs/common';
 
 /**
  * Import local objects
  */
-import { Pagination } from '../../entity/pagination';
+import { Pagination } from '../entity/pagination';
 
 /**
  * Transform Interceptor Class
@@ -45,6 +46,11 @@ export class TransformInterceptor implements NestInterceptor {
       );
       return data;
     }
+
+    /**
+     * Unprocessable Entity
+     */
+    if (typeof data === 'undefined') throw new ImATeapotException();
 
     /**
      * Default response

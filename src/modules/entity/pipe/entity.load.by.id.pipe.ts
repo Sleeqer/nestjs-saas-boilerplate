@@ -6,13 +6,12 @@ import { ObjectID } from 'typeorm';
  * Import local objects
  */
 import { EntityService } from '../entity.service';
-import { EntityDocument } from '../entity.entity';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
  * Entity Load By Id Pipe Class
  */
-export class EntityLoadByIdPipe implements PipeTransform {
+export class Loader implements PipeTransform {
   /**
    * Constructor of Entity Load By Id Pipe Class
    * @param {EntityService} service Entity Service

@@ -6,13 +6,14 @@ import { MongooseModule } from '@nestjs/mongoose';
  */
 import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
 import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { ApplicationHandler } from './handler/application.handler';
+import { Application, ApplicationSchema } from './application.entity';
+import { ApplicationStrategy } from './strategy/application.strategy';
 import { ApplicationListener } from './listener/application.listener';
+import { ApplicationHandler } from './handler/application.handler';
 import { ApplicationController } from './application.controller';
 import { ApplicationResolver } from './application.resolver';
 import { ApplicationService } from './application.service';
-import { Application, ApplicationSchema } from './application.entity';
-import { ApplicationStrategy } from './strategy/application.strategy';
+import { OrganizationModule } from '../organization';
 
 /**
  * Define module
@@ -24,6 +25,7 @@ import { ApplicationStrategy } from './strategy/application.strategy';
     ]),
     RabbitMQModule,
     RedisPropagatorModule,
+    OrganizationModule,
   ],
   providers: [
     ApplicationService,

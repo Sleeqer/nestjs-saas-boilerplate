@@ -5,12 +5,14 @@ import { AccessControlModule } from 'nest-access-control';
 import * as rotateFile from 'winston-daily-rotate-file';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import * as WinstonMongoDB from 'winston-mongodb';
+import { RouterModule } from 'nest-router';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
 
 /**
  * Import local objects
  */
+import { routes } from './app.routes';
 import { roles } from './app.roles';
 import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
@@ -27,6 +29,7 @@ import { ApplicationModule } from '../application/application.module';
 
 @Module({
   imports: [
+    RouterModule.forRoutes(routes),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

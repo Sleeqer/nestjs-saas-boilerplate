@@ -11,7 +11,7 @@ import { FastifyRequestInterface } from '../../common/interfaces';
 /**
  * Application Load By Id Pipe Class
  */
-export class ApplicationLoadByIdPipe implements PipeTransform {
+export class Loader implements PipeTransform {
   /**
    * Constructor of Application Load By Id Pipe Class
    * @param {ApplicationService} service Application Service

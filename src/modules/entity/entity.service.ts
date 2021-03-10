@@ -1,13 +1,13 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
 
 /**
  * Import local modules
  */
-import { InjectModel } from '@nestjs/mongoose';
 import { Entity, EntityDocument } from './entity.entity';
-import { EntityService as BaseEntityService } from '../common/entity/service';
+import { BaseEntityService } from '../common/entity/service';
 
 /**
  * Entity Service Class
@@ -27,7 +27,7 @@ export class EntityService extends BaseEntityService<EntityDocument> {
   constructor(
     @InjectModel(Entity.name)
     protected readonly repository: Model<EntityDocument>,
-    protected readonly emitter?: EventEmitter2,
+    protected readonly emitter: EventEmitter2,
   ) {
     super(repository, emitter);
   }
