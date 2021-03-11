@@ -33,7 +33,6 @@ export class Loader implements PipeTransform {
      */
     const { id, organization } = this.request.params as any;
     const identifier = organization || id;
-    console.log(identifier, '<<');
     if (!identifier) return value;
     let entity = undefined;
 

@@ -32,12 +32,12 @@ export class Query {
    */
   @ApiPropertyOptional({
     default: {
-      id: 'DESC',
+      _id: -1,
     },
   })
   @IsObject()
   order?: object = {
-    id: 'DESC',
+    _id: -1,
   };
 
   /**

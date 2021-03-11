@@ -4,6 +4,7 @@ import {
   ApiResponse,
   ApiOperation,
   ApiProperty,
+  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import {
   Controller,
@@ -77,6 +78,7 @@ export class EntityController extends BaseEntityController<
    * @returns {Promise<Pagination<Entity>>} Paginated Entity objects
    */
   @Get('')
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Paginate Entity objects.' })
   @ApiResponse({
     status: 200,
@@ -101,6 +103,7 @@ export class EntityController extends BaseEntityController<
    * @returns {Promise<Entity>} Entity's object
    */
   @Get(':id')
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Retrieve Entity By id.' })
   @ApiResponse({
     status: 200,
@@ -128,6 +131,7 @@ export class EntityController extends BaseEntityController<
    * @returns {Promise<Entity>} Entity's object
    */
   @Put(':id')
+  @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Entity By id.',
     description: '**Inserts** Entity If It does not exists By id.',
@@ -154,6 +158,7 @@ export class EntityController extends BaseEntityController<
    * @returns {Promise<Entity>} Entity's object
    */
   @Patch(':id')
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update Entity by id.' })
   @ApiResponse({
     status: 200,
@@ -184,6 +189,7 @@ export class EntityController extends BaseEntityController<
    */
   @Delete(':id')
   @HttpCode(204)
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Delete Entity By id.' })
   @ApiResponse({
     status: 204,
@@ -210,6 +216,7 @@ export class EntityController extends BaseEntityController<
    * @returns {Promise<Entity>} Entity object
    */
   @Post()
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create Entity.' })
   @ApiResponse({
     status: 201,

@@ -1,6 +1,5 @@
 import { PipeTransform, BadRequestException } from '@nestjs/common';
-import { ObjectId as CastObjectId } from 'mongodb';
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 /**
  * Parse Id Pipe Options Interface
@@ -13,7 +12,7 @@ export interface ParseIdPipeOptions {
  * Parse Id Pipe Class
  */
 export class ParseIdPipe
-  implements PipeTransform<any, number | string | ObjectID> {
+  implements PipeTransform<any, number | string | ObjectId> {
   /**
    * Options of Parse Id Pipe Class
    */
@@ -32,12 +31,12 @@ export class ParseIdPipe
    * @param {any} value Evaluating
    * @returns {number | string | ObjectID} Value
    */
-  transform(value: any): number | string | ObjectID {
+  transform(value: any): number | string | ObjectId {
     /**
      * Phase one , validate only object id type
      */
     try {
-      value = new CastObjectId(value);
+      value = new ObjectId(value);
 
       return value;
     } catch (error) {

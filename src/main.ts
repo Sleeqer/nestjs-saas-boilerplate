@@ -73,6 +73,14 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
     .setDescription(SWAGGER_API_DESCRIPTION)
     .setVersion(SWAGGER_API_CURRENT_VERSION)
     .addBearerAuth()
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'X-API-Key',
+        in: 'header',
+      },
+      'X-API-Key',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(application, options);

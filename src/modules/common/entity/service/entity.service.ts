@@ -16,9 +16,11 @@ import {
 /**
  * Import local modules
  */
+import { populate } from '../../../common/helpers';
 import { EntityEvent } from '../../../entity/event';
 import { EntityEventEnum } from '../../../entity/enum';
 import { Pagination, Query } from '../pagination';
+import { Payload } from '../../../common/entity/controller';
 
 /**
  * Schema Type for FilterQuery
@@ -61,7 +63,7 @@ export class BaseEntityService<Entity extends Document> {
    * @returns {NotFoundException} NotFoundException instance
    */
   _NotFoundException(context: string = '') {
-    const message = `${this.entity} entity could not be found.`;
+    const message = `${this.entity} could not be found.`;
     return new NotFoundException(context || message);
   }
 
@@ -71,7 +73,7 @@ export class BaseEntityService<Entity extends Document> {
    * @returns {ForbiddenException} ForbiddenException instance
    */
   _ForbiddenException(context: string = '') {
-    const message = `${this.entity} entity already exists.`;
+    const message = `${this.entity} already exists.`;
     return new ForbiddenException(context || message);
   }
 
@@ -81,7 +83,7 @@ export class BaseEntityService<Entity extends Document> {
    * @returns {BadRequestException} BadRequestException instance
    */
   _BadRequestException(context: string | Array<string>) {
-    const message = `${this.entity} entity already exists.`;
+    const message = `${this.entity} already exists.`;
     return new BadRequestException(context || message);
   }
 
@@ -106,6 +108,7 @@ export class BaseEntityService<Entity extends Document> {
     limit = 15,
     order = {},
     filter = {},
+    populator = [],
   }: Query): Promise<Pagination<Entity>> {
     /**
      * Find entities
@@ -114,6 +117,7 @@ export class BaseEntityService<Entity extends Document> {
     const results = await this.repository
       .find(filter)
       .sort(order)
+      .populate(populate(populator))
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
@@ -158,7 +162,7 @@ export class BaseEntityService<Entity extends Document> {
    * @param {CreateQuery<Entity>} payload Entity's payload
    * @returns {Promise<Entity>} Entity object
    */
-  async create(payload: CreateQuery<Entity>): Promise<Entity> {
+  async create(payload: CreateQuery<Payload>): Promise<Entity> {
     const entity: Entity = await new this.repository(payload).save();
 
     /**

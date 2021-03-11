@@ -52,6 +52,9 @@ export class FormatResponseException {
  * Format Response Exception Messages Class
  */
 export class FormatResponseExceptionMessages {
+  /**
+   * Default object
+   */
   private object = {
     error: {
       code: 400,
@@ -97,7 +100,9 @@ export class FormatResponseExceptionMessages {
     }
 
     if (!Array.isArray(data.message)) {
-      this.object.error.errors.push(new FormatResponseException(data.message));
+      this.object.error.errors.push(
+        new FormatResponseException(data.message, data?.property || ''),
+      );
 
       /**
        * General message , human readable , this time main error
@@ -109,6 +114,10 @@ export class FormatResponseExceptionMessages {
     this.object.error.code = data.status || data.statusCode;
   }
 
+  /**
+   *
+   * @returns {object}
+   */
   public getObject() {
     return this.object;
   }
@@ -174,7 +183,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if ((config.get('LOGGER_HTTP') as unknown) as boolean)
       this.logger.error(
         `${this.log} -> Error ${object.error.code} on ${
-          request.ip
+          request?.ip || '0.0.0.0'
         } (${JSON.stringify(object)})`,
         (exception as any)?.stack || '',
       );

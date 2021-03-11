@@ -90,6 +90,7 @@ export class ProfileService {
     // keep making default roles for every created profile, these roles are defined from AppRoles enum.
     const profile = new this.repository({
       ...payload,
+      password: crypto.createHmac("sha256", payload.password).digest("hex"),
       roles: AppRoles.DEFAULT,
       avatar: url(payload.email, {
         protocol: 'http',

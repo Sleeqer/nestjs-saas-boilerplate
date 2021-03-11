@@ -21,8 +21,8 @@ export class ApplicationResolver {
    *
    * @returns
    */
-  @Query((returns) => [Application], { name: 'entities', nullable: false })
-  async entities() {
+  @Query((returns) => [Application], { name: 'applications', nullable: false })
+  async applications() {
     return this.service.all();
   }
 }

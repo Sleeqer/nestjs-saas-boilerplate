@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude } from 'class-transformer';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,19 +15,54 @@ import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 export type ApplicationDocument = Application & Document;
 
 /**
+ * Application Settings Token Class
+ */
+@ObjectType()
+export class ApplicationSettingsToken {
+  @Field(() => String)
+  @Prop({ required: false, default: '' })
+  secret: string = '';
+
+  @Field(() => String)
+  @Prop({ required: false, default: '' })
+  property: string = '';
+}
+
+/**
+ * Application Settings Class
+ */
+@ObjectType()
+export class ApplicationSettings {
+  @Field(() => ApplicationSettingsToken)
+  @Prop({
+    required: false,
+  })
+  token: ApplicationSettingsToken = new ApplicationSettingsToken();
+}
+
+/**
  * Application Schema
  */
+@ObjectType()
 @Schema(SchemaOptions)
 export class Application extends BaseEntity {
+  @Field(() => String)
   @Prop({ required: true })
   title: string;
 
+  @Field(() => String)
   @Prop()
   description: string;
 
+  @Field(() => ApplicationSettings)
+  @Prop({ required: false, default: new ApplicationSettings() })
+  settings?: ApplicationSettings;
+
+  @Field(() => String)
   @Prop()
   key?: string;
 
+  @Field(() => String)
   @Prop({ type: Types.ObjectId, ref: 'Organization' })
   organization?: Organization;
 }

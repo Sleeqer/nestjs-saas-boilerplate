@@ -1,13 +1,14 @@
 import { MongooseModule, MongooseModuleAsyncOptions } from '@nestjs/mongoose';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
 import * as rotateFile from 'winston-daily-rotate-file';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import * as WinstonMongoDB from 'winston-mongodb';
+import { GraphQLModule } from '@nestjs/graphql';
 import { RouterModule } from 'nest-router';
+import { APP_FILTER } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
+import { join } from 'path';
 
 /**
  * Import local objects
@@ -15,10 +16,12 @@ import * as winston from 'winston';
 import { routes } from './app.routes';
 import { roles } from './app.roles';
 import { AppService } from './app.service';
+import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { AppController } from './app.controller';
 import { OrganizationModule } from '../organization';
 import { EntityModule } from '../entity/entity.module';
+import { ReportModule } from '../report/report.module';
 import { ConfigModule } from '../config/config.module';
 import { HttpExceptionFilter } from '../common/filters';
 import { ConfigService } from '../config/config.service';
@@ -26,6 +29,7 @@ import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
 import { SharedModule } from '../../adapters/shared/shared.module';
 import { ApplicationModule } from '../application/application.module';
+import { ConversationModule } from '../conversation/conversation.module';
 
 @Module({
   imports: [
@@ -127,11 +131,14 @@ import { ApplicationModule } from '../application/application.module';
       // Disable throwing uncaughtException if an error event is emitted and it has no listeners
       ignoreErrors: false,
     }),
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 1000,
-    }),
     AccessControlModule.forRoles(roles),
+    GraphQLModule.forRoot({
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      playground: true,
+      debug: true,
+      path: 'api/v1/graphql',
+    }),
     ConfigModule,
     AuthModule,
     ProfileModule,
@@ -139,14 +146,13 @@ import { ApplicationModule } from '../application/application.module';
     SharedModule,
     ApplicationModule,
     OrganizationModule,
+    UserModule,
+    ReportModule,
+    ConversationModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,

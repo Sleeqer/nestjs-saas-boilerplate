@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude } from 'class-transformer';
+import { ObjectType, Field } from '@nestjs/graphql';
 import { Document } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,15 +16,18 @@ export type EntityDocument = Entity & Document;
 /**
  * Entity Schema
  */
-
+@ObjectType()
 @Schema(SchemaOptions)
 export class Entity extends BaseEntity {
+  @Field(() => String)
   @Prop({ required: true })
   title: string;
 
+  @Field(() => String)
   @Prop({ required: false, default: '' })
   description: string = '';
 
+  @Field(() => String)
   @Prop({ required: false })
   key?: string;
 }

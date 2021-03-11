@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiOperation,
+  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 
 /**
@@ -46,6 +47,7 @@ export class ProfileController {
    */
   @Get('@me')
   @UseGuards(AuthGuard('jwt'), ACGuard)
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get current user profile.' })
   @ApiResponse({
     status: 200,
@@ -66,6 +68,7 @@ export class ProfileController {
    */
   @Get(':username')
   @UseGuards(AuthGuard('jwt'))
+  @ApiExcludeEndpoint()
   @ApiResponse({ status: 200, description: 'Fetch Profile Request Received' })
   @ApiResponse({ status: 400, description: 'Fetch Profile Request Failed' })
   async getProfile(@Param('username') username: string): Promise<Profile> {
@@ -90,6 +93,7 @@ export class ProfileController {
     action: 'update',
     possession: 'any',
   })
+  @ApiExcludeEndpoint()
   @ApiResponse({ status: 200, description: 'Patch Profile Request Received' })
   @ApiResponse({ status: 400, description: 'Patch Profile Request Failed' })
   async patchProfile(@Body() payload: PatchProfilePayload): Promise<Profile> {
@@ -108,6 +112,7 @@ export class ProfileController {
     action: 'delete',
     possession: 'any',
   })
+  @ApiExcludeEndpoint()
   @ApiResponse({ status: 200, description: 'Delete Profile Request Received' })
   @ApiResponse({ status: 400, description: 'Delete Profile Request Failed' })
   async delete(

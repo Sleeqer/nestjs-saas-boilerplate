@@ -5,6 +5,7 @@ import {
   ApiResponse,
   ApiOperation,
   ApiProperty,
+  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import {
   Controller,
@@ -39,7 +40,6 @@ import { ParseIdPipe } from '../common/pipes';
 import { ApplicationService } from './application.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Application, ApplicationDocument } from './application.entity';
-import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
 import { OrganizationInterceptor } from '../organization/interceptor/organization.interceptor';
 
@@ -57,7 +57,7 @@ export class ApplicationPaginateResponse extends Pagination<Application> {
 /**
  * Application Controller Class
  */
-@UseInterceptors(TransformInterceptor, OrganizationInterceptor)
+@UseInterceptors(OrganizationInterceptor)
 @ApiBearerAuth()
 @ApiTags('applications')
 @Controller('/')
@@ -144,6 +144,7 @@ export class ApplicationController extends BaseEntityController<
    */
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Application By id.',
     description: '**Inserts** Application If It does not exists By id.',

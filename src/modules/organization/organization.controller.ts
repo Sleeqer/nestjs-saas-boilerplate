@@ -5,6 +5,7 @@ import {
   ApiResponse,
   ApiOperation,
   ApiProperty,
+  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import {
   Controller,
@@ -136,6 +137,7 @@ export class OrganizationController extends BaseEntityController<
    */
   @Put(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Organization By id.',
     description: '**Inserts** Organization If It does not exists By id.',

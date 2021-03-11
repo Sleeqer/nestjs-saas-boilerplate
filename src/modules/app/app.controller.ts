@@ -1,30 +1,34 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 /**
- * App Controller
+ * App Controller Class
  */
 @ApiBearerAuth()
 @Controller()
 export class AppController {
   /**
-   * Constructor
-   * @param {AppService} appService app service
+   * Constructor of App Controller Class
+   * @param {AppService} service app service
    */
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly service: AppService) {}
 
   /**
    * Returns the an environment variable from config file
    * @returns {string} the application environment url
    */
-  @Get()
+  @Get('healthz')
   @UseGuards(AuthGuard('jwt'))
   @ApiResponse({ status: 200, description: 'Root Request Completed' })
   @ApiResponse({ status: 400, description: 'Root Request Failed' })
   root(): string {
-    return this.appService.root();
+    return this.service.root();
   }
 
   /**
@@ -34,6 +38,7 @@ export class AppController {
    */
   @Get('request/user')
   @UseGuards(AuthGuard('jwt'))
+  @ApiExcludeEndpoint()
   @ApiResponse({ status: 200, description: 'User Metadata Request Completed' })
   @ApiResponse({ status: 400, description: 'User Metadata Request Failed' })
   getRequestUser(@Req() req): Partial<Request> {

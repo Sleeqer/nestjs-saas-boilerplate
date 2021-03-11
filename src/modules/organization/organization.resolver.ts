@@ -21,8 +21,8 @@ export class OrganizationResolver {
    *
    * @returns
    */
-  @Query((returns) => [Organization], { name: 'entities', nullable: false })
-  async entities() {
+  @Query((returns) => [Organization], { name: 'organizations', nullable: false })
+  async organizations() {
     return this.service.all();
   }
 }
