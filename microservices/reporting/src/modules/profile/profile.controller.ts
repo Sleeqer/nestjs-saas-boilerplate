@@ -1,0 +1,123 @@
+import { ACGuard, UseRoles } from 'nest-access-control';
+import { AuthGuard } from '@nestjs/passport';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiResponse,
+  ApiTags,
+  ApiOperation,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
+
+/**
+ * Import local objects
+ */
+import { Profile } from './profile.entity';
+import { FastifyRequestInterface } from '../common/interfaces';
+import { PatchProfilePayload } from './payload/patch.profile.payload';
+import { ProfileService, IGenericMessageBody } from './profile.service';
+
+/**
+ * Profile Controller
+ */
+@ApiBearerAuth()
+@ApiTags('profiles')
+@Controller('profiles')
+export class ProfileController {
+  /**
+   * Constructor
+   * @param profileService
+   */
+  constructor(private readonly profileService: ProfileService) {}
+
+  /**
+   * Retrieves current user profile
+   * @param {Req} request Request
+   * @returns {Promise<Profile>} Profile
+   */
+  @Get('@me')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @ApiExcludeEndpoint()
+  @ApiOperation({ summary: 'Get current user profile.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieve User Profile Request Received.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Retrieve User Profile Request Failed.',
+  })
+  async profile(@Req() request: FastifyRequestInterface): Promise<Profile> {
+    return request.user;
+  }
+
+  /**
+   * Retrieves a particular profile
+   * @param username the profile given username to fetch
+   * @returns {Promise<Profile>} queried profile data
+   */
+  @Get(':username')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiExcludeEndpoint()
+  @ApiResponse({ status: 200, description: 'Fetch Profile Request Received' })
+  @ApiResponse({ status: 400, description: 'Fetch Profile Request Failed' })
+  async getProfile(@Param('username') username: string): Promise<Profile> {
+    const profile = await this.profileService.getByUsername(username);
+    if (!profile) {
+      throw new BadRequestException(
+        'The profile with that username could not be found.',
+      );
+    }
+    return profile;
+  }
+
+  /**
+   * Edit a profile
+   * @param {RegisterPayload} payload
+   * @returns {Promise<Profile>} mutated profile data
+   */
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  @UseRoles({
+    resource: 'profiles',
+    action: 'update',
+    possession: 'any',
+  })
+  @ApiExcludeEndpoint()
+  @ApiResponse({ status: 200, description: 'Patch Profile Request Received' })
+  @ApiResponse({ status: 400, description: 'Patch Profile Request Failed' })
+  async patchProfile(@Body() payload: PatchProfilePayload): Promise<Profile> {
+    return await this.profileService.edit(payload);
+  }
+
+  /**
+   * Removes a profile from the database
+   * @param {string} username the username to remove
+   * @returns {Promise<IGenericMessageBody>} whether or not the profile has been deleted
+   */
+  @Delete(':username')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    resource: 'profiles',
+    action: 'delete',
+    possession: 'any',
+  })
+  @ApiExcludeEndpoint()
+  @ApiResponse({ status: 200, description: 'Delete Profile Request Received' })
+  @ApiResponse({ status: 400, description: 'Delete Profile Request Failed' })
+  async delete(
+    @Param('username') username: string,
+  ): Promise<IGenericMessageBody> {
+    return await this.profileService.delete(username);
+  }
+}
