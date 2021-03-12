@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsOptional,
   MaxLength,
@@ -5,15 +7,13 @@ import {
   IsString,
   IsNotEmpty,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 
 /**
  * Import local objects
  */
 import { Conversation } from '../../conversation/conversation.entity';
 import { ReportReasonEnum } from '../enum/report.reason.enum';
-import { User } from 'src/modules/user/user.entity';
+import { User } from '../../user/user.entity';
 
 /**
  * Report Create Payload Class

@@ -26,7 +26,9 @@ type Conversation {
   _id: String!
   description: String!
   edited_timestamp: DateTime
+  members: [User!]
   name: String!
+  owner: User
   timestamp: DateTime
   title: String!
 }
@@ -41,9 +43,19 @@ type Organization {
   description: String
   edited_timestamp: DateTime
   key: String
-  profile: String
+  profile: Profile
   timestamp: DateTime
   title: String!
+}
+
+type Profile {
+  avatar: String
+  email: String
+  name: String
+  organizations: [Organization!]
+  password: String
+  roles: [String!]
+  username: String
 }
 
 type Query {

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,10 +20,12 @@ export type ApplicationDocument = Application & Document;
  */
 @ObjectType()
 export class ApplicationSettingsToken {
+  @ApiProperty({ required: false, default: '' })
   @Field(() => String)
   @Prop({ required: false, default: '' })
   secret: string = '';
 
+  @ApiProperty({ required: false, default: '' })
   @Field(() => String)
   @Prop({ required: false, default: '' })
   property: string = '';
@@ -33,6 +36,9 @@ export class ApplicationSettingsToken {
  */
 @ObjectType()
 export class ApplicationSettings {
+  @ApiProperty({
+    required: true,
+  })
   @Field(() => ApplicationSettingsToken)
   @Prop({
     required: false,

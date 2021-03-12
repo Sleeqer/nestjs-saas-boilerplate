@@ -1,11 +1,11 @@
 import { MongooseModule, MongooseModuleAsyncOptions } from '@nestjs/mongoose';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
-import * as rotateFile from 'winston-daily-rotate-file';
+import * as DailyRotateFile from 'winston-daily-rotate-file';
 import * as WinstonMongoDB from 'winston-mongodb';
 import { GraphQLModule } from '@nestjs/graphql';
 import { RouterModule } from 'nest-router';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import * as winston from 'winston';
 import { join } from 'path';
@@ -27,6 +27,7 @@ import { HttpExceptionFilter } from '../common/filters';
 import { ConfigService } from '../config/config.service';
 import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
+import { ProfileGuards } from '../auth/guards';
 import { SharedModule } from '../../adapters/shared/shared.module';
 import { ApplicationModule } from '../application/application.module';
 import { ConversationModule } from '../conversation/conversation.module';
@@ -89,7 +90,7 @@ import { ConversationModule } from '../conversation/conversation.module';
                 new winston.transports.Console({
                   format: winston.format.simple(),
                 }),
-                new rotateFile({
+                new DailyRotateFile({
                   filename: 'logs/application-%DATE%.log',
                   datePattern: 'YYYY-MM-DD',
                   zippedArchive: true,

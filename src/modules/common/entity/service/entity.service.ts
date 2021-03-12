@@ -4,7 +4,6 @@ import {
   Document,
   FilterQuery,
   UpdateQuery,
-  CreateQuery,
 } from 'mongoose';
 import {
   Injectable,
@@ -159,10 +158,10 @@ export class BaseEntityService<Entity extends Document> {
 
   /**
    * Create Entity by payload
-   * @param {CreateQuery<Entity>} payload Entity's payload
+   * @param {Payload} payload Entity's payload
    * @returns {Promise<Entity>} Entity object
    */
-  async create(payload: CreateQuery<Payload>): Promise<Entity> {
+  async create(payload: Payload): Promise<Entity> {
     const entity: Entity = await new this.repository(payload).save();
 
     /**

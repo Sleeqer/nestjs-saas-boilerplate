@@ -26,6 +26,7 @@ import { Profile } from './profile.entity';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { PatchProfilePayload } from './payload/patch.profile.payload';
 import { ProfileService, IGenericMessageBody } from './profile.service';
+import { ProfileGuards } from '../auth/guards';
 
 /**
  * Profile Controller
@@ -46,19 +47,19 @@ export class ProfileController {
    * @returns {Promise<Profile>} Profile
    */
   @Get('@me')
-  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseGuards(ProfileGuards)
   @ApiExcludeEndpoint()
-  @ApiOperation({ summary: 'Get current user profile.' })
+  @ApiOperation({ summary: 'Retrieve Profile.' })
   @ApiResponse({
     status: 200,
-    description: 'Retrieve User Profile Request Received.',
+    description: 'Retrieve Profile Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Retrieve User Profile Request Failed.',
+    description: 'Retrieve Profile Request Failed.',
   })
   async profile(@Req() request: FastifyRequestInterface): Promise<Profile> {
-    return request.user;
+    return request.profile;
   }
 
   /**

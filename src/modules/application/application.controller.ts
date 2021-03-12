@@ -42,6 +42,7 @@ import { FastifyRequestInterface } from '../common/interfaces';
 import { Application, ApplicationDocument } from './application.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
 import { OrganizationInterceptor } from '../organization/interceptor/organization.interceptor';
+import { ProfileGuards } from '../auth/guards';
 
 /**
  * Application Paginate Response Class
@@ -80,7 +81,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Pagination<Application>>} Paginated Application objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Paginate Application objects.' })
   @ApiResponse({
     status: 200,
@@ -112,7 +113,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Retrieve Application By id.' })
   @ApiResponse({
     status: 200,
@@ -143,7 +144,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Application By id.',
@@ -174,7 +175,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Update Application by id.' })
   @ApiResponse({
     status: 200,
@@ -204,7 +205,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Application By id.' })
   @ApiResponse({
@@ -236,7 +237,7 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application object
    */
   @Post('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Create Application.' })
   @ApiResponse({
     status: 201,
@@ -256,7 +257,7 @@ export class ApplicationController extends BaseEntityController<
     /**
      * Attach organization to application
      */
-    application.organization = organization;
+    application.organization = organization._id;
     application = await application.save();
 
     return application;

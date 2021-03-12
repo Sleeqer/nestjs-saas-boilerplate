@@ -179,3 +179,9 @@ modules.xml
 
 # Sonarlint plugin
 .idea/sonarlint
+
+# Lock
+*-lock.json
+
+# Docs
+docs/*

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 /**
@@ -8,6 +8,7 @@ import { Profile, ProfileSchema } from './profile.entity';
 import { ProfileService } from './profile.service';
 import { ProfileController } from './profile.controller';
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Profile.name, schema: ProfileSchema }]),

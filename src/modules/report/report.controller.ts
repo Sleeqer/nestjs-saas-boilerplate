@@ -43,6 +43,7 @@ import { UserInterceptor } from '../user/interceptor';
 import { Report, ReportDocument } from './report.entity';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { ReportPopulateEnum } from './enum/report.populate.enum';
+import { ApplicationGuard } from '../common/guards/application.guard';
 import { ConversationInterceptor } from '../conversation/interceptor';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
 
@@ -85,7 +86,7 @@ export class ReportController extends BaseEntityController<
    * @returns {Promise<Pagination<Report>>} Paginated Report objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'), AuthGuard('application'))
+  @UseGuards(AuthGuard('application.key'))
   @ApiOperation({ summary: 'Paginate Report objects.' })
   @ApiResponse({
     status: 200,
@@ -103,11 +104,13 @@ export class ReportController extends BaseEntityController<
     /**
      * Adjusting parameters for finding
      */
-    parameters.filter = { application: request.locals.application._id };
+    parameters.filter = { application: request.application._id };
     parameters.populator = [
       ReportPopulateEnum.REPORTER,
       ReportPopulateEnum.CONVERSATION,
       ReportPopulateEnum.USER,
+      ReportPopulateEnum.CONVERSATION_MEMBERS,
+      ReportPopulateEnum.CONVERSATION_OWNER
     ];
 
     return this.service.paginate(parameters);
@@ -246,7 +249,7 @@ export class ReportController extends BaseEntityController<
    */
   @Post()
   @UseInterceptors(ConversationInterceptor, UserInterceptor)
-  @UseGuards(AuthGuard('application'))
+  @UseGuards(ApplicationGuard)
   @ApiOperation({ summary: 'Create Report.' })
   @ApiResponse({
     status: 201,
@@ -260,14 +263,14 @@ export class ReportController extends BaseEntityController<
     @Body() payload: ReportCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Report> {
-    const { application, conversation, user } = request.locals;
+    const { conversation, user } = request.locals;
 
     const report = await this.service.create({
       ...payload,
-      application,
-      reporter: request.user,
-      conversation,
-      user,
+      application: request.application?._id,
+      reporter: request.user?._id,
+      conversation: conversation?._id,
+      user: user?._id,
     });
     return report;
   }

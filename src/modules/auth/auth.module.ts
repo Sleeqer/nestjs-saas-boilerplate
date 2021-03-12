@@ -14,6 +14,7 @@ import { ProfileModule } from '../profile/profile.module';
 import { ConfigService } from '../config/config.service';
 import { ApplicationStrategy } from './strategy/application.strategy';
 import { ApplicationModule } from '../application/application.module';
+import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
 
 @Module({
   imports: [
@@ -42,7 +43,7 @@ import { ApplicationModule } from '../application/application.module';
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, ApplicationStrategy],
+  providers: [AuthService, JwtStrategy, ApplicationStrategy, ApplicationKeyStrategy],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' })],
 })
 

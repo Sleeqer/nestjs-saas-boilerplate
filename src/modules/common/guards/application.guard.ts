@@ -1,7 +1,11 @@
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
-import { Strategy } from 'passport-custom';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Observable } from 'rxjs';
 
 /**
  * Import local objects
@@ -19,14 +23,13 @@ type TokenizeResult = {
   user: any;
 };
 
-/**
- * Application Strategy Class
- */
 @Injectable()
-export class ApplicationStrategy extends PassportStrategy(
-  Strategy,
-  'application',
-) {
+export class ApplicationGuard implements CanActivate {
+  /**
+   * @type {JwtService}
+   */
+  private readonly jwt: JwtService;
+
   /**
    * Field to query User Service
    * @type {string}
@@ -36,15 +39,13 @@ export class ApplicationStrategy extends PassportStrategy(
   /**
    * Constructor of Application Strategy Class
    * @param {ApplicationService} service Application service
-   * @param {JwtService} jwt JWT Service
    * @param {UserService} user User Service
    */
   constructor(
     private readonly service: ApplicationService,
-    private readonly jwt: JwtService,
     private readonly user: UserService,
   ) {
-    super();
+    this.jwt = new JwtService({});
   }
 
   /**
@@ -88,40 +89,70 @@ export class ApplicationStrategy extends PassportStrategy(
   }
 
   /**
-   * Validate strategy
+   * Validate application
+   * @param {string} _id Application's _id
    * @param {FastifyRequestInterface} request Request
-   * @param {Function} next Callback
    * @returns {Promise<boolean>}
    */
-  async validate(
+  async application(
+    _id: string,
+    token: string,
     request: FastifyRequestInterface,
-    next: Function,
-  ): Promise<any> {
+  ): Promise<boolean> {
+    let application = undefined;
+    try {
+      application = await this.service.by(_id, '_id');
+    } catch {}
+
+    /**
+     * Applicatino does not exists , reject
+     */
+    if (!application) throw new UnauthorizedException();
+
+    /**
+     * Defaulting response
+     */
+    request.application = application;
+    const tokenize = await this.tokenization(application.settings, token);
+
+    request.user =
+      tokenize.evaluated && tokenize.user
+        ? tokenize.user
+        : request.user || undefined;
+
+    const evaluation = tokenize.evaluated;
+    if (!evaluation) throw new UnauthorizedException();
+    return evaluation;
+  }
+
+  /**
+   *
+   * @param context
+   * @returns
+   */
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request: FastifyRequestInterface = context
+      .switchToHttp()
+      .getRequest();
+
+    /**
+     * Access headers
+     */
     const { headers } = request;
+
+    /**
+     * Retrieve application identifier & token
+     */
     const key = headers['x-api-key'];
-    const authorization =
-      headers['authorization']?.replace('Bearer', '')?.trim() || '';
+    const authorization = headers['authorization']?.replace('Bearer', '');
+    if (!key) throw new UnauthorizedException();
 
-    if (!key) return next(null, false);
-
-    const application = await this.service.by(key, '_id');
-    if (!application) return next(null, false);
-
-    /**
-     * Attach application & verify token if settings exists
-     */
-    request.locals.application = application;
-    const tokenize = await this.tokenization(
-      application.settings,
-      authorization,
+    return this.application(
+      key as string,
+      (authorization?.trim() || '') as string,
+      request,
     );
-
-    /**
-     * Retrieve user
-     */
-    const user =
-      tokenize.evaluated && tokenize.user ? tokenize.user : request.user;
-    console.log(user, tokenize);
-    return next(null, user);
   }
 }

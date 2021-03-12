@@ -1,20 +1,17 @@
-import { Inject } from '@nestjs/common';
 import { Logger } from 'winston';
-import { getRepository } from 'typeorm';
 
 /**
  * Import local objects
  */
-import { Entity } from '../entity.entity';
 import {
   RabbitMQEnum,
   RabbitMQExchangeTypeEnum,
 } from '../../../adapters/rabbitmq/interface';
 import { EXCHANGE, KEY, QUEUE } from './entity.handler.enum';
 import { ConfigService } from '../../../modules/config/config.service';
-import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../../../adapters/redis/propagator/redis.propgator.service';
 import { RabbitMQOptionInterface } from '../../../adapters/rabbitmq/interface/rabbitmq.option.interface';
-import { MessageHandler } from 'src/adapters/rabbitmq/handler/message.handler';
+import { MessageHandler } from '../../../adapters/rabbitmq/handler/message.handler';
 
 /**
  * Current config

@@ -12,8 +12,11 @@ COPY . .
 # Env setup
 COPY .env.example .env
 
-#Expose port and begin application
-EXPOSE 8000
+# BUILD
+RUN npm run build
 
 # Start the app
-CMD [ "npm", "run", "start:dev"]
+CMD [ "npm", "run", "start:prod"]
+
+#Expose port and begin application
+EXPOSE 8000
