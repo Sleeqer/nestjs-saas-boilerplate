@@ -25,9 +25,9 @@ import {
  * Import local objects
  */
 import {
-  ApplicationCreatePayload,
-  ApplicationReplacePayload,
-  ApplicationUpdatePayload,
+  MemberCreatePayload,
+  MemberReplacePayload,
+  MemberUpdatePayload,
 } from './payload';
 import { Loader } from './pipe';
 import {
@@ -35,65 +35,65 @@ import {
   Query as QueryPagination,
 } from '../common/entity/pagination';
 import { ParseIdPipe } from '../common/pipes';
-import { ApplicationService } from './application.service';
+import { MemberService } from './member.service';
 import { FastifyRequestInterface } from '../common/interfaces';
-import { Application, ApplicationDocument } from './application.entity';
+import { Member, MemberDocument } from './member.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
 import { OrganizationGuards, ProfileGuards } from '../auth/guards';
 import { GuardsProperty } from '../auth/guards/decorators';
 
 /**
- * Application Paginate Response Class
+ * Member Paginate Response Class
  */
-export class ApplicationPaginateResponse extends Pagination<Application> {
+export class MemberPaginateResponse extends Pagination<Member> {
   /**
    * Results field
    */
-  @ApiProperty({ type: [Application] })
-  results: Application[];
+  @ApiProperty({ type: [Member] })
+  results: Member[];
 }
 
 /**
- * Application Controller Class
+ * Member Controller Class
  */
 @ApiBearerAuth()
-@ApiTags('applications')
+@ApiTags('Members')
 @Controller('/')
-export class ApplicationController extends BaseEntityController<
-Application,
-ApplicationDocument
+export class MemberController extends BaseEntityController<
+Member,
+MemberDocument
 > {
   /**
-   * Constructor of Application Controller Class
-   * @param {ApplicationService} service Application Service
+   * Constructor of Member Controller Class
+   * @param {MemberService} service Member Service
    */
-  constructor(protected readonly service: ApplicationService) {
+  constructor(protected readonly service: MemberService) {
     super(service);
   }
 
   /**
-   * Paginate Application objects by parameters
+   * Paginate Member objects by parameters
    * @param {QueryPagination} parameters Pagination query parameters
    * @param {FastifyRequestInterface} request Request's object
-   * @returns {Promise<Pagination<Application>>} Paginated Application objects
+   * @returns {Promise<Pagination<Member>>} Paginated Member objects
    */
   @Get('')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Paginate Application objects.' })
+  @ApiOperation({ summary: 'Paginate Member objects.' })
   @ApiResponse({
     status: 200,
-    description: `Application List Request Received.`,
-    type: ApplicationPaginateResponse,
+    description: `Member List Request Received.`,
+    type: MemberPaginateResponse,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application List Request Failed.',
+    description: 'Member List Request Failed.',
   })
   async index(
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Pagination<Application>> {
+  ): Promise<Pagination<Member>> {
     const { organization } = request;
 
     /**
@@ -105,103 +105,103 @@ ApplicationDocument
   }
 
   /**
-   * Retrieve Application by id
-   * @param {number | string} id Application's id
+   * Retrieve Member by id
+   * @param {number | string} id Member's id
    * @param {FastifyRequestInterface} request Request's object
-   * @returns {Promise<Application>} Application's object
+   * @returns {Promise<Member>} Member's object
    */
   @Get(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Retrieve Application By id.' })
+  @ApiOperation({ summary: 'Retrieve Member By id.' })
   @ApiResponse({
     status: 200,
-    description: 'Application Retrieve Request Received.',
-    type: Application,
+    description: 'Member Retrieve Request Received.',
+    type: Member,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Retrieve Request Failed.',
+    description: 'Member Retrieve Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Retrieve Request Failed (Not found).',
+    description: 'Member Retrieve Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
     id: number | string,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Application> {
-    return request.locals.application;
+  ): Promise<Member> {
+    return request.locals.Member;
   }
 
   /**
-   * Replace Application by id
-   * @param {number | string} id Application's id
-   * @param {ApplicationReplacePayload} payload Application's payload
+   * Replace Member by id
+   * @param {number | string} id Member's id
+   * @param {MemberReplacePayload} payload Member's payload
    * @param {FastifyRequestInterface} request Request's object
-   * @returns {Promise<Application>} Application's object
+   * @returns {Promise<Member>} Member's object
    */
   @Put(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Application By id.',
-    description: '**Inserts** Application If It does not exists By id.',
+    summary: 'Replace Member By id.',
+    description: '**Inserts** Member If It does not exists By id.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Application Replace Request Received.',
-    type: Application,
+    description: 'Member Replace Request Received.',
+    type: Member,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Replace Request Failed.',
+    description: 'Member Replace Request Failed.',
   })
   async replace(
     @Param('id', ParseIdPipe) id: number | string,
-    @Body() payload: ApplicationReplacePayload,
+    @Body() payload: MemberReplacePayload,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Application> {
+  ): Promise<Member> {
     return await this.service.replace(id, payload);
   }
 
   /**
-   * Update Application by id
-   * @param {number | string} id Application's id
-   * @param {ApplicationUpdatePayload} payload Application's payload
+   * Update Member by id
+   * @param {number | string} id Member's id
+   * @param {MemberUpdatePayload} payload Member's payload
    * @param {FastifyRequestInterface} request Request's object
-   * @returns {Promise<Application>} Application's object
+   * @returns {Promise<Member>} Member's object
    */
   @Patch(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Update Application by id.' })
+  @ApiOperation({ summary: 'Update Member by id.' })
   @ApiResponse({
     status: 200,
-    description: 'Application Update Request Received.',
-    type: Application,
+    description: 'Member Update Request Received.',
+    type: Member,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Update Request Failed.',
+    description: 'Member Update Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Update Request Failed (Not found).',
+    description: 'Member Update Request Failed (Not found).',
   })
   async update(
     @Param('id', Loader) id: number | string,
-    @Body() payload: ApplicationUpdatePayload,
+    @Body() payload: MemberUpdatePayload,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Application> {
-    return await this.service.update(request.locals.application, payload);
+  ): Promise<Member> {
+    return await this.service.update(request.locals.Member, payload);
   }
 
   /**
-   * Delete Application by id
-   * @param {number | string} id Application's id
+   * Delete Member by id
+   * @param {number | string} id Member's id
    * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<object>} Empty object
    */
@@ -209,60 +209,60 @@ ApplicationDocument
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Application By id.' })
+  @ApiOperation({ summary: 'Delete Member By id.' })
   @ApiResponse({
     status: 204,
-    description: 'Application Delete Request Received.',
+    description: 'Member Delete Request Received.',
     type: Object,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Delete Request Failed.',
+    description: 'Member Delete Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Delete Request Failed (Not found).',
+    description: 'Member Delete Request Failed (Not found).',
   })
   async destroy(
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.application._id);
+    await this.service.destroy(request.locals.Member._id);
     return {};
   }
 
   /**
-   * Create Application by payload
+   * Create Member by payload
    * @param {number | string} organization Organization's id
-   * @param {ApplicationCreatePayload} payload Application's payload
+   * @param {MemberCreatePayload} payload Member's payload
    * @param {FastifyRequestInterface} request Request's object
-   * @returns {Promise<Application>} Application object
+   * @returns {Promise<Member>} Member object
    */
   @Post('')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Create Application.' })
+  @ApiOperation({ summary: 'Create Member.' })
   @ApiResponse({
     status: 201,
-    description: 'Application Create Request Received.',
+    description: 'Member Create Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Create Request Failed.',
+    description: 'Member Create Request Failed.',
   })
   async create(
-    @Body() payload: ApplicationCreatePayload,
+    @Body() payload: MemberCreatePayload,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Application> {
+  ): Promise<Member> {
     const { organization } = request;
-    let application = await this.service.create(payload);
+    let Member = await this.service.create(payload);
 
     /**
-     * Attach organization to application
+     * Attach organization to Member
      */
-    application.organization = organization._id;
-    application = await application.save();
+    Member.organization = organization._id;
+    Member = await Member.save();
 
-    return application;
+    return Member;
   }
 }

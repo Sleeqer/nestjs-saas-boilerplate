@@ -61,8 +61,8 @@ export class OrganizationPaginateResponse extends Pagination<Organization> {
 @ApiTags('organizations')
 @Controller('/')
 export class OrganizationController extends BaseEntityController<
-  Organization,
-  OrganizationDocument
+Organization,
+OrganizationDocument
 > {
   /**
    * Constructor of Organization Controller Class
@@ -128,7 +128,7 @@ export class OrganizationController extends BaseEntityController<
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return request.locals.organization;
+    return request.organization;
   }
 
   /**
@@ -190,7 +190,7 @@ export class OrganizationController extends BaseEntityController<
     @Body() payload: OrganizationUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return await this.service.update(request.locals.organization, payload);
+    return await this.service.update(request.organization, payload);
   }
 
   /**
@@ -220,7 +220,7 @@ export class OrganizationController extends BaseEntityController<
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.organization._id);
+    await this.service.destroy(request.organization._id);
     return {};
   }
 
@@ -255,6 +255,7 @@ export class OrganizationController extends BaseEntityController<
      * Attach organization to profile
      */
     profile.organizations.addToSet(organization);
+    await profile.save()
 
     return organization;
   }

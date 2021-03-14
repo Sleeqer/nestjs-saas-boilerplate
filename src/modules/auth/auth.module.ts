@@ -10,10 +10,8 @@ import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '../config/config.module';
-import { ProfileModule } from '../profile/profile.module';
 import { ConfigService } from '../config/config.service';
 import { ApplicationStrategy } from './strategy/application.strategy';
-import { ApplicationModule } from '../application/application.module';
 import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
 
 @Module({
@@ -27,10 +25,10 @@ import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
           signOptions: {
             ...(configService.get('WEBTOKEN_EXPIRATION_TIME')
               ? {
-                  expiresIn: Number(
-                    configService.get('WEBTOKEN_EXPIRATION_TIME'),
-                  ),
-                }
+                expiresIn: Number(
+                  configService.get('WEBTOKEN_EXPIRATION_TIME'),
+                ),
+              }
               : {}),
           },
         };
@@ -38,8 +36,6 @@ import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
       inject: [ConfigService],
     }),
     ConfigModule,
-    ProfileModule,
-    ApplicationModule,
     UserModule,
   ],
   controllers: [AuthController],
@@ -50,4 +46,4 @@ import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
 /**
  * Export module
  */
-export class AuthModule {}
+export class AuthModule { }

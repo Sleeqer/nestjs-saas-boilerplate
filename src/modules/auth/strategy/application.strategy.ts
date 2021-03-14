@@ -121,7 +121,6 @@ export class ApplicationStrategy extends PassportStrategy(
      */
     const user =
       tokenize.evaluated && tokenize.user ? tokenize.user : request.user;
-    console.log(user, tokenize);
     return next(null, user);
   }
 }

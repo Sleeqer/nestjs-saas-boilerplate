@@ -19,7 +19,7 @@ export type OrganizationDocument = Organization & Document;
  * Organization Schema
  */
 @ObjectType()
-@Schema({ ...SchemaOptions, collection: 'organizationsx' })
+@Schema({ ...SchemaOptions, collection: 'organizations_entities' })
 export class Organization extends BaseEntity {
   @Field(() => String, { nullable: false })
   @Prop({ required: true })
@@ -34,7 +34,7 @@ export class Organization extends BaseEntity {
   key?: string;
 
   @Field(() => Profile, { nullable: true })
-  @Prop({ type: BaseSchema.Types.ObjectId, ref: Profile.name })
+  @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Profile' })
   profile?: Profile;
 }
 

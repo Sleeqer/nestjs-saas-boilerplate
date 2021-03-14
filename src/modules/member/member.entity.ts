@@ -12,15 +12,15 @@ import { Organization } from '../organization/organization.entity';
 import { SchemaOptions } from '../common/entity/entity';
 
 /**
- * Application Document
+ * Member Document
  */
-export type ApplicationDocument = Application & Document;
+export type MemberDocument = Member & Document;
 
 /**
- * Application Settings Token Class
+ * Member Settings Token Class
  */
 @ObjectType()
-export class ApplicationSettingsToken {
+export class MemberSettingsToken {
   @ApiProperty({ required: false, default: '' })
   @Field(() => String)
   @Prop({ required: false, default: '' })
@@ -33,26 +33,26 @@ export class ApplicationSettingsToken {
 }
 
 /**
- * Application Settings Class
+ * Member Settings Class
  */
 @ObjectType()
-export class ApplicationSettings {
+export class MemberSettings {
   @ApiProperty({
     required: true,
   })
-  @Field(() => ApplicationSettingsToken)
+  @Field(() => MemberSettingsToken)
   @Prop({
     required: false,
   })
-  token: ApplicationSettingsToken = new ApplicationSettingsToken();
+  token: MemberSettingsToken = new MemberSettingsToken();
 }
 
 /**
- * Application Schema
+ * Member Schema
  */
 @ObjectType()
 @Schema(SchemaOptions)
-export class Application {
+export class Member {
   @Field(() => String, { nullable: false })
   @Transform((value) => (value?.value || value).toString(), {
     toPlainOnly: true,
@@ -67,9 +67,9 @@ export class Application {
   @Prop()
   description: string;
 
-  @Field(() => ApplicationSettings)
-  @Prop({ required: false, default: new ApplicationSettings() })
-  settings?: ApplicationSettings;
+  @Field(() => MemberSettings)
+  @Prop({ required: false, default: new MemberSettings() })
+  settings?: MemberSettings;
 
   @Field(() => String)
   @Prop()
@@ -93,14 +93,14 @@ export class Application {
 }
 
 /**
- * Export Application Schema
+ * Export Member Schema
  */
-export const ApplicationSchema = SchemaFactory.createForClass(Application);
+export const MemberSchema = SchemaFactory.createForClass(Member);
 
 /**
- * Application Schema Hooks
+ * Member Schema Hooks
  */
-ApplicationSchema.pre('save', function () {
+MemberSchema.pre('save', function () {
   const self: any = this as unknown;
   self.key = uuidv4();
 });

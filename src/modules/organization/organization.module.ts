@@ -1,4 +1,4 @@
-import { Module, Global, UseGuards } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 /**

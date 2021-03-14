@@ -22,7 +22,7 @@ export class OrganizationGuards implements CanActivate {
   constructor(
     private reflector: Reflector,
     private readonly organization: OrganizationService,
-  ) {}
+  ) { }
 
   /**
    * Retrieve profile & validates token
@@ -31,13 +31,26 @@ export class OrganizationGuards implements CanActivate {
    */
   async organizationer(
     request: FastifyRequestInterface,
-    property: GuardsPropertyObjectInterface,
+    shield: GuardsPropertyObjectInterface,
   ): Promise<boolean> {
-    const current = this instanceof (property.guards as Function);
+    const current = this instanceof (shield?.guards as Function);
     const evaluation = { scope: false };
-    const { profile, params } = request;
+    const { profile } = request;
+    const location: string = ((current) ? shield?.location : 'params') || 'params'
+    const field: string = ((current) ? shield?.property : 'id') || 'id'
+    const params: any = request[location]
 
-    console.log(profile, params);
+    try {
+      const organization = !request.organization
+        ? await this.organization.get(params[field])
+        : request.organization;
+
+      request.organization = organization;
+      const condition = organization.profile.equals(profile._id) || profile.organizations.includes(organization._id)
+      evaluation.scope = organization && condition
+    } catch {
+      evaluation.scope = false;
+    }
 
     return evaluation.scope;
   }
@@ -53,7 +66,7 @@ export class OrganizationGuards implements CanActivate {
     const property: GuardsPropertyObjectInterface = this.reflector.get(
       'guards.property',
       context.getHandler(),
-    );
+    )
 
     const request: FastifyRequestInterface = context
       .switchToHttp()

@@ -13,7 +13,6 @@ import { ApplicationHandler } from './handler/application.handler';
 import { ApplicationController } from './application.controller';
 import { ApplicationResolver } from './application.resolver';
 import { ApplicationService } from './application.service';
-import { OrganizationModule } from '../organization';
 
 /**
  * Define module
@@ -26,7 +25,6 @@ import { OrganizationModule } from '../organization';
     ]),
     RabbitMQModule,
     RedisPropagatorModule,
-    OrganizationModule,
   ],
   providers: [
     ApplicationService,
@@ -42,4 +40,4 @@ import { OrganizationModule } from '../organization';
 /**
  * Export module
  */
-export class ApplicationModule {}
+export class ApplicationModule { }
