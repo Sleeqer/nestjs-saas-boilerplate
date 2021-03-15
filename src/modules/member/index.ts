@@ -1,3 +1,3 @@
-export * from './application.service';
-export * from './application.module';
+export * from './member.service';
+export * from './member.module';
 export * from './payload';

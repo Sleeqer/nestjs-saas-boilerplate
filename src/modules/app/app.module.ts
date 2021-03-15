@@ -17,7 +17,7 @@ import { routes } from './app.routes';
 import { roles } from './app.roles';
 import { AppService } from './app.service';
 import { UserModule } from '../user/user.module';
-import { AuthModule } from '../auth/auth.module';
+import { AuthModule } from '../authorization/authorization.module';
 import { AppController } from './app.controller';
 import { OrganizationModule } from '../organization';
 import { EntityModule } from '../entity/entity.module';
@@ -25,11 +25,11 @@ import { ReportModule } from '../report/report.module';
 import { ConfigModule } from '../config/config.module';
 import { HttpExceptionFilter } from '../common/filters';
 import { ConfigService } from '../config/config.service';
-import { ProfileModule } from '../profile/profile.module';
 import { WinstonModule } from '../winston/winston.module';
 import { SharedModule } from '../../adapters/shared/shared.module';
 import { ApplicationModule } from '../application/application.module';
 import { ConversationModule } from '../conversation/conversation.module';
+import { MemberModule } from '../member';
 
 @Module({
   imports: [
@@ -38,17 +38,16 @@ import { ConversationModule } from '../conversation/conversation.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
-        ({
-          uri: `${config.get('DB_TYPE')}://${
-            config.get('DB_USERNAME') && config.get('DB_PASSWORD')
-              ? `${config.get('DB_USERNAME')}:${config.get('DB_PASSWORD')}@`
-              : ``
+      ({
+        uri: `${config.get('DB_TYPE')}://${config.get('DB_USERNAME') && config.get('DB_PASSWORD')
+          ? `${config.get('DB_USERNAME')}:${config.get('DB_PASSWORD')}@`
+          : ``
           }${config.get('DB_HOST')}:${config.get('DB_PORT')}/${config.get(
             'DB_DATABASE',
           )}`,
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        } as MongooseModuleAsyncOptions),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      } as MongooseModuleAsyncOptions),
     }),
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
@@ -56,63 +55,61 @@ import { ConversationModule } from '../conversation/conversation.module';
       useFactory: (config: ConfigService) => {
         return config.isEnv('dev')
           ? {
-              level: 'info',
-              format: winston.format.json(),
-              defaultMeta: { service: 'user-service' },
-              transports: [
-                new winston.transports.Console({
-                  format: winston.format.simple(),
-                }),
-                new WinstonMongoDB.MongoDB({
-                  db: `mongodb://${
-                    config.get('LOGGER_DB_USERNAME') &&
-                    config.get('LOGGER_DB_PASSWORD')
-                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
-                          'LOGGER_DB_PASSWORD',
-                        )}@`
-                      : ``
+            level: 'info',
+            format: winston.format.json(),
+            defaultMeta: { service: 'user-service' },
+            transports: [
+              new winston.transports.Console({
+                format: winston.format.simple(),
+              }),
+              new WinstonMongoDB.MongoDB({
+                db: `mongodb://${config.get('LOGGER_DB_USERNAME') &&
+                  config.get('LOGGER_DB_PASSWORD')
+                  ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
+                    'LOGGER_DB_PASSWORD',
+                  )}@`
+                  : ``
                   }${config.get('LOGGER_DB_HOST')}:${config.get(
                     'LOGGER_DB_PORT',
                   )}/${config.get('LOGGER_DB_DATABASE')}`,
-                }),
-              ],
-            }
+              }),
+            ],
+          }
           : {
-              level: 'info',
-              format: winston.format.json(),
-              defaultMeta: { service: 'user-service' },
-              transports: [
-                new winston.transports.File({
-                  filename: 'logs/error.log',
-                  level: 'error',
-                }),
-                new winston.transports.Console({
-                  format: winston.format.simple(),
-                }),
-                new DailyRotateFile({
-                  filename: 'logs/application-%DATE%.log',
-                  datePattern: 'YYYY-MM-DD',
-                  zippedArchive: true,
-                  maxSize: '20m',
-                  maxFiles: '14d',
-                }),
-                new WinstonMongoDB.MongoDB({
-                  options: {
-                    includeIds: true,
-                  },
-                  db: `mongodb://${
-                    config.get('LOGGER_DB_USERNAME') &&
-                    config.get('LOGGER_DB_PASSWORD')
-                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
-                          'LOGGER_DB_PASSWORD',
-                        )}@`
-                      : ``
+            level: 'info',
+            format: winston.format.json(),
+            defaultMeta: { service: 'user-service' },
+            transports: [
+              new winston.transports.File({
+                filename: 'logs/error.log',
+                level: 'error',
+              }),
+              new winston.transports.Console({
+                format: winston.format.simple(),
+              }),
+              new DailyRotateFile({
+                filename: 'logs/application-%DATE%.log',
+                datePattern: 'YYYY-MM-DD',
+                zippedArchive: true,
+                maxSize: '20m',
+                maxFiles: '14d',
+              }),
+              new WinstonMongoDB.MongoDB({
+                options: {
+                  includeIds: true,
+                },
+                db: `mongodb://${config.get('LOGGER_DB_USERNAME') &&
+                  config.get('LOGGER_DB_PASSWORD')
+                  ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
+                    'LOGGER_DB_PASSWORD',
+                  )}@`
+                  : ``
                   }${config.get('LOGGER_DB_HOST')}:${config.get(
                     'LOGGER_DB_PORT',
                   )}/${config.get('LOGGER_DB_DATABASE')}`,
-                }),
-              ],
-            };
+              }),
+            ],
+          };
       },
     }),
     EventEmitterModule.forRoot({
@@ -141,7 +138,6 @@ import { ConversationModule } from '../conversation/conversation.module';
     }),
     ConfigModule,
     AuthModule,
-    ProfileModule,
     EntityModule,
     SharedModule,
     ApplicationModule,
@@ -149,6 +145,7 @@ import { ConversationModule } from '../conversation/conversation.module';
     UserModule,
     ReportModule,
     ConversationModule,
+    MemberModule
   ],
   controllers: [AppController],
   providers: [
@@ -163,4 +160,4 @@ import { ConversationModule } from '../conversation/conversation.module';
 /**
  * Export module
  */
-export class AppModule {}
+export class AppModule { }

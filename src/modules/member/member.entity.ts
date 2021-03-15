@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Transform, Exclude } from 'class-transformer';
+import { Document, Schema as BaseSchema } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { ApiProperty } from '@nestjs/swagger';
-import { Document, Types } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Import local objects
  */
-import { Organization } from '../organization/organization.entity';
-import { SchemaOptions } from '../common/entity/entity';
+import { BaseEntity, SchemaOptions } from '../common/entity/entity';
+import { AppRoles } from '../app/app.roles';
 
 /**
  * Member Document
@@ -17,90 +14,41 @@ import { SchemaOptions } from '../common/entity/entity';
 export type MemberDocument = Member & Document;
 
 /**
- * Member Settings Token Class
- */
-@ObjectType()
-export class MemberSettingsToken {
-  @ApiProperty({ required: false, default: '' })
-  @Field(() => String)
-  @Prop({ required: false, default: '' })
-  secret: string = '';
-
-  @ApiProperty({ required: false, default: '' })
-  @Field(() => String)
-  @Prop({ required: false, default: '' })
-  property: string = '';
-}
-
-/**
- * Member Settings Class
- */
-@ObjectType()
-export class MemberSettings {
-  @ApiProperty({
-    required: true,
-  })
-  @Field(() => MemberSettingsToken)
-  @Prop({
-    required: false,
-  })
-  token: MemberSettingsToken = new MemberSettingsToken();
-}
-
-/**
  * Member Schema
  */
 @ObjectType()
 @Schema(SchemaOptions)
-export class Member {
-  @Field(() => String, { nullable: false })
-  @Transform((value) => (value?.value || value).toString(), {
-    toPlainOnly: true,
-  })
-  readonly _id: string;
-
-  @Field(() => String)
+export class Member extends BaseEntity {
+  @Field(() => String, { nullable: true })
   @Prop({ required: true })
-  title: string;
+  email: string;
 
-  @Field(() => String)
-  @Prop()
-  description: string;
+  @Field(() => [String], { nullable: true })
+  @Prop({ type: [{ type: String }], required: false })
+  roles: AppRoles;
 
-  @Field(() => MemberSettings)
-  @Prop({ required: false, default: new MemberSettings() })
-  settings?: MemberSettings;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  password: string;
 
-  @Field(() => String)
-  @Prop()
-  key?: string;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  first_name: string;
 
-  @Field(() => String)
-  @Prop({ type: Types.ObjectId, ref: 'Organization' })
-  organization?: Organization;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  last_name: string;
 
-  @Field(() => Date, { nullable: true })
-  @Prop()
-  timestamp?: Date;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  name: string;
 
-  @Field(() => Date, { nullable: true })
-  @Prop()
-  edited_timestamp?: Date;
-
-  @Exclude()
-  @Prop()
-  readonly __v?: number;
+  @Field(() => [BaseEntity], { nullable: true })
+  @Prop({ type: [{ type: BaseSchema.Types.ObjectId, ref: 'Organization' }] })
+  organizations?: BaseEntity;
 }
 
 /**
  * Export Member Schema
  */
 export const MemberSchema = SchemaFactory.createForClass(Member);
-
-/**
- * Member Schema Hooks
- */
-MemberSchema.pre('save', function () {
-  const self: any = this as unknown;
-  self.key = uuidv4();
-});

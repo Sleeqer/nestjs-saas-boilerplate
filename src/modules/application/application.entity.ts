@@ -8,8 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * Import local objects
  */
-import { Organization } from '../organization/organization.entity';
-import { SchemaOptions } from '../common/entity/entity';
+import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 
 /**
  * Application Document
@@ -77,7 +76,7 @@ export class Application {
 
   @Field(() => String)
   @Prop({ type: Types.ObjectId, ref: 'Organization' })
-  organization?: Organization;
+  organization?: BaseEntity;
 
   @Field(() => Date, { nullable: true })
   @Prop()

@@ -39,8 +39,8 @@ import { ApplicationService } from './application.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Application, ApplicationDocument } from './application.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../auth/guards';
-import { GuardsProperty } from '../auth/guards/decorators';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Application Paginate Response Class

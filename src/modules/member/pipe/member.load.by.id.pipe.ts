@@ -43,7 +43,7 @@ export class Loader implements PipeTransform {
      * Check if entity exists & attach to request locals
      */
     if (!entity) throw this.service._NotFoundException();
-    this.request.locals.Member = entity;
+    this.request.locals.member = entity;
     return value;
   }
 }

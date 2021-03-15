@@ -40,6 +40,7 @@ import { UserService } from './user.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { User, UserDocument } from './user.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { ApplicationMasterKeyGuards } from '../authorization/guards/application.master.key.guards';
 
 /**
  * User Paginate Response Class
@@ -74,7 +75,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<Pagination<User>>} Paginated User objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Paginate User objects.' })
   @ApiResponse({
@@ -90,6 +91,12 @@ export class UserController extends BaseEntityController<User, UserDocument> {
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<User>> {
+    const { application } = request;
+
+    /**
+     * Filtering by application
+     */
+    parameters.filter = { application: application._id };
     return this.service.paginate(parameters);
   }
 
@@ -100,7 +107,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<User>} User's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Retrieve User By id.' })
   @ApiResponse({
@@ -132,7 +139,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<User>} User's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace User By id.',
@@ -163,7 +170,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<User>} User's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update User by id.' })
   @ApiResponse({
@@ -225,7 +232,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<User>} User object
    */
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create User.' })
   @ApiResponse({
@@ -240,7 +247,14 @@ export class UserController extends BaseEntityController<User, UserDocument> {
     @Body() payload: UserCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<User> {
+    const { application } = request;
+
+    /**
+     * Attach application to user
+     */
+    payload.application = application._id;
     const user = await this.service.create(payload);
+
     return user;
   }
 }

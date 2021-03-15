@@ -3,7 +3,7 @@ import { Routes } from 'nest-router';
 /**
  * Import local objects
  */
-import { ProfileModule } from '../profile/profile.module';
+import { MemberModule } from '../member/member.module';
 import { ApplicationModule } from '../application/application.module';
 import { OrganizationModule } from '../organization/organization.module';
 
@@ -17,7 +17,7 @@ export const routes: Routes = [
     children: [
       {
         path: '/:organization/members',
-        module: ProfileModule,
+        module: MemberModule,
       },
       {
         path: '/:organization/applications',

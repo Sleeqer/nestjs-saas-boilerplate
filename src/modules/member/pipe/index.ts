@@ -1,1 +1,1 @@
-export * from './application.load.by.id.pipe';
+export * from './member.load.by.id.pipe';

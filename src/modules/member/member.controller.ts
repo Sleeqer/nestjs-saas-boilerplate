@@ -39,8 +39,9 @@ import { MemberService } from './member.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Member, MemberDocument } from './member.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../auth/guards';
-import { GuardsProperty } from '../auth/guards/decorators';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { GuardsProperty } from '../authorization/guards/decorators';
+import { OrganizationKeeperGuards } from '../authorization/guards/organization.keeper.guards';
 
 /**
  * Member Paginate Response Class
@@ -60,8 +61,8 @@ export class MemberPaginateResponse extends Pagination<Member> {
 @ApiTags('Members')
 @Controller('/')
 export class MemberController extends BaseEntityController<
-Member,
-MemberDocument
+  Member,
+  MemberDocument
 > {
   /**
    * Constructor of Member Controller Class
@@ -99,8 +100,7 @@ MemberDocument
     /**
      * Filtering by organization
      */
-    parameters.filter = { organization: organization._id };
-
+    parameters.filter = { organizations: { $in: organization._id } };
     return this.service.paginate(parameters);
   }
 
@@ -132,7 +132,7 @@ MemberDocument
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return request.locals.Member;
+    return request.locals.member;
   }
 
   /**
@@ -176,7 +176,7 @@ MemberDocument
    */
   @Patch(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @UseGuards(ProfileGuards, OrganizationGuards, OrganizationKeeperGuards)
   @ApiOperation({ summary: 'Update Member by id.' })
   @ApiResponse({
     status: 200,
@@ -196,7 +196,7 @@ MemberDocument
     @Body() payload: MemberUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return await this.service.update(request.locals.Member, payload);
+    return await this.service.update(request.locals.member, payload);
   }
 
   /**
@@ -207,7 +207,7 @@ MemberDocument
    */
   @Delete(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @UseGuards(ProfileGuards, OrganizationGuards, OrganizationKeeperGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Member By id.' })
   @ApiResponse({
@@ -227,7 +227,7 @@ MemberDocument
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.Member._id);
+    await this.service.destroy(request.locals.member._id);
     return {};
   }
 
@@ -254,15 +254,14 @@ MemberDocument
     @Body() payload: MemberCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    const { organization } = request;
-    let Member = await this.service.create(payload);
+    let member: any = await this.service.create(payload);
 
     /**
-     * Attach organization to Member
+     * Attach organization to member
      */
-    Member.organization = organization._id;
-    Member = await Member.save();
+    member.organizations.addToSet(request.organization._id);
+    member = await member.save();
 
-    return Member;
+    return member;
   }
 }

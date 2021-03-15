@@ -1,9 +1,9 @@
 import {
   IsNotEmpty,
-  MinLength,
   IsOptional,
   MaxLength,
   IsEmail,
+  IsString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -12,45 +12,63 @@ import { ApiProperty } from '@nestjs/swagger';
  */
 export class UserCreatePayload {
   /**
+   * Id field
+   */
+  application: number | string;
+
+  /**
    * Email field
    */
   @ApiProperty({
-    required: false,
+    required: true,
   })
   @IsEmail()
-  @IsOptional()
-  email: string;
+  @IsNotEmpty()
+  readonly email: string;
 
   /**
    * First name field
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
-  @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(255)
-  first_name: string;
+  @IsString()
+  @IsOptional()
+  readonly first_name: string;
 
   /**
    * Last name field
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
+  @IsString()
   @IsOptional()
-  @MaxLength(255)
-  last_name: string;
+  readonly last_name: string;
 
   /**
-   * Username field
+   * Name field
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
+  @IsString()
   @IsOptional()
-  @MaxLength(255)
-  username: string;
+  readonly name: string;
+
+  /**
+   * Picture field
+   */
+  @ApiProperty({
+    required: false,
+    default: '',
+  })
+  @IsString()
+  @IsOptional()
+  readonly picture: string;
 
   /**
    * Username field
@@ -60,5 +78,5 @@ export class UserCreatePayload {
   })
   @IsNotEmpty()
   @MaxLength(255)
-  sso: string;
+  readonly sso: string;
 }

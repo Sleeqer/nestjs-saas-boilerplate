@@ -38,4 +38,4 @@ import { Organization, OrganizationSchema } from './organization.entity';
 /**
  * Export module
  */
-export class OrganizationModule {}
+export class OrganizationModule { }

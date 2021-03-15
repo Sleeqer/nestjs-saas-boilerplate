@@ -1,6 +1,5 @@
-import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
+import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectID } from 'mongodb';
 
 /**
  * User Create Payload Class
@@ -9,26 +8,45 @@ export class UserReplacePayload {
   /**
    * Id field
    */
-  _id: number | string | ObjectID;
+  _id: number | string;
 
   /**
-   * Title field
+   * First name field
    */
   @ApiProperty({
     required: true,
+    default: '',
   })
-  @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(255)
-  title: string;
+  @IsString()
+  readonly first_name: string;
 
   /**
-   * Description field
+   * Last name field
    */
   @ApiProperty({
     required: true,
+    default: '',
   })
-  @IsOptional()
-  @MaxLength(512)
-  description: string;
+  @IsString()
+  readonly last_name: string;
+
+  /**
+   * Name field
+   */
+  @ApiProperty({
+    required: true,
+    default: '',
+  })
+  @IsString()
+  readonly name: string;
+
+  /**
+   * Picture field
+   */
+  @ApiProperty({
+    required: false,
+    default: '',
+  })
+  @IsString()
+  readonly picture: string;
 }

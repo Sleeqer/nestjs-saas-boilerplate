@@ -7,7 +7,6 @@ import * as crypto from 'crypto';
 /**
  * Import local objects
  */
-import { Profile } from '../profile/profile.entity';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 
 /**
@@ -33,9 +32,9 @@ export class Organization extends BaseEntity {
   @Prop({ required: false })
   key?: string;
 
-  @Field(() => Profile, { nullable: true })
-  @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Profile' })
-  profile?: Profile;
+  @Field(() => BaseEntity, { nullable: true })
+  @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Member' })
+  member?: BaseEntity;
 }
 
 /**

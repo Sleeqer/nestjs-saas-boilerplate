@@ -35,7 +35,7 @@ export class OrganizationGuards implements CanActivate {
   ): Promise<boolean> {
     const current = this instanceof (shield?.guards as Function);
     const evaluation = { scope: false };
-    const { profile } = request;
+    const { member } = request;
     const location: string = ((current) ? shield?.location : 'params') || 'params'
     const field: string = ((current) ? shield?.property : 'id') || 'id'
     const params: any = request[location]
@@ -46,7 +46,7 @@ export class OrganizationGuards implements CanActivate {
         : request.organization;
 
       request.organization = organization;
-      const condition = organization.profile.equals(profile._id) || profile.organizations.includes(organization._id)
+      const condition = organization.member.equals(member._id) || member.organizations.includes(organization._id)
       evaluation.scope = organization && condition
     } catch {
       evaluation.scope = false;

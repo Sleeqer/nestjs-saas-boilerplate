@@ -1,28 +1,34 @@
-import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
+import { MinLength, IsOptional, IsEnum, ArrayUnique } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+
+/**
+ * Import local objects
+ */
+import { RegisterPayload } from '../../authorization/payload/register.payload';
+import { AppRoles } from 'src/modules/app/app.roles';
 
 /**
  * Member Create Payload Class
  */
-export class MemberCreatePayload {
+export class MemberCreatePayload extends RegisterPayload {
   /**
-   * Title field
-   */
-  @ApiProperty({
-    required: true,
-  })
-  @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(255)
-  title: string;
-
-  /**
-   * Description field
+   * Password field
    */
   @ApiProperty({
     required: false,
   })
   @IsOptional()
-  @MaxLength(512)
-  description: string;
+  @MinLength(6)
+  readonly password: string;
+
+  /**
+   * Password field
+   */
+  @ApiProperty({
+    required: false,
+  })
+  @ArrayUnique()
+  @IsOptional()
+  @IsEnum(AppRoles, { each: true })
+  readonly roles: AppRoles;
 }

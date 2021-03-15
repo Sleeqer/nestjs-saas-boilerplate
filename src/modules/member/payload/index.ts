@@ -1,6 +1,6 @@
 /**
  * Export Entity Payloads
  */
-export * from './application.create.payload';
-export * from './application.update.payload';
-export * from './application.replace.payload';
+export * from './member.create.payload';
+export * from './member.update.payload';
+export * from './member.replace.payload';

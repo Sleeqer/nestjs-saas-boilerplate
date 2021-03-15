@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
  * Import local objects
  */
 import { ApplicationService } from '../../application/application.service';
-import { ApplicationSettings } from '../..//application/application.entity';
+import { ApplicationSettings } from '../../application/application.entity';
 import { FastifyRequestInterface } from '../../common/interfaces';
 import { UserService } from '../../user/user.service';
 

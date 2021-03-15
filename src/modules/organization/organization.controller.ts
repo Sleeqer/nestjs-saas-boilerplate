@@ -40,8 +40,8 @@ import { OrganizationService } from './organization.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Organization, OrganizationDocument } from './organization.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../auth/guards';
-import { GuardsProperty } from '../auth/guards/decorators';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Organization Paginate Response Class
@@ -94,8 +94,8 @@ OrganizationDocument
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Organization>> {
-    const { profile } = request;
-    parameters.filter = { profile: profile._id };
+    const { member } = request;
+    parameters.filter = { member: member._id };
 
     return this.service.paginate(parameters);
   }
@@ -245,17 +245,17 @@ OrganizationDocument
     @Body() payload: OrganizationCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    const { profile } = request;
+    const { member } = request;
     const organization = await this.service.create({
       ...payload,
-      profile: profile._id,
+      member: member._id,
     });
 
     /**
-     * Attach organization to profile
+     * Attach organization to member
      */
-    profile.organizations.addToSet(organization);
-    await profile.save()
+    member.organizations.addToSet(organization);
+    await member.save()
 
     return organization;
   }
