@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 /**
@@ -16,6 +16,7 @@ import { Organization, OrganizationSchema } from './organization.entity';
 /**
  * Define module
  */
+@Global()
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -37,4 +38,4 @@ import { Organization, OrganizationSchema } from './organization.entity';
 /**
  * Export module
  */
-export class OrganizationModule {}
+export class OrganizationModule { }

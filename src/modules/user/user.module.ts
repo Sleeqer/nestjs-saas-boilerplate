@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 /**
@@ -16,20 +16,14 @@ import { User, UserSchema } from './user.entity';
 /**
  * Define module
  */
+@Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-    ]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     RabbitMQModule,
     RedisPropagatorModule,
   ],
-  providers: [
-    UserService,
-    UserListener,
-    UserResolver,
-    UserHandler,
-  ],
+  providers: [UserService, UserListener, UserResolver, UserHandler],
   exports: [UserService],
   controllers: [UserController],
 })

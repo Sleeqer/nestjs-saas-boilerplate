@@ -1,16 +1,12 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-  Model,
-  Document,
-  FilterQuery,
-  UpdateQuery,
-  CreateQuery,
-} from 'mongoose';
+import { Model, Document, FilterQuery, UpdateQuery } from 'mongoose';
 import {
   Injectable,
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 /**
@@ -62,7 +58,7 @@ export class BaseEntityService<Entity extends Document> {
    * @param {string | Array<string>} context Exception message
    * @returns {NotFoundException} NotFoundException instance
    */
-  _NotFoundException(context: string = '') {
+  _NotFoundException(context: string = ''): NotFoundException {
     const message = `${this.entity} could not be found.`;
     return new NotFoundException(context || message);
   }
@@ -82,9 +78,31 @@ export class BaseEntityService<Entity extends Document> {
    * @param {string | Array<string>} context Exception message
    * @returns {BadRequestException} BadRequestException instance
    */
-  _BadRequestException(context: string | Array<string>) {
+  _BadRequestException(context?: string | Array<string>): BadRequestException {
     const message = `${this.entity} already exists.`;
     return new BadRequestException(context || message);
+  }
+
+  /**
+   * Conflict exception entity error
+   * @param {string | Array<string>} context Exception message
+   * @returns {ConflictException} ConflictException instance
+   */
+  _ConflictException(context?: string | Array<string>): ConflictException {
+    const message = `${this.entity} already exists.`;
+    return new ConflictException(context || message);
+  }
+
+  /**
+   * Unauthorized exception entity error
+   * @param {string | Array<string>} context Exception message
+   * @returns {UnauthorizedException} UnauthorizedException instance
+   */
+  _UnauthorizedException(
+    context?: string | Array<string>,
+  ): UnauthorizedException {
+    const message = ``;
+    return new UnauthorizedException(context || message);
   }
 
   /**
@@ -113,7 +131,7 @@ export class BaseEntityService<Entity extends Document> {
     /**
      * Find entities
      */
-    const total = await this.repository.estimatedDocumentCount().exec();
+    const total = await this.repository.countDocuments(filter).exec();
     const results = await this.repository
       .find(filter)
       .sort(order)
@@ -135,8 +153,8 @@ export class BaseEntityService<Entity extends Document> {
 
   /**
    * Retrieve Entity by key value
-   * @param {number | string | string[]} id Entity's value
-   * @param {string} id Entity's key
+   * @param {number | string | string[]} value Entity's value
+   * @param {string} key Entity's key
    * @returns {Promise<Entity>} Entity object
    */
   async by(
@@ -146,6 +164,15 @@ export class BaseEntityService<Entity extends Document> {
     return this.repository
       .findOne({ [key]: value } as FilterQuery<Schema>)
       .exec();
+  }
+
+  /**
+   * Retrieve Entity by query
+   * @param {FilterQuery<Schema>} query Entity's query
+   * @returns {Promise<Entity>} Entity object
+   */
+  async find(query: FilterQuery<Schema>): Promise<Entity> {
+    return this.repository.findOne(query).exec();
   }
 
   /**
@@ -159,10 +186,10 @@ export class BaseEntityService<Entity extends Document> {
 
   /**
    * Create Entity by payload
-   * @param {CreateQuery<Entity>} payload Entity's payload
+   * @param {Payload} payload Entity's payload
    * @returns {Promise<Entity>} Entity object
    */
-  async create(payload: CreateQuery<Payload>): Promise<Entity> {
+  async create(payload: Payload): Promise<Entity> {
     const entity: Entity = await new this.repository(payload).save();
 
     /**

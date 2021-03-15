@@ -19,7 +19,6 @@ import {
   Delete,
   Query,
   Req,
-  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 
@@ -40,8 +39,9 @@ import { ParseIdPipe } from '../common/pipes';
 import { OrganizationService } from './organization.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Organization, OrganizationDocument } from './organization.entity';
-import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Organization Paginate Response Class
@@ -57,13 +57,12 @@ export class OrganizationPaginateResponse extends Pagination<Organization> {
 /**
  * Organization Controller Class
  */
-@UseInterceptors(TransformInterceptor)
 @ApiBearerAuth()
 @ApiTags('organizations')
 @Controller('/')
 export class OrganizationController extends BaseEntityController<
-  Organization,
-  OrganizationDocument
+Organization,
+OrganizationDocument
 > {
   /**
    * Constructor of Organization Controller Class
@@ -80,7 +79,7 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<Pagination<Organization>>} Paginated Organization objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Paginate Organization objects.' })
   @ApiResponse({
     status: 200,
@@ -95,6 +94,9 @@ export class OrganizationController extends BaseEntityController<
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Organization>> {
+    const { member } = request;
+    parameters.filter = { member: member._id };
+
     return this.service.paginate(parameters);
   }
 
@@ -105,7 +107,8 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<Organization>} Organization's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Retrieve Organization By id.' })
   @ApiResponse({
     status: 200,
@@ -121,11 +124,11 @@ export class OrganizationController extends BaseEntityController<
     description: 'Organization Retrieve Request Failed (Not found).',
   })
   async get(
-    @Param('id', Loader)
+    @Param('id')
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return request.locals.organization;
+    return request.organization;
   }
 
   /**
@@ -136,7 +139,7 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<Organization>} Organization's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Organization By id.',
@@ -167,7 +170,7 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<Organization>} Organization's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Update Organization by id.' })
   @ApiResponse({
     status: 200,
@@ -187,7 +190,7 @@ export class OrganizationController extends BaseEntityController<
     @Body() payload: OrganizationUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    return await this.service.update(request.locals.organization, payload);
+    return await this.service.update(request.organization, payload);
   }
 
   /**
@@ -197,6 +200,7 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
+  @UseGuards(ProfileGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Organization By id.' })
   @ApiResponse({
@@ -216,7 +220,7 @@ export class OrganizationController extends BaseEntityController<
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.organization._id);
+    await this.service.destroy(request.organization._id);
     return {};
   }
 
@@ -227,7 +231,7 @@ export class OrganizationController extends BaseEntityController<
    * @returns {Promise<Organization>} Organization object
    */
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ProfileGuards)
   @ApiOperation({ summary: 'Create Organization.' })
   @ApiResponse({
     status: 201,
@@ -241,12 +245,17 @@ export class OrganizationController extends BaseEntityController<
     @Body() payload: OrganizationCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    const organization = await this.service.create(payload);
+    const { member } = request;
+    const organization = await this.service.create({
+      ...payload,
+      member: member._id,
+    });
 
     /**
-     * Attach organization to profile
+     * Attach organization to member
      */
-    request.user.organizations.addToSet(organization);
+    member.organizations.addToSet(organization);
+    await member.save()
 
     return organization;
   }

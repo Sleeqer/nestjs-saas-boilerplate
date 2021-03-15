@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Transform, Exclude } from 'class-transformer';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Import local objects
  */
-import { Organization } from '../organization/organization.entity';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 
 /**
@@ -19,10 +20,12 @@ export type ApplicationDocument = Application & Document;
  */
 @ObjectType()
 export class ApplicationSettingsToken {
+  @ApiProperty({ required: false, default: '' })
   @Field(() => String)
   @Prop({ required: false, default: '' })
   secret: string = '';
 
+  @ApiProperty({ required: false, default: '' })
   @Field(() => String)
   @Prop({ required: false, default: '' })
   property: string = '';
@@ -33,6 +36,9 @@ export class ApplicationSettingsToken {
  */
 @ObjectType()
 export class ApplicationSettings {
+  @ApiProperty({
+    required: true,
+  })
   @Field(() => ApplicationSettingsToken)
   @Prop({
     required: false,
@@ -45,7 +51,13 @@ export class ApplicationSettings {
  */
 @ObjectType()
 @Schema(SchemaOptions)
-export class Application extends BaseEntity {
+export class Application {
+  @Field(() => String, { nullable: false })
+  @Transform((value) => (value?.value || value).toString(), {
+    toPlainOnly: true,
+  })
+  readonly _id: string;
+
   @Field(() => String)
   @Prop({ required: true })
   title: string;
@@ -64,7 +76,19 @@ export class Application extends BaseEntity {
 
   @Field(() => String)
   @Prop({ type: Types.ObjectId, ref: 'Organization' })
-  organization?: Organization;
+  organization?: BaseEntity;
+
+  @Field(() => Date, { nullable: true })
+  @Prop()
+  timestamp?: Date;
+
+  @Field(() => Date, { nullable: true })
+  @Prop()
+  edited_timestamp?: Date;
+
+  @Exclude()
+  @Prop()
+  readonly __v?: number;
 }
 
 /**

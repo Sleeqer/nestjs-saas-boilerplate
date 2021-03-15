@@ -19,7 +19,6 @@ import {
   Delete,
   Query,
   Req,
-  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 
@@ -40,8 +39,9 @@ import { ParseIdPipe } from '../common/pipes';
 import { ConversationService } from './conversation.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Conversation, ConversationDocument } from './conversation.entity';
-import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { UserGuards } from '../authorization/guards/user.guards';
+import { ApplicationKeyGuards } from '../authorization/guards/application.key.guards';
 
 /**
  * Conversation Paginate Response Class
@@ -229,7 +229,7 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<Conversation>} Conversation object
    */
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationKeyGuards, UserGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create Conversation.' })
   @ApiResponse({

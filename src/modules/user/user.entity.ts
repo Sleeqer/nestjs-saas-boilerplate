@@ -5,7 +5,6 @@ import { Document } from 'mongoose';
 /**
  * Import local objects
  */
-import { AppRoles } from '../app/app.roles';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 
 /**
@@ -19,29 +18,29 @@ export type UserDocument = User & Document;
 @ObjectType()
 @Schema(SchemaOptions)
 export class User extends BaseEntity {
-  @Field(() => String)
+  @Field(() => String, { nullable: false })
   @Prop({ required: true })
+  email: string;
+
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
   first_name: string;
 
-  @Field(() => String)
-  @Prop()
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
   last_name: string;
 
-  @Field(() => String)
-  @Prop()
-  username: string;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  name: string;
 
-  @Field(() => String)
-  @Prop()
-  email: string;
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
+  picture: string;
 
   @Field(() => String)
   @Prop()
   sso: string;
-
-  @Field(() => [String])
-  @Prop({ type: [{ type: String }] })
-  roles: AppRoles;
 }
 
 /**

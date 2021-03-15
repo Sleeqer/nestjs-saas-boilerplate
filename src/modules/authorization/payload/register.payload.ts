@@ -3,8 +3,8 @@ import {
   IsEmail,
   IsNotEmpty,
   MinLength,
-  IsAlphanumeric,
-  Matches,
+  IsString,
+  IsOptional,
 } from 'class-validator';
 
 /**
@@ -19,26 +19,40 @@ export class RegisterPayload {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  readonly email: string;
 
   /**
-   * Username field
+   * First name field
    */
   @ApiProperty({
-    required: true,
+    required: false,
+    default: '',
   })
-  @IsNotEmpty()
-  username: string;
+  @IsString()
+  @IsOptional()
+  readonly first_name: string;
+
+  /**
+   * Last name field
+   */
+  @ApiProperty({
+    required: false,
+    default: '',
+  })
+  @IsString()
+  @IsOptional()
+  readonly last_name: string;
 
   /**
    * Name field
    */
   @ApiProperty({
-    required: true,
+    required: false,
+    default: '',
   })
-  @Matches(/^[a-zA-Z ]+$/)
-  @IsNotEmpty()
-  name: string;
+  @IsString()
+  @IsOptional()
+  readonly name: string;
 
   /**
    * Password field
@@ -47,6 +61,6 @@ export class RegisterPayload {
     required: true,
   })
   @IsNotEmpty()
-  @MinLength(8)
-  password: string;
+  @MinLength(6)
+  readonly password: string;
 }

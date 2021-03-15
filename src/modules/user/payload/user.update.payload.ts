@@ -1,4 +1,4 @@
-import { MinLength, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -6,23 +6,46 @@ import { ApiProperty } from '@nestjs/swagger';
  */
 export class UserUpdatePayload {
   /**
-   * Title field
+   * First name field
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
+  @IsString()
   @IsOptional()
-  @MinLength(1)
-  @MaxLength(255)
-  title: string;
+  readonly first_name: string;
 
   /**
-   * Description field
+   * Last name field
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
+  @IsString()
   @IsOptional()
-  @MaxLength(512)
-  description: string;
+  readonly last_name: string;
+
+  /**
+   * Name field
+   */
+  @ApiProperty({
+    required: false,
+    default: '',
+  })
+  @IsString()
+  @IsOptional()
+  readonly name: string;
+
+  /**
+   * Picture field
+   */
+  @ApiProperty({
+    required: false,
+    default: '',
+  })
+  @IsString()
+  @IsOptional()
+  readonly picture: string;
 }

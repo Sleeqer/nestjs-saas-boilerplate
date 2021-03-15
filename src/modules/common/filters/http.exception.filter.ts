@@ -110,7 +110,7 @@ export class FormatResponseExceptionMessages {
       this.object.error.message = data.message;
     }
 
-    this.object.error.status = ChangeCase.constantCase(data.error || '');
+    this.object.error.status = ChangeCase.constantCase(data?.error || data?.message || '')
     this.object.error.code = data.status || data.statusCode;
   }
 

@@ -12,9 +12,8 @@ import {
 } from './interface';
 import subscriptions from './handler';
 import { connection } from './rabbitmq.connect';
-import { MessageHandler } from './handler/message.handler';
 import { ConfigService } from '../../modules/config/config.service';
-import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../../adapters/redis/propagator/redis.propgator.service';
 
 /**
  * Current config

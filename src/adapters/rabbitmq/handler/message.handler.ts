@@ -1,4 +1,3 @@
-import { Inject } from '@nestjs/common';
 import { Logger } from 'winston';
 
 /**
@@ -8,7 +7,7 @@ import {
   RabbitMQEnum,
   RabbitMQOptionInterface,
 } from '../interface/rabbitmq.option.interface';
-import { RedisPropagatorService } from 'src/adapters/redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../../../adapters/redis/propagator/redis.propgator.service';
 
 /**
  * Message Handler Class

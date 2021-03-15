@@ -13,4 +13,19 @@ export interface FastifyRequestInterface extends FastifyRequest {
    * User field
    */
   user?: any;
+
+  /**
+   * Application
+   */
+  application?: any;
+
+  /**
+   * Member field
+   */
+  member?: any;
+
+  /**
+ * Organization field
+ */
+  organization?: any;
 }

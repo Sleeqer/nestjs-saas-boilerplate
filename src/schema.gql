@@ -22,11 +22,19 @@ type ApplicationSettingsToken {
   secret: String!
 }
 
+type BaseEntity {
+  _id: String!
+  edited_timestamp: DateTime
+  timestamp: DateTime
+}
+
 type Conversation {
   _id: String!
   description: String!
   edited_timestamp: DateTime
+  members: [User!]
   name: String!
+  owner: User
   timestamp: DateTime
   title: String!
 }
@@ -36,12 +44,25 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Member {
+  _id: String!
+  edited_timestamp: DateTime
+  email: String
+  first_name: String
+  last_name: String
+  name: String
+  organizations: [BaseEntity!]
+  password: String
+  roles: [String!]
+  timestamp: DateTime
+}
+
 type Organization {
   _id: String!
   description: String
   edited_timestamp: DateTime
   key: String
-  profile: String
+  member: BaseEntity
   timestamp: DateTime
   title: String!
 }
@@ -49,6 +70,7 @@ type Organization {
 type Query {
   applications: [Application!]!
   conversations: [Conversation!]!
+  members: [Member!]!
   organizations: [Organization!]!
   reports: [Report!]!
   users: [User!]!
@@ -70,10 +92,10 @@ type User {
   _id: String!
   edited_timestamp: DateTime
   email: String!
-  first_name: String!
-  last_name: String!
-  roles: [String!]!
+  first_name: String
+  last_name: String
+  name: String
+  picture: String
   sso: String!
   timestamp: DateTime
-  username: String!
 }

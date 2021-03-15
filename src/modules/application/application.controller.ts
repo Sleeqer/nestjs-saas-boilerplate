@@ -1,4 +1,3 @@
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -19,7 +18,6 @@ import {
   Delete,
   Query,
   Req,
-  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 
@@ -41,7 +39,8 @@ import { ApplicationService } from './application.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Application, ApplicationDocument } from './application.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationInterceptor } from '../organization/interceptor/organization.interceptor';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Application Paginate Response Class
@@ -57,13 +56,12 @@ export class ApplicationPaginateResponse extends Pagination<Application> {
 /**
  * Application Controller Class
  */
-@UseInterceptors(OrganizationInterceptor)
 @ApiBearerAuth()
 @ApiTags('applications')
 @Controller('/')
 export class ApplicationController extends BaseEntityController<
-  Application,
-  ApplicationDocument
+Application,
+ApplicationDocument
 > {
   /**
    * Constructor of Application Controller Class
@@ -80,7 +78,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Pagination<Application>>} Paginated Application objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Paginate Application objects.' })
   @ApiResponse({
     status: 200,
@@ -95,7 +94,7 @@ export class ApplicationController extends BaseEntityController<
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Application>> {
-    const { organization } = request.locals;
+    const { organization } = request;
 
     /**
      * Filtering by organization
@@ -112,7 +111,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Retrieve Application By id.' })
   @ApiResponse({
     status: 200,
@@ -143,7 +143,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Application By id.',
@@ -174,7 +175,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Update Application by id.' })
   @ApiResponse({
     status: 200,
@@ -204,7 +206,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Application By id.' })
   @ApiResponse({
@@ -236,7 +239,8 @@ export class ApplicationController extends BaseEntityController<
    * @returns {Promise<Application>} Application object
    */
   @Post('')
-  @UseGuards(AuthGuard('jwt'))
+  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Create Application.' })
   @ApiResponse({
     status: 201,
@@ -250,13 +254,13 @@ export class ApplicationController extends BaseEntityController<
     @Body() payload: ApplicationCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Application> {
-    const { organization } = request.locals;
+    const { organization } = request;
     let application = await this.service.create(payload);
 
     /**
      * Attach organization to application
      */
-    application.organization = organization;
+    application.organization = organization._id;
     application = await application.save();
 
     return application;
