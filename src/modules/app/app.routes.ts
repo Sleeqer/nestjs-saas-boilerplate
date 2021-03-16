@@ -3,9 +3,11 @@ import { Routes } from 'nest-router';
 /**
  * Import local objects
  */
-import { MemberModule } from '../member/member.module';
-import { ApplicationModule } from '../application/application.module';
-import { OrganizationModule } from '../organization/organization.module';
+import { UserModule } from '../user';
+import { MemberModule } from '../member';
+import { ApplicationModule } from '../application';
+import { OrganizationModule } from '../organization';
+import { ConversationModule } from '../conversation';
 
 /**
  * Defining & exporting routes
@@ -24,5 +26,9 @@ export const routes: Routes = [
         module: ApplicationModule,
       },
     ],
+  },
+  {
+    path: '/conversations',
+    module: ConversationModule,
   },
 ];

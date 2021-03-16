@@ -60,7 +60,7 @@ export class ConversationPaginateResponse extends Pagination<Conversation> {
  */
 @ApiBearerAuth()
 @ApiTags('conversations')
-@Controller('conversations')
+@Controller('/')
 export class ConversationController extends BaseEntityController<
   Conversation,
   ConversationDocument
@@ -178,7 +178,6 @@ export class ConversationController extends BaseEntityController<
    */
   @Patch(':id')
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update Conversation by id.' })
   @ApiResponse({
     status: 200,
@@ -210,7 +209,6 @@ export class ConversationController extends BaseEntityController<
   @Delete(':id')
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Delete Conversation By id.' })
   @ApiResponse({
     status: 204,
@@ -241,7 +239,6 @@ export class ConversationController extends BaseEntityController<
    */
   @Post()
   @UseGuards(ApplicationKeyGuards, UserGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create Conversation.' })
   @ApiResponse({
     status: 201,

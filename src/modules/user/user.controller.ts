@@ -80,7 +80,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get('')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Paginate User objects.' })
   @ApiResponse({
     status: 200,
@@ -111,7 +110,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get('@me')
   @UseGuards(ApplicationKeyGuards, UserGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Retrieve User.' })
   @ApiResponse({
     status: 200,
@@ -138,7 +136,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get(':id')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Retrieve User By id.' })
   @ApiResponse({
     status: 200,
@@ -201,7 +198,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Patch(':id')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update User by id.' })
   @ApiResponse({
     status: 200,
@@ -232,7 +228,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Delete(':id')
   @HttpCode(204)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Delete User By id.' })
   @ApiResponse({
     status: 204,
@@ -263,7 +258,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Post()
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create User.' })
   @ApiResponse({
     status: 201,
