@@ -16,6 +16,7 @@ import { ConfigService } from './modules/config/config.service';
 import { SocketStateAdapter } from './adapters/socket/state/socket.state.adapter';
 import { SocketStateService } from './adapters/socket/state/socket.state.service';
 import { RedisPropagatorService } from './adapters/redis/propagator/redis.propgator.service';
+import { FastifyRequestInterface } from './modules/common/interfaces';
 
 /**
  * Current config
@@ -54,7 +55,17 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
     trustProxy: true,
   });
 
-  core.getInstance().decorateRequest('locals', () => {});
+  core.getInstance().decorateRequest('locals', {});
+
+  core
+    .getInstance()
+    .addHook(
+      'preHandler',
+      function (request: FastifyRequestInterface, reply, done) {
+        request.locals = {};
+        done();
+      },
+    );
 
   core.register(cors);
 

@@ -31,8 +31,8 @@ export class ProfileGuards implements CanActivate {
    * @param {ConfigService} config Config Service
    */
   constructor(
-    private readonly member: MemberService,
-    private readonly config: ConfigService,
+    protected readonly member: MemberService,
+    protected readonly config: ConfigService,
   ) {
     const secret: string = config.get('WEBTOKEN_SECRET_KEY');
     const expire: string = config.get('WEBTOKEN_EXPIRATION_TIME');

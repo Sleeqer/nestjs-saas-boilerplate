@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 /**
  * Import local modules
  */
+import { ConversationPopulatorEnum } from './enum';
 import { BaseEntityService } from '../common/entity/service';
 import { Conversation, ConversationDocument } from './conversation.entity';
 
@@ -18,6 +19,14 @@ export class ConversationService extends BaseEntityService<ConversationDocument>
    * Conversation
    */
   protected entity: string = 'Conversation';
+
+  /**
+   * Populator
+   */
+  protected populator: Array<string> = [
+    ConversationPopulatorEnum.MEMBERS_USER,
+    ConversationPopulatorEnum.OWNER,
+  ];
 
   /**
    * Constructor of Conversation Service Class

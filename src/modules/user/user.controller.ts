@@ -32,15 +32,19 @@ import {
 } from './payload';
 import { Loader } from './pipe';
 import {
+  UserGuards,
+  ApplicationKeyGuards,
+  ApplicationMasterKeyGuards,
+} from '../authorization/guards';
+import {
   Pagination,
   Query as QueryPagination,
 } from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
 import { UserService } from './user.service';
-import { FastifyRequestInterface } from '../common/interfaces';
+import { ParseIdPipe } from '../common/pipes';
 import { User, UserDocument } from './user.entity';
+import { FastifyRequestInterface } from '../common/interfaces';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { ApplicationMasterKeyGuards } from '../authorization/guards/application.master.key.guards';
 
 /**
  * User Paginate Response Class
@@ -76,7 +80,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get('')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Paginate User objects.' })
   @ApiResponse({
     status: 200,
@@ -101,6 +104,31 @@ export class UserController extends BaseEntityController<User, UserDocument> {
   }
 
   /**
+   * Retrieve User
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<User>} User's object
+   */
+  @Get('@me')
+  @UseGuards(ApplicationKeyGuards, UserGuards)
+  @ApiOperation({ summary: 'Retrieve User.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieve User Request Received.',
+    type: User,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Retrieve User Request Failed.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Retrieve User Request Failed (Unauthorized).',
+  })
+  async me(@Req() request: FastifyRequestInterface): Promise<User> {
+    return request.user;
+  }
+
+  /**
    * Retrieve User by id
    * @param {number | string} id User's id
    * @param {FastifyRequestInterface} request Request's object
@@ -108,7 +136,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get(':id')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Retrieve User By id.' })
   @ApiResponse({
     status: 200,
@@ -171,7 +198,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Patch(':id')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update User by id.' })
   @ApiResponse({
     status: 200,
@@ -202,7 +228,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Delete(':id')
   @HttpCode(204)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Delete User By id.' })
   @ApiResponse({
     status: 204,
@@ -233,7 +258,6 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Post()
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create User.' })
   @ApiResponse({
     status: 201,

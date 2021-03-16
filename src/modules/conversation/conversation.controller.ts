@@ -1,4 +1,3 @@
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -35,13 +34,15 @@ import {
   Pagination,
   Query as QueryPagination,
 } from '../common/entity/pagination';
+import { AppRoles } from '../app/app.roles';
 import { ParseIdPipe } from '../common/pipes';
 import { ConversationService } from './conversation.service';
 import { FastifyRequestInterface } from '../common/interfaces';
+import { UserGuards } from '../authorization/guards/user.guards';
 import { Conversation, ConversationDocument } from './conversation.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { UserGuards } from '../authorization/guards/user.guards';
 import { ApplicationKeyGuards } from '../authorization/guards/application.key.guards';
+import { ConversationGuards } from './guards';
 
 /**
  * Conversation Paginate Response Class
@@ -59,7 +60,7 @@ export class ConversationPaginateResponse extends Pagination<Conversation> {
  */
 @ApiBearerAuth()
 @ApiTags('conversations')
-@Controller('conversations')
+@Controller('/')
 export class ConversationController extends BaseEntityController<
   Conversation,
   ConversationDocument
@@ -79,7 +80,7 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<Pagination<Conversation>>} Paginated Conversation objects
    */
   @Get('')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationKeyGuards, UserGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Paginate Conversation objects.' })
   @ApiResponse({
@@ -95,6 +96,15 @@ export class ConversationController extends BaseEntityController<
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Conversation>> {
+    const { application, user } = request;
+
+    /**
+     * Filtering query
+     */
+    parameters.filter = {
+      application: application._id,
+      'members.user': { $in: user._id },
+    };
     return this.service.paginate(parameters);
   }
 
@@ -105,7 +115,7 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<Conversation>} Conversation's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Retrieve Conversation By id.' })
   @ApiResponse({
     status: 200,
@@ -121,11 +131,11 @@ export class ConversationController extends BaseEntityController<
     description: 'Conversation Retrieve Request Failed (Not found).',
   })
   async get(
-    @Param('id', Loader)
+    @Param('id')
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Conversation> {
-    return request.locals.organization;
+    return request.locals.conversation;
   }
 
   /**
@@ -136,7 +146,7 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<Conversation>} Conversation's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Conversation By id.',
@@ -167,8 +177,7 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<Conversation>} Conversation's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiExcludeEndpoint()
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Update Conversation by id.' })
   @ApiResponse({
     status: 200,
@@ -184,11 +193,11 @@ export class ConversationController extends BaseEntityController<
     description: 'Conversation Update Request Failed (Not found).',
   })
   async update(
-    @Param('id', Loader) id: number | string,
+    @Param('id') id: number | string,
     @Body() payload: ConversationUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Conversation> {
-    return await this.service.update(request.locals.organization, payload);
+    return await this.service.update(request.locals.conversation, payload);
   }
 
   /**
@@ -198,8 +207,8 @@ export class ConversationController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Delete Conversation By id.' })
   @ApiResponse({
     status: 204,
@@ -215,10 +224,10 @@ export class ConversationController extends BaseEntityController<
     description: 'Conversation Delete Request Failed (Not found).',
   })
   async destroy(
-    @Param('id', Loader) id: number | string,
+    @Param('id') id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.organization._id);
+    await this.service.destroy(request.locals.conversation._id);
     return {};
   }
 
@@ -230,7 +239,6 @@ export class ConversationController extends BaseEntityController<
    */
   @Post()
   @UseGuards(ApplicationKeyGuards, UserGuards)
-  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Create Conversation.' })
   @ApiResponse({
     status: 201,
@@ -240,17 +248,25 @@ export class ConversationController extends BaseEntityController<
     status: 400,
     description: 'Conversation Create Request Failed.',
   })
+  @ApiResponse({
+    status: 401,
+  })
   async create(
     @Body() payload: ConversationCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Conversation> {
-    const organization = await this.service.create(payload);
+    const { application, user } = request;
 
     /**
-     * Attach organization to profile
+     * Attach realtions to conversation
      */
-    request.user.organizations.addToSet(organization);
+    const conversation = await this.service.create({
+      ...payload,
+      application: application._id,
+      owner: user._id,
+      members: [{ user: user._id, roles: AppRoles.ADMIN }],
+    });
 
-    return organization;
+    return conversation;
   }
 }

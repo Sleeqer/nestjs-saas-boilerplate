@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
+import { IsNotEmpty, MinLength, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ObjectID } from 'mongodb';
 
@@ -27,8 +27,9 @@ export class ConversationReplacePayload {
    */
   @ApiProperty({
     required: true,
+    default: '',
   })
-  @IsOptional()
+  @IsString()
   @MaxLength(512)
   description: string;
 }

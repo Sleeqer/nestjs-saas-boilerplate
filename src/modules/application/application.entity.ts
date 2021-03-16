@@ -27,8 +27,8 @@ export class ApplicationSettingsToken {
 
   @ApiProperty({ required: false, default: '' })
   @Field(() => String)
-  @Prop({ required: false, default: '' })
-  property: string = '';
+  @Prop({ required: false, default: '_id' })
+  property: string = '_id';
 }
 
 /**
