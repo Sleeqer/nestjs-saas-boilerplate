@@ -92,7 +92,7 @@ export class UserGuards implements CanActivate {
     token: string,
   ): Promise<TokenizeResult> {
     const evaluation: TokenizeResult = {
-      scope: false,
+      scope: true,
       user: null,
     };
     const { secret, property } = settings.token;
@@ -100,14 +100,14 @@ export class UserGuards implements CanActivate {
     /**
      * One of fields from settings are empty , so skip this token validation
      */
-    if (!secret || !property) return evaluation;
+    if (!secret && !property) return evaluation;
 
     /**
      * Validate token
      */
     try {
-      const decoded = this.jwt.verify(token, { secret });
-      const field = decoded[property];
+      const decoded = this.alive(this.jwt.verify(token, { secret }));
+      const field = decoded[property] || '_id';
       const user = await this.user.by(field, this.keyed);
       evaluation.user = user;
       if (!user) evaluation.scope = false;
@@ -138,7 +138,10 @@ export class UserGuards implements CanActivate {
         : { user: request.user, scope: true };
 
       request.user = user;
-      evaluation.scope = user && scope ? true : false;
+      evaluation.scope =
+        user && scope && application._id.equals(user.application)
+          ? true
+          : false;
     } catch {
       evaluation.scope = false;
     }

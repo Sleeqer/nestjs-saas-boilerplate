@@ -32,11 +32,23 @@ type Conversation {
   _id: String!
   description: String!
   edited_timestamp: DateTime
-  members: [User!]
-  name: String!
+  members: [ConversationMember!]
   owner: User
   timestamp: DateTime
   title: String!
+}
+
+type ConversationMember {
+  _id: String!
+  edited_timestamp: DateTime
+  roles: [String!]
+  settings: ConversationMemberSettings!
+  timestamp: DateTime
+  user: User
+}
+
+type ConversationMemberSettings {
+  notifications: String!
 }
 
 """

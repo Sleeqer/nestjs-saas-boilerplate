@@ -1,5 +1,11 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Model, Document, FilterQuery, UpdateQuery } from 'mongoose';
+import {
+  Model,
+  Document,
+  FilterQuery,
+  UpdateQuery,
+  LeanDocument,
+} from 'mongoose';
 import {
   Injectable,
   NotFoundException,
@@ -42,6 +48,11 @@ export class BaseEntityService<Entity extends Document> {
    * Entity
    */
   protected entity: string = 'Entity';
+
+  /**
+   * Populator
+   */
+  protected populator: Array<string> = [];
 
   /**
    * Constructor of Entity Service Class
@@ -106,6 +117,15 @@ export class BaseEntityService<Entity extends Document> {
   }
 
   /**
+   * Populating schema
+   * @param {Array<string>} populator Entity's populator
+   * @returns {object[]} Entity object
+   */
+  _populate(populator: Array<string> = []): object[] {
+    return populate([...populator, ...this.populator]);
+  }
+
+  /**
    * Retrieve Entity objects
    * @returns {Promise<Entity[]>} Entity's objects
    */
@@ -135,7 +155,7 @@ export class BaseEntityService<Entity extends Document> {
     const results = await this.repository
       .find(filter)
       .sort(order)
-      .populate(populate(populator))
+      .populate(this._populate(populator))
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
@@ -163,6 +183,7 @@ export class BaseEntityService<Entity extends Document> {
   ): Promise<Entity> {
     return this.repository
       .findOne({ [key]: value } as FilterQuery<Schema>)
+      .populate(this._populate())
       .exec();
   }
 
@@ -172,16 +193,23 @@ export class BaseEntityService<Entity extends Document> {
    * @returns {Promise<Entity>} Entity object
    */
   async find(query: FilterQuery<Schema>): Promise<Entity> {
-    return this.repository.findOne(query).exec();
+    return this.repository.findOne(query).populate(this._populate()).exec();
   }
 
   /**
    * Retrieve Entity by id
    * @param {number | string} id Entity's id
+   * @param {Array<string>} populator Entity's populator
    * @returns {Promise<Entity>} Entity object
    */
-  async get(id: number | string): Promise<Entity> {
-    return this.repository.findById(id).exec();
+  async get(
+    id: number | string,
+    populator: Array<string> = [],
+  ): Promise<Entity> {
+    return this.repository
+      .findById(id)
+      .populate(this._populate(populator))
+      .exec();
   }
 
   /**
@@ -205,14 +233,20 @@ export class BaseEntityService<Entity extends Document> {
    * @param {UpdateQuery<Entity>} payload Entity's payload
    * @returns {Promise<Entity} Updated Entity
    */
-  async update(entity: Entity, payload: UpdateQuery<Entity>): Promise<Entity> {
-    entity = await this.repository.findOneAndUpdate(
-      { _id: entity._id } as FilterQuery<Schema>,
-      { ...payload },
-      {
-        new: true,
-      },
-    );
+  async update(
+    entity: Entity,
+    payload: UpdateQuery<Entity>,
+  ): Promise<Entity | LeanDocument<Entity>> {
+    entity = await this.repository
+      .findOneAndUpdate(
+        { _id: entity._id } as FilterQuery<Schema>,
+        { ...payload },
+        {
+          new: true,
+        },
+      )
+      .populate(this._populate())
+      .exec();
 
     /**
      * Entity Updated Event Emit
@@ -231,14 +265,17 @@ export class BaseEntityService<Entity extends Document> {
     _id: number | string,
     payload: UpdateQuery<Entity>,
   ): Promise<Entity> {
-    const entity = await this.repository.findOneAndUpdate(
-      { _id } as FilterQuery<Schema>,
-      { ...payload },
-      {
-        new: true,
-        upsert: true,
-      },
-    );
+    const entity = await this.repository
+      .findOneAndUpdate(
+        { _id } as FilterQuery<Schema>,
+        { ...payload },
+        {
+          new: true,
+          upsert: true,
+        },
+      )
+      .populate(this._populate())
+      .exec();
 
     /**
      * Entity Updated Event Emit
@@ -276,10 +313,12 @@ export class BaseEntityService<Entity extends Document> {
 
   /**
    * Entity Updated Event Emitter
-   * @param {Entity | number | string} entity Entity's _id || object
+   * @param {Entity | LeanDocument<Entity> | number | string} entity Entity's _id || object
    * @returns {Promise<void>} Void
    */
-  async _updated(entity: Entity | number | string): Promise<void> {
+  async _updated(
+    entity: Entity | LeanDocument<Entity> | number | string,
+  ): Promise<void> {
     if (!this.emitter) return;
     const event = new EntityEvent<Entity>(EntityEventEnum.UPDATED, entity);
     this.emitter.emit(event.title, event);
