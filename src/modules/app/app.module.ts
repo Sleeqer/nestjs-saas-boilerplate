@@ -29,6 +29,7 @@ import { WinstonModule } from '../winston/winston.module';
 import { SharedModule } from '../../adapters/shared/shared.module';
 import { ApplicationModule } from '../application/application.module';
 import { ConversationModule } from '../conversation/conversation.module';
+import { ProfileModule } from '../profile';
 import { MemberModule } from '../member';
 
 @Module({
@@ -145,6 +146,7 @@ import { MemberModule } from '../member';
     UserModule,
     ReportModule,
     ConversationModule,
+    ProfileModule,
     MemberModule
   ],
   controllers: [AppController],

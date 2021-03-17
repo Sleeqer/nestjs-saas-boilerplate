@@ -18,10 +18,10 @@ export class OrganizationKeeperGuards implements CanActivate {
    */
   async organizationer(request: FastifyRequestInterface): Promise<boolean> {
     const evaluation = { scope: false };
-    const { member, organization } = request;
+    const { profile, organization } = request;
 
     try {
-      evaluation.scope = organization.member.equals(member._id);
+      evaluation.scope = organization.profile.equals(profile._id);
     } catch {
       evaluation.scope = false;
     }

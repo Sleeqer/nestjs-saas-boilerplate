@@ -5,6 +5,7 @@ import {
   FilterQuery,
   UpdateQuery,
   LeanDocument,
+  PopulateOptions,
 } from 'mongoose';
 import {
   Injectable,
@@ -126,14 +127,33 @@ export class BaseEntityService<Entity extends Document> {
   }
 
   /**
+   * Save Entity's object
+   * @param {Entity} entity Entity's object
+   * @returns {Promise<Entity>} Entity's object
+   */
+  async save(entity: Entity): Promise<Entity> {
+    entity = await entity.save();
+    const object: Entity = await entity
+      .populate(this._populate() as PopulateOptions[])
+      .execPopulate();
+
+    /**
+     * Entity Updated Event Emit
+     */
+    this._updated(object);
+    return object;
+  }
+
+  /**
    * Retrieve Entity objects
+   * @param {FilterQuery<Schema>} query Entity's query
    * @returns {Promise<Entity[]>} Entity's objects
    */
-  async all(): Promise<Entity[]> {
+  async all(query: FilterQuery<Schema> = {}): Promise<Entity[]> {
     /**
      * Entity objects
      */
-    return this.repository.find().exec();
+    return this.repository.find(query).exec();
   }
 
   /**
@@ -219,12 +239,15 @@ export class BaseEntityService<Entity extends Document> {
    */
   async create(payload: Payload): Promise<Entity> {
     const entity: Entity = await new this.repository(payload).save();
+    const object: Entity = await entity
+      .populate(this._populate() as PopulateOptions[])
+      .execPopulate();
 
     /**
      * Entity Created Event Emit
      */
-    this._created(entity);
-    return entity;
+    this._created(object);
+    return object;
   }
 
   /**

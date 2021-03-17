@@ -11,8 +11,7 @@ dayjs.extend(relative);
  */
 import { LoginPayload } from './payload/login.payload';
 import { ConfigService } from '../config/config.service';
-import { Member } from '../member/member.entity';
-import { MemberService } from '../member';
+import { ProfileService, Profile } from '../profile';
 
 /**
  * Models a typical Login/Register route return body
@@ -47,12 +46,12 @@ export class AuthService {
    * Constructor
    * @param {JwtService} jwt jwt service
    * @param {ConfigService} configService configuration service
-   * @param {MemberService} member profile service
+   * @param {ProfileService} profile profile service
    */
   constructor(
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
-    private readonly member: MemberService,
+    private readonly profile: ProfileService,
   ) {
     this.expiration = this.configService.get('WEBTOKEN_EXPIRATION_TIME');
   }
@@ -70,16 +69,16 @@ export class AuthService {
   /**
    * Validates whether or not the profile exists in the database
    * @param {LoginPayload} param login payload to authenticate with
-   * @returns {Promise<Member>} Registered Member
+   * @returns {Promise<Profile>} Registered Profile
    */
-  async validate({ email, password }: LoginPayload): Promise<Member> {
-    const member = await this.member.find({
+  async validate({ email, password }: LoginPayload): Promise<Profile> {
+    const profile = await this.profile.find({
       email,
       password: crypto.createHmac('sha256', password).digest('hex'),
     });
 
-    if (!member) throw this.member._UnauthorizedException();
-    return member;
+    if (!profile) throw this.profile._UnauthorizedException();
+    return profile;
   }
 
   /**
@@ -93,7 +92,7 @@ export class AuthService {
     email,
     first_name,
     last_name,
-  }: Member): Promise<ITokenReturnBody> {
+  }: Profile): Promise<ITokenReturnBody> {
     return {
       expires: this.expiration,
       expires_pretty_print: AuthService.prettyPrintSeconds(this.expiration),

@@ -1,12 +1,23 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as BaseSchema } from 'mongoose';
+import { Schema as BaseSchema, Document } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 /**
  * Import local objects
  */
-import { BaseEntity, SchemaOptions } from '../common/entity/entity';
+import { User } from '../user/user.entity';
 import { AppRoles } from '../app/app.roles';
+import { BaseEntity, SchemaOptions } from '../common/entity/entity';
+
+/**
+ * Member Settings Class
+ */
+@ObjectType()
+export class MemberSettings {
+  @Field(() => String)
+  @Prop({ required: false, default: false })
+  notifications: boolean = false;
+}
 
 /**
  * Member Document
@@ -14,38 +25,26 @@ import { AppRoles } from '../app/app.roles';
 export type MemberDocument = Member & Document;
 
 /**
- * Member Schema
+ * Member Class
  */
 @ObjectType()
-@Schema(SchemaOptions)
+@Schema({ ...SchemaOptions })
 export class Member extends BaseEntity {
-  @Field(() => String, { nullable: true })
-  @Prop({ required: true })
-  email: string;
+  @Field(() => User, { nullable: true })
+  @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
+  user: User;
+
+  @Field(() => MemberSettings)
+  @Prop({ required: false, default: new MemberSettings() })
+  settings?: MemberSettings;
 
   @Field(() => [String], { nullable: true })
-  @Prop({ type: [{ type: String }], required: false })
+  @Prop({
+    type: [{ type: String }],
+    required: false,
+    default: AppRoles.DEFAULT,
+  })
   roles: AppRoles;
-
-  @Field(() => String, { nullable: true })
-  @Prop({ required: false })
-  password: string;
-
-  @Field(() => String, { nullable: true })
-  @Prop({ required: false })
-  first_name: string;
-
-  @Field(() => String, { nullable: true })
-  @Prop({ required: false })
-  last_name: string;
-
-  @Field(() => String, { nullable: true })
-  @Prop({ required: false })
-  name: string;
-
-  @Field(() => [BaseEntity], { nullable: true })
-  @Prop({ type: [{ type: BaseSchema.Types.ObjectId, ref: 'Organization' }] })
-  organizations?: BaseEntity;
 }
 
 /**

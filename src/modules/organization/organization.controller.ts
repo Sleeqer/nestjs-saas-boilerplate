@@ -94,8 +94,8 @@ OrganizationDocument
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Organization>> {
-    const { member } = request;
-    parameters.filter = { member: member._id };
+    const { profile } = request;
+    parameters.filter = { profile: profile._id };
 
     return this.service.paginate(parameters);
   }
@@ -245,17 +245,17 @@ OrganizationDocument
     @Body() payload: OrganizationCreatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Organization> {
-    const { member } = request;
+    const { profile } = request;
     const organization = await this.service.create({
       ...payload,
-      member: member._id,
+      profile: profile._id,
     });
 
     /**
-     * Attach organization to member
+     * Attach organization to profile
      */
-    member.organizations.addToSet(organization);
-    await member.save()
+    profile.organizations.addToSet(organization);
+    await profile.save()
 
     return organization;
   }

@@ -5,20 +5,20 @@ import { ObjectID } from 'typeorm';
 /**
  * Import local objects
  */
-import { MemberService } from '../member.service';
+import { ProfileService } from '../profile.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Member Load By Id Pipe Class
+ * Profile Load By Id Pipe Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Member Load By Id Pipe Class
-   * @param {MemberService} service Member Service
+   * Constructor of Profile Load By Id Pipe Class
+   * @param {ProfileService} service Profile Service
    * @param {FastifyRequestInterface} request Request
    */
   constructor(
-    protected readonly service: MemberService,
+    protected readonly service: ProfileService,
     @Inject(REQUEST) private readonly request: FastifyRequestInterface,
   ) {}
 

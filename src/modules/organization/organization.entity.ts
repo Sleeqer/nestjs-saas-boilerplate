@@ -34,7 +34,7 @@ export class Organization extends BaseEntity {
 
   @Field(() => BaseEntity, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Member' })
-  member?: BaseEntity;
+  profile?: BaseEntity;
 }
 
 /**

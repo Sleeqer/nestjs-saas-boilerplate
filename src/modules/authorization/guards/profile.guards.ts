@@ -11,7 +11,7 @@ import {
  * Import local objects
  */
 import { ConfigService } from '../../config/config.service';
-import { MemberService } from '../../member/member.service';
+import { ProfileService } from '../../profile/profile.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
@@ -27,11 +27,11 @@ export class ProfileGuards implements CanActivate {
 
   /**
    * Constructor of Profile Guards Class
-   * @param {MemberService} member Profile Service
+   * @param {ProfileService} profile Profile Service
    * @param {ConfigService} config Config Service
    */
   constructor(
-    protected readonly member: MemberService,
+    protected readonly profile: ProfileService,
     protected readonly config: ConfigService,
   ) {
     const secret: string = config.get('WEBTOKEN_SECRET_KEY');
@@ -67,7 +67,7 @@ export class ProfileGuards implements CanActivate {
   }
 
   /**
-   * Retrieve member & validates token
+   * Retrieve profile & validates token
    * @param {FastifyRequestInterface} request Request
    * @returns {Promise<boolean>} Scope
    */
@@ -79,12 +79,12 @@ export class ProfileGuards implements CanActivate {
 
     try {
       const decoded = this.alive(this.jwt.decode(token));
-      const member = !request.member
-        ? await this.member.get(decoded?._id)
-        : request.member;
+      const profile = !request.profile
+        ? await this.profile.get(decoded?._id)
+        : request.profile;
 
-      request.member = member;
-      evaluation.scope = member ? true : false;
+      request.profile = profile;
+      evaluation.scope = profile ? true : false;
     } catch {
       evaluation.scope = false;
     }

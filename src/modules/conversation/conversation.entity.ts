@@ -7,7 +7,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
  */
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
 import { User } from '../user/user.entity';
-import { ConversationMember } from './conversation.member.entity';
+import { Member } from '../member/member.entity';
 
 /**
  * Conversation Document
@@ -28,9 +28,9 @@ export class Conversation extends BaseEntity {
   @Prop()
   description: string;
 
-  @Field(() => [ConversationMember], { nullable: true })
-  @Prop([ConversationMember])
-  members?: ConversationMember[];
+  @Field(() => [Member], { nullable: true })
+  @Prop([Member])
+  members?: Member[];
 
   @Field(() => User, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
@@ -53,6 +53,6 @@ ConversationSchema.virtual('members_counts').get(function () {
 
 ConversationSchema.virtual('members_ids').get(function () {
   return this.members.map(
-    (member: ConversationMember) => member?.user?._id || member?.user,
+    (profile: Member) => profile?.user?._id || profile?.user,
   );
 });

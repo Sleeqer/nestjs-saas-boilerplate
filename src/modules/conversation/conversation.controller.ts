@@ -264,7 +264,7 @@ export class ConversationController extends BaseEntityController<
       ...payload,
       application: application._id,
       owner: user._id,
-      members: [{ user: user._id, roles: AppRoles.ADMIN }],
+      members: [{ _id: user._id, user: user._id, roles: AppRoles.ADMIN }],
     });
 
     return conversation;

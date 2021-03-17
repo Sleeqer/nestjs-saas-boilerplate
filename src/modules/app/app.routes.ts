@@ -3,8 +3,8 @@ import { Routes } from 'nest-router';
 /**
  * Import local objects
  */
-import { UserModule } from '../user';
 import { MemberModule } from '../member';
+import { ProfileModule } from '../profile';
 import { ApplicationModule } from '../application';
 import { OrganizationModule } from '../organization';
 import { ConversationModule } from '../conversation';
@@ -19,7 +19,7 @@ export const routes: Routes = [
     children: [
       {
         path: '/:organization/members',
-        module: MemberModule,
+        module: ProfileModule,
       },
       {
         path: '/:organization/applications',
@@ -30,5 +30,11 @@ export const routes: Routes = [
   {
     path: '/conversations',
     module: ConversationModule,
+    children: [
+      {
+        path: '/:conversation/members',
+        module: MemberModule,
+      },
+    ],
   },
 ];

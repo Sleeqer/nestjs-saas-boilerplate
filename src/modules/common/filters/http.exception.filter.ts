@@ -30,21 +30,25 @@ export class FormatResponseException {
   protected property: string = '';
   protected message: string = '';
   protected details: object = {};
+  protected children: Array<any> = [];
 
   /**
    * Constructor of Format Response Exception Class
    * @param {string} message Message
    * @param {string} property Property of message
    * @param {object} details Details
+   * @param {object} children Details
    */
   constructor(
     message: string = '',
     property: string = '',
     details: object = {},
+    children: Array<any> = [],
   ) {
     this.property = property;
     this.message = message;
     this.details = details;
+    this.children = children;
   }
 }
 
@@ -66,32 +70,15 @@ export class FormatResponseExceptionMessages {
 
   /**
    * Constructor of Format Response Exception Message Class
-   * @param {Array<ValidationError> | string} messages Message to apply formatting
+   * @param {any} data Message to apply formatting
    */
   constructor(data: any) {
+    /**
+     * Formatting data
+     */
+    const errors = [];
     if (Array.isArray(data.message)) {
-      /**
-       * Array of messages , parse each message and format
-       */
-      data.message.forEach((message: ValidationError) => {
-        const details = {};
-        const constraints = Object.keys(message?.constraints) || [];
-        constraints.forEach((constraint) => {
-          details[ChangeCase.constantCase(constraint || '')] =
-            message?.constraints[constraint];
-        });
-
-        /**
-         * Add to errors object
-         */
-        this.object.error.errors.push(
-          new FormatResponseException(
-            details[Object.keys(details)?.find((key) => key)] || '',
-            message?.property || '',
-            details,
-          ),
-        );
-      });
+      this.object.error.errors = this.format(data.message, errors);
 
       /**
        * General message , human readable
@@ -110,8 +97,48 @@ export class FormatResponseExceptionMessages {
       this.object.error.message = data.message;
     }
 
-    this.object.error.status = ChangeCase.constantCase(data?.error || data?.message || '')
+    this.object.error.status = ChangeCase.constantCase(
+      data?.error || data?.message || '',
+    );
     this.object.error.code = data.status || data.statusCode;
+  }
+
+  /**
+   * Format array of messages
+   * @param {any} data
+   * @param {Array<FormatResponseException>} data
+   */
+  private format(messages: any, errors: Array<FormatResponseException> = []) {
+    /**
+     * Array of messages , parse each message and format
+     */
+    messages.forEach((message: ValidationError) => {
+      const details = {};
+      const constraints = Object.keys(message?.constraints || {}) || [];
+      constraints.forEach((constraint) => {
+        details[ChangeCase.constantCase(constraint || '')] =
+          message?.constraints[constraint];
+      });
+
+      /**
+       * Add to errors object
+       */
+      const children =
+        (message?.children &&
+          Array.isArray(message.children) &&
+          this.format(message.children)) ||
+        [];
+      errors.push(
+        new FormatResponseException(
+          details[Object.keys(details)?.find((key) => key)] || '',
+          message?.property || '',
+          details,
+          children,
+        ),
+      );
+    });
+
+    return errors;
   }
 
   /**

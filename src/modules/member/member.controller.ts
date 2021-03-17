@@ -39,9 +39,17 @@ import { MemberService } from './member.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Member, MemberDocument } from './member.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import {
+  ApplicationKeyGuards,
+  OrganizationGuards,
+  ProfileGuards,
+  UserGuards,
+} from '../authorization/guards';
 import { GuardsProperty } from '../authorization/guards/decorators';
-import { OrganizationKeeperGuards } from '../authorization/guards/organization.keeper.guards';
+import { ConversationGuards } from '../conversation/guards';
+import { UserService, User } from '../user';
+import { ConversationService } from '../conversation';
+import { AppRoles } from '../app/app.roles';
 
 /**
  * Member Paginate Response Class
@@ -67,8 +75,14 @@ export class MemberController extends BaseEntityController<
   /**
    * Constructor of Member Controller Class
    * @param {MemberService} service Member Service
+   * @param {ConversationService} conversation Conversation Service
+   * @param {UserService} user User Service
    */
-  constructor(protected readonly service: MemberService) {
+  constructor(
+    protected readonly service: MemberService,
+    protected readonly conversation: ConversationService,
+    protected readonly user: UserService,
+  ) {
     super(service);
   }
 
@@ -79,8 +93,8 @@ export class MemberController extends BaseEntityController<
    * @returns {Promise<Pagination<Member>>} Paginated Member objects
    */
   @Get('')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Paginate Member objects.' })
   @ApiResponse({
     status: 200,
@@ -95,12 +109,12 @@ export class MemberController extends BaseEntityController<
     @Query() parameters: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Member>> {
-    const { organization } = request;
+    const { conversation } = request.locals;
 
     /**
-     * Filtering by organization
+     * Filtering by conversation
      */
-    parameters.filter = { organizations: { $in: organization._id } };
+    parameters.filter = { conversations: { $in: conversation._id } };
     return this.service.paginate(parameters);
   }
 
@@ -111,8 +125,8 @@ export class MemberController extends BaseEntityController<
    * @returns {Promise<Member>} Member's object
    */
   @Get(':id')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards)
   @ApiOperation({ summary: 'Retrieve Member By id.' })
   @ApiResponse({
     status: 200,
@@ -132,7 +146,7 @@ export class MemberController extends BaseEntityController<
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return request.locals.member;
+    return request.locals.profile;
   }
 
   /**
@@ -143,8 +157,8 @@ export class MemberController extends BaseEntityController<
    * @returns {Promise<Member>} Member's object
    */
   @Put(':id')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Member By id.',
@@ -175,8 +189,8 @@ export class MemberController extends BaseEntityController<
    * @returns {Promise<Member>} Member's object
    */
   @Patch(':id')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards, OrganizationKeeperGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiOperation({ summary: 'Update Member by id.' })
   @ApiResponse({
     status: 200,
@@ -196,7 +210,7 @@ export class MemberController extends BaseEntityController<
     @Body() payload: MemberUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return await this.service.update(request.locals.member, payload);
+    return await this.service.update(request.locals.profile, payload);
   }
 
   /**
@@ -206,8 +220,8 @@ export class MemberController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards, OrganizationKeeperGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ProfileGuards, OrganizationGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Member By id.' })
   @ApiResponse({
@@ -227,20 +241,20 @@ export class MemberController extends BaseEntityController<
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.member._id);
+    await this.service.destroy(request.locals.profile._id);
     return {};
   }
 
   /**
    * Create Member by payload
-   * @param {number | string} organization Organization's id
+   * @param {number | string} conversation Organization's id
    * @param {MemberCreatePayload} payload Member's payload
    * @param {FastifyRequestInterface} request Request's object
    * @returns {Promise<Member>} Member object
    */
   @Post('')
-  @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Create Member.' })
   @ApiResponse({
     status: 201,
@@ -253,15 +267,26 @@ export class MemberController extends BaseEntityController<
   async create(
     @Body() payload: MemberCreatePayload,
     @Req() request: FastifyRequestInterface,
-  ): Promise<Member> {
-    let member: any = await this.service.create(payload);
+  ): Promise<Member | any> {
+    const { application, locals } = request;
+    const { conversation } = locals;
+    const users = await this.user.all({
+      _id: { $in: payload.members },
+      application: application._id,
+    });
 
     /**
-     * Attach organization to member
+     * Attach members to conversation
      */
-    member.organizations.addToSet(request.organization._id);
-    member = await member.save();
-
-    return member;
+    conversation.members.addToSet(
+      ...users.map((user: User) => {
+        return {
+          _id: user._id,
+          user: user._id,
+          roles: AppRoles.ADMIN,
+        };
+      }),
+    );
+    return await this.conversation.save(conversation);
   }
 }

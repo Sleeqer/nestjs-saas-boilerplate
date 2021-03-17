@@ -22,7 +22,7 @@ export interface FastifyRequestInterface extends FastifyRequest {
   /**
    * Member field
    */
-  member?: any;
+  profile?: any;
 
   /**
  * Organization field

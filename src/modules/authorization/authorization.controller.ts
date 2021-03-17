@@ -7,7 +7,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService, ITokenReturnBody } from './authorization.service';
 import { RegisterPayload } from './payload/register.payload';
 import { LoginPayload } from './payload/login.payload';
-import { MemberService } from '../member';
+import { ProfileService } from '../profile';
 import { ProfileGuards } from './guards';
 import { FastifyRequestInterface } from '../common/interfaces';
 
@@ -20,11 +20,11 @@ export class AuthController {
   /**
    * Constructor of Authentication Controller Class
    * @param {AuthService} service Authentication service
-   * @param {MemberService} member Profile service
+   * @param {ProfileService} profile Profile service
    */
   constructor(
     private readonly service: AuthService,
-    private readonly member: MemberService,
+    private readonly profile: ProfileService,
   ) {}
 
   /**
@@ -42,10 +42,10 @@ export class AuthController {
     status: 400,
     description: 'Retrieve Profile Request Failed.',
   })
-  async profile(
+  async profiler(
     @Req() request: FastifyRequestInterface,
   ): Promise<ITokenReturnBody> {
-    return request.member;
+    return request.profile;
   }
 
   /**
@@ -56,15 +56,15 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Login.' })
   @ApiResponse({
     status: 200,
-    description: 'Member Login Request Received.',
+    description: 'Profile Login Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Member Login Request Failed.',
+    description: 'Profile Login Request Failed.',
   })
   async login(@Body() payload: LoginPayload): Promise<ITokenReturnBody> {
-    const member = await this.service.validate(payload);
-    return await this.service.tokenize(member);
+    const profile = await this.service.validate(payload);
+    return await this.service.tokenize(profile);
   }
 
   /**
@@ -75,14 +75,14 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Register.' })
   @ApiResponse({
     status: 200,
-    description: 'Member Register Request Received.',
+    description: 'Profile Register Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Member Register Request Failed.',
+    description: 'Profile Register Request Failed.',
   })
   async register(@Body() payload: RegisterPayload) {
-    const member = await this.member.create(payload);
-    return await this.service.tokenize(member);
+    const profile = await this.profile.create(payload);
+    return await this.service.tokenize(profile);
   }
 }

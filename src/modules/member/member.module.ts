@@ -13,6 +13,7 @@ import { MemberHandler } from './handler/member.handler';
 import { MemberController } from './member.controller';
 import { MemberResolver } from './member.resolver';
 import { MemberService } from './member.service';
+import { ConversationModule } from '../conversation';
 
 /**
  * Define module
@@ -20,11 +21,10 @@ import { MemberService } from './member.service';
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Member.name, schema: MemberSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Member.name, schema: MemberSchema }]),
     RabbitMQModule,
     RedisPropagatorModule,
+    ConversationModule,
   ],
   providers: [
     MemberService,
@@ -40,4 +40,4 @@ import { MemberService } from './member.service';
 /**
  * Export module
  */
-export class MemberModule { }
+export class MemberModule {}
