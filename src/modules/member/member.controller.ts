@@ -16,10 +16,11 @@ import {
   Patch,
   HttpCode,
   Delete,
-  Query,
   Req,
+  Query,
   UseGuards,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 /**
  * Import local objects
@@ -39,12 +40,7 @@ import { MemberService } from './member.service';
 import { FastifyRequestInterface } from '../common/interfaces';
 import { Member, MemberDocument } from './member.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import {
-  ApplicationKeyGuards,
-  OrganizationGuards,
-  ProfileGuards,
-  UserGuards,
-} from '../authorization/guards';
+import { ApplicationKeyGuards, UserGuards } from '../authorization/guards';
 import { GuardsProperty } from '../authorization/guards/decorators';
 import { ConversationGuards } from '../conversation/guards';
 import { UserService, User } from '../user';
@@ -106,16 +102,18 @@ export class MemberController extends BaseEntityController<
     description: 'Member List Request Failed.',
   })
   async index(
-    @Query() parameters: QueryPagination,
+    @Query() { limit, page }: QueryPagination,
     @Req() request: FastifyRequestInterface,
   ): Promise<Pagination<Member>> {
     const { conversation } = request.locals;
+    const { members, members_counts } = conversation;
 
-    /**
-     * Filtering by conversation
-     */
-    parameters.filter = { conversations: { $in: conversation._id } };
-    return this.service.paginate(parameters);
+    return new Pagination<Member>({
+      results: members.slice((page - 1) * limit, page * limit),
+      total: members_counts,
+      page,
+      limit,
+    });
   }
 
   /**
@@ -126,7 +124,7 @@ export class MemberController extends BaseEntityController<
    */
   @Get(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
-  @UseGuards(ApplicationKeyGuards, UserGuards)
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Retrieve Member By id.' })
   @ApiResponse({
     status: 200,
@@ -146,7 +144,19 @@ export class MemberController extends BaseEntityController<
     id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return request.locals.profile;
+    const { locals } = request;
+    const { conversation, member } = locals;
+    const { members } = conversation;
+
+    /**
+     * Validate if user is member of conversation
+     */
+    if (!conversation.members_ids.includes(member._id))
+      throw this.service._NotFoundException();
+
+    return members.find(({ _id }: Member) =>
+      (_id as Types.ObjectId).equals(member._id),
+    );
   }
 
   /**
@@ -158,7 +168,7 @@ export class MemberController extends BaseEntityController<
    */
   @Put(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
-  @UseGuards(ApplicationKeyGuards, UserGuards)
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
     summary: 'Replace Member By id.',
@@ -174,11 +184,30 @@ export class MemberController extends BaseEntityController<
     description: 'Member Replace Request Failed.',
   })
   async replace(
-    @Param('id', ParseIdPipe) id: number | string,
+    @Param('id', Loader) id: number | string,
     @Body() payload: MemberReplacePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return await this.service.replace(id, payload);
+    const { locals } = request;
+    const { conversation, member } = locals;
+
+    /**
+     * Finding participant
+     */
+    const participant: Member = this.service.finder(conversation, member);
+    participant.roles = payload.roles || participant.roles;
+    participant.settings = {
+      ...participant.settings,
+      ...Object.fromEntries(
+        Object.entries(payload.settings).filter(([_, value]) => value !== null),
+      ),
+    };
+
+    /**
+     * Update participant
+     */
+    const conference = await this.conversation.save(conversation);
+    return this.service.finder(conference, member);
   }
 
   /**
@@ -190,7 +219,7 @@ export class MemberController extends BaseEntityController<
    */
   @Patch(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiOperation({ summary: 'Update Member by id.' })
   @ApiResponse({
     status: 200,
@@ -210,7 +239,72 @@ export class MemberController extends BaseEntityController<
     @Body() payload: MemberUpdatePayload,
     @Req() request: FastifyRequestInterface,
   ): Promise<Member> {
-    return await this.service.update(request.locals.profile, payload);
+    const { locals } = request;
+    const { conversation, member } = locals;
+
+    /**
+     * Finding participant
+     */
+    const participant: Member = this.service.finder(conversation, member);
+    participant.roles = payload.roles || participant.roles;
+    participant.settings = {
+      ...participant.settings,
+      ...Object.fromEntries(
+        Object.entries(payload.settings).filter(([_, value]) => value !== null),
+      ),
+    };
+
+    /**
+     * Update participant
+     */
+    const conference = await this.conversation.save(conversation);
+    return this.service.finder(conference, member);
+  }
+
+  /**
+   * Create Member by id
+   * @param {number | string} id Member's id
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<object>} Empty object
+   */
+  @Post(':id')
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
+  @ApiOperation({ summary: 'Create Member By id.' })
+  @ApiResponse({
+    status: 204,
+    description: 'Create Member Request Received.',
+    type: Object,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Create Member Request Failed.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Create Member Request Failed (Not found).',
+  })
+  async creator(
+    @Param('id', Loader) id: number | string,
+    @Req() request: FastifyRequestInterface,
+  ): Promise<object> {
+    const { locals } = request;
+    const { conversation, member } = locals;
+
+    /**
+     * Validate if user is member of conversation
+     */
+    if (!conversation.members_ids.includes(member._id))
+      throw this.service._NotFoundException();
+
+    /**
+     * Detach member to conversation
+     */
+    conversation.members.addToSet({
+      _id: id,
+      user: id,
+    });
+    return await this.conversation.save(conversation);
   }
 
   /**
@@ -221,7 +315,7 @@ export class MemberController extends BaseEntityController<
    */
   @Delete(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
-  @UseGuards(ProfileGuards, OrganizationGuards)
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete Member By id.' })
   @ApiResponse({
@@ -241,8 +335,67 @@ export class MemberController extends BaseEntityController<
     @Param('id', Loader) id: number | string,
     @Req() request: FastifyRequestInterface,
   ): Promise<object> {
-    await this.service.destroy(request.locals.profile._id);
-    return {};
+    const { locals } = request;
+    const { conversation, member } = locals;
+
+    /**
+     * Validate if user is member of conversation
+     */
+    if (!conversation.members_ids.includes(member._id))
+      throw this.service._NotFoundException();
+
+    /**
+     * Detach member to conversation
+     */
+    conversation.members.pull({
+      _id: id,
+      user: id,
+    });
+    return await this.conversation.save(conversation);
+  }
+
+  /**
+   * Delete Member by payload
+   * @param {number | string} conversation Organization's id
+   * @param {MemberCreatePayload} payload Member's payload
+   * @param {FastifyRequestInterface} request Request's object
+   * @returns {Promise<Member>} Member object
+   */
+  @Delete('')
+  @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
+  @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
+  @ApiOperation({ summary: 'Delete Members.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Delete Members Request Received.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Delete Members Request Failed.',
+  })
+  async delete(
+    @Body() payload: MemberCreatePayload,
+    @Req() request: FastifyRequestInterface,
+  ): Promise<Member | any> {
+    const { application, locals } = request;
+    const { conversation } = locals;
+    const users = await this.user.all({
+      _id: { $in: payload.members },
+      application: application._id,
+    });
+
+    /**
+     * Detach members to conversation
+     */
+    conversation.members.pull(
+      ...users.map((user: User) => {
+        return {
+          _id: user._id,
+          user: user._id,
+        };
+      }),
+    );
+    return await this.conversation.save(conversation);
   }
 
   /**
@@ -255,14 +408,14 @@ export class MemberController extends BaseEntityController<
   @Post('')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiOperation({ summary: 'Create Member.' })
+  @ApiOperation({ summary: 'Create Members.' })
   @ApiResponse({
     status: 201,
-    description: 'Member Create Request Received.',
+    description: 'Create Members Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Member Create Request Failed.',
+    description: 'Create Members Request Failed.',
   })
   async create(
     @Body() payload: MemberCreatePayload,

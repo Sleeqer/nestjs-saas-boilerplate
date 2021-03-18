@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { Schema as BaseSchema, Document } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
 
 /**
  * Import local objects
@@ -14,9 +17,23 @@ import { BaseEntity, SchemaOptions } from '../common/entity/entity';
  */
 @ObjectType()
 export class MemberSettings {
+  @ApiProperty({
+    required: true,
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
   @Field(() => String)
+  @Type(() => Boolean)
   @Prop({ required: false, default: false })
-  notifications: boolean = false;
+  notifications: boolean;
+
+  /**
+   * Constructor of Member Settings Class
+   */
+  constructor(notifications?: boolean) {
+    this.notifications = notifications;
+  }
 }
 
 /**
@@ -35,7 +52,7 @@ export class Member extends BaseEntity {
   user: User;
 
   @Field(() => MemberSettings)
-  @Prop({ required: false, default: new MemberSettings() })
+  @Prop({ required: false, default: new MemberSettings(false) })
   settings?: MemberSettings;
 
   @Field(() => [String], { nullable: true })

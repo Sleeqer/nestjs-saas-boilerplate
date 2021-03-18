@@ -1,5 +1,14 @@
-import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  MinLength,
+  IsOptional,
+  MaxLength,
+  ArrayUnique,
+  ArrayNotEmpty,
+  ArrayMinSize,
+  IsMongoId,
+} from 'class-validator';
 
 /**
  * Conversation Create Payload Class
@@ -14,7 +23,7 @@ export class ConversationCreatePayload {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(255)
-  title: string;
+  readonly title: string;
 
   /**
    * Description field
@@ -24,5 +33,18 @@ export class ConversationCreatePayload {
   })
   @IsOptional()
   @MaxLength(512)
-  description: string;
+  readonly description: string;
+
+  /**
+   * Members field
+   */
+  @ApiProperty({
+    required: false,
+    type: () => [String],
+    default: [],
+  })
+  @IsOptional()
+  @ArrayUnique()
+  @IsMongoId({ each: true })
+  readonly members: Array<string> = [];
 }

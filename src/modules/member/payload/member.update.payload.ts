@@ -1,28 +1,47 @@
-import { MinLength, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  ArrayNotEmpty,
+  ArrayMinSize,
+  ArrayUnique,
+  IsEnum,
+  IsOptional,
+  ValidateNested,
+  IsObject,
+} from 'class-validator';
+
+/**
+ * Import local objects
+ */
+import { AppRoles } from '../../app/app.roles';
+import { MemberSettings } from '../member.entity';
 
 /**
  * Member Update Payload Class
  */
 export class MemberUpdatePayload {
   /**
-   * Title field
+   * Roles field
    */
   @ApiProperty({
-    required: false,
+    required: true,
+    type: () => [String],
   })
   @IsOptional()
-  @MinLength(1)
-  @MaxLength(255)
-  title: string;
+  @ArrayUnique()
+  @IsEnum(AppRoles, { each: true })
+  readonly roles: AppRoles;
 
   /**
-   * Description field
+   * Settings field
    */
   @ApiProperty({
     required: false,
+    type: () => MemberSettings,
   })
   @IsOptional()
-  @MaxLength(512)
-  description: string;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => MemberSettings)
+  readonly settings: MemberSettings;
 }

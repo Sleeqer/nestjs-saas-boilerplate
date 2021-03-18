@@ -258,13 +258,30 @@ export class ConversationController extends BaseEntityController<
     const { application, user } = request;
 
     /**
+     * Attach members to conversation
+     */
+    const _id = user._id.toString();
+    const members = [
+      ...payload.members.map((member: string) => {
+        return {
+          _id: member,
+          user: member,
+          roles: AppRoles.DEFAULT,
+        };
+      }),
+      ...[{ _id, user: _id, roles: AppRoles.ADMIN }],
+    ];
+
+    /**
      * Attach realtions to conversation
      */
     const conversation = await this.service.create({
       ...payload,
       application: application._id,
       owner: user._id,
-      members: [{ _id: user._id, user: user._id, roles: AppRoles.ADMIN }],
+      members: [
+        ...new Map(members.map((item) => [item['_id'], item])).values(),
+      ],
     });
 
     return conversation;

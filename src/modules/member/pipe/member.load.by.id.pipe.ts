@@ -5,7 +5,7 @@ import { ObjectID } from 'typeorm';
 /**
  * Import local objects
  */
-import { MemberService } from '../member.service';
+import { UserService } from '../../user/user.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
@@ -14,11 +14,11 @@ import { FastifyRequestInterface } from '../../common/interfaces';
 export class Loader implements PipeTransform {
   /**
    * Constructor of Member Load By Id Pipe Class
-   * @param {MemberService} service Member Service
+   * @param {UserService} service Member Service
    * @param {FastifyRequestInterface} request Request
    */
   constructor(
-    protected readonly service: MemberService,
+    protected readonly service: UserService,
     @Inject(REQUEST) private readonly request: FastifyRequestInterface,
   ) {}
 
@@ -43,7 +43,7 @@ export class Loader implements PipeTransform {
      * Check if entity exists & attach to request locals
      */
     if (!entity) throw this.service._NotFoundException();
-    this.request.locals.profile = entity;
+    this.request.locals.member = entity;
     return value;
   }
 }

@@ -36,7 +36,7 @@ export class BaseEntity {
   @Transform((value) => (value?.value || value).toString(), {
     toPlainOnly: true,
   })
-  readonly _id: string;
+  readonly _id: string | Types.ObjectId;
 
   @Exclude()
   @Prop({ type: Types.ObjectId, ref: 'Application' })

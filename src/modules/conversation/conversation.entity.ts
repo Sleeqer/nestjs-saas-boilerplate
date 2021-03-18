@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as BaseSchema } from 'mongoose';
+import { Document, Schema as BaseSchema, Types } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 /**
@@ -37,6 +37,7 @@ export class Conversation extends BaseEntity {
   owner?: User;
 
   readonly members_counts?: Number;
+  readonly members_ids?: Array<string | Types.ObjectId>;
 }
 
 /**
