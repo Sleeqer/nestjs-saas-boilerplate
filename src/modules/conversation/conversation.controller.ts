@@ -29,7 +29,6 @@ import {
   ConversationReplacePayload,
   ConversationUpdatePayload,
 } from './payload';
-import { Loader } from './pipe';
 import {
   Pagination,
   Query as QueryPagination,

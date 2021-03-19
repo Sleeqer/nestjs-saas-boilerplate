@@ -1,11 +1,11 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * Import local objects
+ */
 import { AppService } from './app.service';
-import {
-  ApiBearerAuth,
-  ApiExcludeEndpoint,
-  ApiResponse,
-} from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 
 /**
  * App Controller Class
@@ -15,33 +15,23 @@ import { AuthGuard } from '@nestjs/passport';
 export class AppController {
   /**
    * Constructor of App Controller Class
-   * @param {AppService} service app service
+   * @param {AppService} service App Service
    */
   constructor(private readonly service: AppService) {}
 
   /**
-   * Returns the an environment variable from config file
-   * @returns {string} the application environment url
+   * Retrieve Application Url
+   * @returns {object} Application Url
    */
   @Get('healthz')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiResponse({ status: 200, description: 'Root Request Completed' })
-  @ApiResponse({ status: 400, description: 'Root Request Failed' })
-  root(): string {
-    return this.service.root();
-  }
-
-  /**
-   * Fetches request metadata
-   * @param {Req} req the request body
-   * @returns {Partial<Request>} the request user populated from the passport module
-   */
-  @Get('request/user')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiExcludeEndpoint()
-  @ApiResponse({ status: 200, description: 'User Metadata Request Completed' })
-  @ApiResponse({ status: 400, description: 'User Metadata Request Failed' })
-  getRequestUser(@Req() req): Partial<Request> {
-    return req.user;
+  @ApiOperation({ summary: 'Retrive application healthcheck.' })
+  @ApiResponse({ status: 200, description: `Request Received.` })
+  @ApiResponse({ status: 400, description: 'Request Failed.' })
+  root(): object {
+    return {
+      _id: uuidv4(),
+      url: this.service.root(),
+      timestamp: new Date(),
+    };
   }
 }
