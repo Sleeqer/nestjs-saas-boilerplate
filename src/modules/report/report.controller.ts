@@ -110,7 +110,7 @@ export class ReportController extends BaseEntityController<
       ReportPopulateEnum.CONVERSATION,
       ReportPopulateEnum.USER,
       ReportPopulateEnum.CONVERSATION_MEMBERS,
-      ReportPopulateEnum.CONVERSATION_OWNER
+      ReportPopulateEnum.CONVERSATION_AUTHOR
     ];
 
     return this.service.paginate(parameters);

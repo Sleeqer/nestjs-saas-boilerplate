@@ -30,10 +30,10 @@ type BaseEntity {
 
 type Conversation {
   _id: String!
+  author: User
   description: String!
   edited_timestamp: DateTime
   members: [Member!]
-  owner: User
   timestamp: DateTime
   title: String!
 }
@@ -54,6 +54,16 @@ type Member {
 
 type MemberSettings {
   notifications: String!
+}
+
+type Message {
+  _id: String!
+  author: User
+  content: String
+  conversation: BaseEntity!
+  edited_timestamp: DateTime
+  timestamp: DateTime
+  type: String!
 }
 
 type Organization {
@@ -82,7 +92,7 @@ type Profile {
 type Query {
   applications: [Application!]!
   conversations: [Conversation!]!
-  members: [Member!]!
+  members: [Message!]!
   organizations: [Organization!]!
   reports: [Report!]!
   users: [User!]!

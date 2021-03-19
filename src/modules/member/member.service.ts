@@ -62,6 +62,27 @@ export class MemberService extends BaseEntityService<MemberDocument> {
   }
 
   /**
+   * Updater Member's object
+   * @param {Member} member Member's object
+   * @param {Payload} payload Payload's object
+   * @returns {Member} Member's object
+   */
+  updater(member: Member, payload: Payload): Member {
+    member.roles = payload.roles || member.roles;
+    member.settings = {
+      ...member.settings,
+      ...Object.keys(payload.settings).reduce((accumulator, key) => {
+        const _accumulator = accumulator;
+        if (payload.settings[key] !== undefined)
+          _accumulator[key] = payload.settings[key];
+        return _accumulator;
+      }, {}),
+    };
+
+    return member;
+  }
+
+  /**
    * Create Entity by payload
    * @param {Payload} payload Entity's payload
    * @returns {Promise<MemberDocument>} Entity object

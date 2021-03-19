@@ -6,5 +6,5 @@ export enum ReportPopulateEnum {
   CONVERSATION = `conversation`,
   USER = `user`,
   CONVERSATION_MEMBERS = `conversation.members`,
-  CONVERSATION_OWNER = `conversation.owner`,
+  CONVERSATION_AUTHOR = `conversation.author`,
 }

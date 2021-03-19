@@ -3,5 +3,5 @@
  */
 export enum ConversationPopulatorEnum {
   MEMBERS_USER = `members.user`,
-  OWNER = `owner`,
+  AUTHOR = `author`,
 }

@@ -34,7 +34,7 @@ export class Conversation extends BaseEntity {
 
   @Field(() => User, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
-  owner?: User;
+  author?: User;
 
   readonly members_counts?: Number;
   readonly members_ids?: Array<string | Types.ObjectId>;

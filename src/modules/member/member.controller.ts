@@ -192,16 +192,9 @@ export class MemberController extends BaseEntityController<
     const { conversation, member } = locals;
 
     /**
-     * Finding participant
+     * Finding participant & updating references
      */
-    const participant: Member = this.service.finder(conversation, member);
-    participant.roles = payload.roles || participant.roles;
-    participant.settings = {
-      ...participant.settings,
-      ...Object.fromEntries(
-        Object.entries(payload.settings).filter(([_, value]) => value !== null),
-      ),
-    };
+    this.service.updater(this.service.finder(conversation, member), payload);
 
     /**
      * Update participant
@@ -243,16 +236,9 @@ export class MemberController extends BaseEntityController<
     const { conversation, member } = locals;
 
     /**
-     * Finding participant
+     * Finding participant & updating references
      */
-    const participant: Member = this.service.finder(conversation, member);
-    participant.roles = payload.roles || participant.roles;
-    participant.settings = {
-      ...participant.settings,
-      ...Object.fromEntries(
-        Object.entries(payload.settings).filter(([_, value]) => value !== null),
-      ),
-    };
+    this.service.updater(this.service.finder(conversation, member), payload);
 
     /**
      * Update participant
@@ -292,17 +278,11 @@ export class MemberController extends BaseEntityController<
     const { conversation, member } = locals;
 
     /**
-     * Validate if user is member of conversation
-     */
-    if (!conversation.members_ids.includes(member._id))
-      throw this.service._NotFoundException();
-
-    /**
      * Detach member to conversation
      */
     conversation.members.addToSet({
-      _id: id,
-      user: id,
+      _id: member._id,
+      user: member._id,
     });
     return await this.conversation.save(conversation);
   }
@@ -341,15 +321,14 @@ export class MemberController extends BaseEntityController<
     /**
      * Validate if user is member of conversation
      */
-    if (!conversation.members_ids.includes(member._id))
-      throw this.service._NotFoundException();
+    const participant: Member = this.service.finder(conversation, member);
 
     /**
      * Detach member to conversation
      */
     conversation.members.pull({
-      _id: id,
-      user: id,
+      _id: participant._id,
+      user: participant._id,
     });
     return await this.conversation.save(conversation);
   }

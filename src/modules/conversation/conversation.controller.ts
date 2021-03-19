@@ -278,7 +278,7 @@ export class ConversationController extends BaseEntityController<
     const conversation = await this.service.create({
       ...payload,
       application: application._id,
-      owner: user._id,
+      author: user._id,
       members: [
         ...new Map(members.map((item) => [item['_id'], item])).values(),
       ],

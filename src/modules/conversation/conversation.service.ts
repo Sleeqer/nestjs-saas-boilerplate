@@ -25,7 +25,7 @@ export class ConversationService extends BaseEntityService<ConversationDocument>
    */
   protected populator: Array<string> = [
     ConversationPopulatorEnum.MEMBERS_USER,
-    ConversationPopulatorEnum.OWNER,
+    ConversationPopulatorEnum.AUTHOR,
   ];
 
   /**
