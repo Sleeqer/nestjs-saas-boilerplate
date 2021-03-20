@@ -19,7 +19,16 @@ import { UserService } from '../../user/user.service';
  * Tokenize Result
  */
 type TokenizeResult = {
+  /**
+   * Evaluated result
+   * @type {boolean}
+   */
   evaluated: boolean;
+
+  /**
+   * User entity
+   * @type {any}
+   */
   user: any;
 };
 
@@ -29,6 +38,7 @@ type TokenizeResult = {
 @Injectable()
 export class ApplicationGuard implements CanActivate {
   /**
+   * JWT Service
    * @type {JwtService}
    */
   private readonly jwt: JwtService;
@@ -55,7 +65,7 @@ export class ApplicationGuard implements CanActivate {
    * Validate token of by application settings
    * @param {ApplicationSettings} settings Application Settings
    * @param {string} token Token to verify
-   * @returns {Promise<TokenizeResult>}
+   * @returns {Promise<TokenizeResult>} Tokenize Result
    */
   async tokenization(
     settings: ApplicationSettings,
@@ -94,8 +104,9 @@ export class ApplicationGuard implements CanActivate {
   /**
    * Validate application
    * @param {string} _id Application's _id
+   * @param {string} token Token to check
    * @param {FastifyRequestInterface} request Request
-   * @returns {Promise<boolean>}
+   * @returns {Promise<boolean>} Scope
    */
   async application(
     _id: string,
@@ -129,8 +140,8 @@ export class ApplicationGuard implements CanActivate {
   }
 
   /**
-   *
-   * @param context
+   * Validate permissions
+   * @param {ExecutionContext} context Context
    * @returns
    */
   canActivate(

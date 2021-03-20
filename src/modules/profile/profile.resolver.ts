@@ -18,7 +18,7 @@ export class ProfileResolver {
   constructor(private readonly service: ProfileService) {}
 
   /**
-   *
+   * Retrieve members
    * @returns
    */
   @Query((returns) => [Profile], { name: 'members', nullable: false })

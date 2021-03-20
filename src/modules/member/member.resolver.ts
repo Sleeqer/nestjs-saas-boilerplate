@@ -18,7 +18,7 @@ export class MemberResolver {
   constructor(private readonly service: MemberService) {}
 
   /**
-   *
+   * Retrieve members
    * @returns
    */
   @Query((returns) => [Member], { name: 'members', nullable: false })

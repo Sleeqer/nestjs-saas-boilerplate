@@ -19,14 +19,23 @@ export type EntityDocument = Entity & Document;
 @ObjectType()
 @Schema(SchemaOptions)
 export class Entity extends BaseEntity {
+  /**
+   * Title field
+   */
   @Field(() => String)
   @Prop({ required: true })
   title: string;
 
+  /**
+   * Description field
+   */
   @Field(() => String)
   @Prop({ required: false, default: '' })
   description: string = '';
 
+  /**
+   * Key field
+   */
   @Field(() => String)
   @Prop({ required: false })
   key?: string;

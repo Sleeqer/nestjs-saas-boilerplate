@@ -20,18 +20,30 @@ export type OrganizationDocument = Organization & Document;
 @ObjectType()
 @Schema({ ...SchemaOptions, collection: 'organizations_entities' })
 export class Organization extends BaseEntity {
+  /**
+   * Title field
+   */
   @Field(() => String, { nullable: false })
   @Prop({ required: true })
   title: string;
 
+  /**
+   * Description field
+   */
   @Field(() => String, { nullable: true })
   @Prop({ required: false })
   description: string;
 
+  /**
+   * Key field
+   */
   @Field(() => String, { nullable: true })
   @Prop({ required: false })
   key?: string;
 
+  /**
+   * Profile field
+   */
   @Field(() => BaseEntity, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Member' })
   profile?: BaseEntity;

@@ -21,22 +21,37 @@ export type ReportDocument = Report & Document;
 @ObjectType()
 @Schema(SchemaOptions)
 export class Report extends BaseEntity {
+  /**
+   * Title field
+   */
   @Field(() => String, { nullable: true })
   @Prop({ required: false })
   title: string;
 
+  /**
+   * Description field
+   */
   @Field(() => String, { nullable: true })
   @Prop({ required: false })
   description: string;
 
+  /**
+   * Reason field
+   */
   @Field(() => String, { nullable: false })
   @Prop({ required: true, default: ReportReasonEnum.OTHER })
   reason: string;
 
+  /**
+   * Reporter field
+   */
   @Field(() => User, { nullable: false })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
   reporter: User;
 
+  /**
+   * Conversation field
+   */
   @Field(() => Conversation, { nullable: true })
   @Prop({
     required: false,
@@ -46,6 +61,9 @@ export class Report extends BaseEntity {
   })
   conversation: Conversation;
 
+  /**
+   * User field
+   */
   @Field(() => User, { nullable: true })
   @Prop({
     required: false,

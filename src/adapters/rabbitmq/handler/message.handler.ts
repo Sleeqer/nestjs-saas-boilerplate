@@ -14,11 +14,13 @@ import {
  */
 export class MessageHandler {
   /**
+   * Options of handler
    * @type {RabbitMQOptionInterface}
    */
   public options: RabbitMQOptionInterface;
 
   /**
+   * Handler of entity
    * @type {Function}
    */
   public handler: (
@@ -35,8 +37,8 @@ export class MessageHandler {
 
   /**
    * Constructor of Message Handler Class
-   * @param {Function} handler Handler of incomming messages
-   * @param {RabbitMQOptionInterface} options Options
+   * @param {Function} handler Handler of incomming message
+   * @param {RabbitMQOptionInterface} options Options of handler
    */
   constructor(
     handler: (

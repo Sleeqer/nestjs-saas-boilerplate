@@ -18,8 +18,8 @@ export class ApplicationResolver {
   constructor(private readonly service: ApplicationService) {}
 
   /**
-   *
-   * @returns {}
+   * Retrieve applications
+   * @returns
    */
   @Query((returns) => [Application], { name: 'applications', nullable: false })
   async applications() {

@@ -26,9 +26,28 @@ const config: ConfigService = ConfigService.getInstance();
  * Format Response Exception Class
  */
 export class FormatResponseException {
+  /**
+   * Property errors
+   * @type {string}
+   */
   protected property: string = '';
+
+  /**
+   * Message errors
+   * @type {string}
+   */
   protected message: string = '';
+
+  /**
+   * Details errors
+   * @type {object}
+   */
   protected details: object = {};
+
+  /**
+   * Children errors
+   * @type {Array<any>}
+   */
   protected children: Array<any> = [];
 
   /**
@@ -36,7 +55,7 @@ export class FormatResponseException {
    * @param {string} message Message
    * @param {string} property Property of message
    * @param {object} details Details
-   * @param {object} children Details
+   * @param {Array<any>} children Details
    */
   constructor(
     message: string = '',
@@ -141,10 +160,10 @@ export class FormatResponseExceptionMessages {
   }
 
   /**
-   *
+   * Retrive object of exception
    * @returns {object}
    */
-  public getObject() {
+  public getObject(): object {
     return this.object;
   }
 }

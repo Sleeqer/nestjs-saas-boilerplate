@@ -5,6 +5,10 @@ import { ObjectId } from 'mongodb';
  * Parse Id Pipe Options Interface
  */
 export interface ParseIdPipeOptions {
+  /**
+   * Check whenever parse should be strict
+   * @type {boolean}
+   */
   strict: boolean;
 }
 

@@ -18,11 +18,11 @@ export class MessageResolver {
   constructor(private readonly service: MessageService) {}
 
   /**
-   *
+   * Retrieve messages
    * @returns
    */
-  @Query((returns) => [Message], { name: 'members', nullable: false })
-  async members() {
+  @Query((returns) => [Message], { name: 'messages', nullable: false })
+  async messages() {
     return this.service.all();
   }
 }

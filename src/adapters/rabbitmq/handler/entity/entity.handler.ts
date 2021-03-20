@@ -3,6 +3,7 @@
  */
 export class EntityHandler {
   /**
+   * Handler of entity
    * @type {Function}
    */
   public handler: Function;

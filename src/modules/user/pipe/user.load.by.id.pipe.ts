@@ -23,7 +23,7 @@ export class Loader implements PipeTransform {
   ) {}
 
   /**
-   *
+   * Transformer
    * @param {any} value Evaluating
    * @returns {number | string | ObjectID} Value
    */

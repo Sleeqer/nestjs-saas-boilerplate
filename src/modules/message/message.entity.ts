@@ -20,10 +20,16 @@ export type MessageDocument = Message & Document;
 @ObjectType()
 @Schema({ ...SchemaOptions })
 export class Message extends BaseEntity {
+  /**
+   * Author field
+   */
   @Field(() => User, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
   author: User;
 
+  /**
+   * Content field
+   */
   @Field(() => String, { nullable: true })
   @Prop({
     type: String,
@@ -32,6 +38,9 @@ export class Message extends BaseEntity {
   })
   content: string = '';
 
+  /**
+   * Type field
+   */
   @Field(() => String, { nullable: false })
   @Prop({
     type: String,
@@ -40,6 +49,9 @@ export class Message extends BaseEntity {
   })
   type: MessageTypeEnum = MessageTypeEnum.DEFAULT;
 
+  /**
+   * Conversation field
+   */
   @Field(() => BaseEntity, { nullable: false })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: 'Conversation' })
   conversation?: BaseEntity | Types.ObjectId;

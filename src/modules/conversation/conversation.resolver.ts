@@ -18,7 +18,7 @@ export class ConversationResolver {
   constructor(private readonly service: ConversationService) {}
 
   /**
-   *
+   * Retrieve conversations
    * @returns
    */
   @Query((returns) => [Conversation], {

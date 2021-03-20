@@ -18,7 +18,7 @@ export class OrganizationResolver {
   constructor(private readonly service: OrganizationService) {}
 
   /**
-   *
+   * Retrieve organizations
    * @returns
    */
   @Query((returns) => [Organization], {

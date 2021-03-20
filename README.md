@@ -7,14 +7,12 @@
 <p align="center">
 	<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
 	<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-	<a href="https://travis-ci.org/msanvarov/nest-rest-typeorm-boilerplate"><img src="https://travis-ci.org/msanvarov/nest-rest-typeorm-boilerplate.svg?branch=master" alt="Travis" /></a>
-	<a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-	<a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+	<a href="https://travis-ci.org/Sleeqer/nestjs-saas-boilerplate"><img src="https://travis-ci.org/Sleeqer/nestjs-saas-boilerplate.svg?branch=master" alt="Travis" /></a>
 </p>
 
 ### 📚 Description
 
-This boilerplate is made to quickly prototype backend applications. It comes with authentication, logging, security, and database features out of the box.
+This boilerplate is made to quickly prototype backend saas applications. It comes with authentication, logging, security, and database features out of the box.
 
 ---
 
@@ -22,13 +20,11 @@ This boilerplate is made to quickly prototype backend applications. It comes wit
 
 #### Non Docker
 
-- Please make sure to have MYSQL locally by utilizing a web server stack [XAMPP](https://www.apachefriends.org/). The control panel can then trigger MYSQL to start on localhost. MYSQL can be downloaded independently using `brew`, `choco`, or `apt-get`.
+- Please make sure to have `MongoDB` , `RabbitMQ` , `Redis` locally.
 
 #### Docker 🐳
 
-- Please make sure to have docker desktop setup on any preferred operating system to quickly compose the required dependencies. Then follow the docker procedure outlined below.
-
-**Note**: Docker Desktop comes free on both Mac and Windows, but it only works with Windows 10 Pro. A workaround is to get [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/) which will bypass the Windows 10 Pro prerequisite by executing in a VM.
+- Please make sure to have `docker` setup on any preferred operating system to quickly compose the required dependencies.
 
 ---
 
@@ -40,7 +36,7 @@ This boilerplate is made to quickly prototype backend applications. It comes wit
 
 - Download dependencies using `npm i` or `yarn`
 
-- Start the app in pre-production mode by using `npm run start` or `npm run start:dev` for development (the app will be exposed on the port 9000; not to conflict with React, Angular, or Vue)
+- Start the app in pre-production mode by using `yarn start` or `yarn start:dev` for development (the app will be exposed on the port 8000).
 
 #### Deploying with Docker 🐳
 
@@ -51,7 +47,7 @@ This boilerplate is made to quickly prototype backend applications. It comes wit
 $ docker-compose up -d
 ```
 
-- The following command will set up and run the docker project for quick use. Then the web application, Nginx, and MYSQL will be exposed to http://localhost:9000, http://localhost:80, and http://localhost:3306 respectively.
+- The following command will set up and run the docker project for quick use. Then the web application, Nginx will be exposed to http://localhost:8000 and http://localhost:80 respectively.
 
 ---
 
@@ -59,76 +55,83 @@ $ docker-compose up -d
 
 By default, the application comes with a config module that can read in every environment variable from the `.env` file.
 
-**APPLICATION_ENV** - the application environment to execute as, either in development or production. Determines the type of logging options to utilize. Options: `dev` or `prod`.
+**APPLICATION_NAME** - Application's name
 
-**APPLICATION_URL** - the base URL for the application. Made mainly to showcase the power of `ConfigService` and can be removed as it doesn't serve any other purpose
+**APPLICATION_PORT** - Application's port , by default it's 8000
 
-**WEBTOKEN_SECRET_KEY** - the secret key to encrypt/decrypt web tokens with. Make sure to generate a random alphanumeric string for this.
+**APPLICATION_ENV** - Application's environment , `dev` or `prod`
 
-**WEBTOKEN_EXPIRATION_TIME** - **the time in seconds** indicating when the web token will expire; by default, it's 1209600 seconds which is 14 days.
+**APPLICATION_URL** - Application's url
 
-**DB_TYPE** - the type of database
+**WEBTOKEN_SECRET_KEY** - JWT token secret key to encrypt / decrypt web tokens with. Make sure to generate a random alphanumeric string for this
 
-**DB_USERNAME** - username for authenticating against the database.
+**WEBTOKEN_EXPIRATION_TIME** - JWT token expiring time in seconds , by default it's 1209600 seconds which is 14 days
 
-**DB_PASSWORD** - password for authenticating against the database, can be left empty if a password is not needed (not recommended).
+**DB_TYPE** - The type of database
 
-**DB_HOST** - the endpoint where this database sits (usually localhost but can be a static address).
+**DB_USERNAME** - Database's username
 
-**DB_PORT** - default ports for different types of database connections.
+**DB_PASSWORD** - Database's password
 
-**DB_DATABASE** - the actual database name to perform operations on.
+**DB_HOST** - Database's host
 
-**WORK IN PROGRESS**
+**DB_PORT** - Database's port
+
+**DB_DATABASE** - Database's name
+
+**RABBITMQ_HOST** - RabbitMQ's host
+
+**RABBITMQ_PORT** - RabbitMQ's port
+
+**RABBITMQ_USERNAME** - RabbitMQ's username
+
+**RABBITMQ_PASSWORD** - RabbitMQ's password
+
+**RABBITMQ_VHOST** - RabbitMQ's vhost
+
+**RABBITMQ_RECONNECT_TIMEOUT** - RabbitMQ's reconnection interval
+
+**RABBITMQ_EXCHANGE** - RabbitMQ's exchange name
+
+**RABBITMQ_EXCHANGE_TYPE** - RabbitMQ's exchange type
+
+**RABBITMQ_PREFETCH** - RabbitMQ's prefetch time
+
+**REDIS_HOST** - Redis's host
+
+**REDIS_PORT** - Redis's port
+
+**REDIS_USERNAME** - Redis's username
+
+**REDIS_PASSWORD** - Redis's password
+
+**WEBSOCKET_PING_INTERVAL** - Websocket's ping interval
+
+**WEBSOCKET_PING_TIMEOUT** - Websocket's ping timeout
+
+**WEBSOCKET_PORT** - Websocket's port
+
+**WEBSOCKET_PATH** - Websocket's path
+
+**LOGGER_HTTP** - Log http exceptions or not
+
+**LOGGER_DB_TYPE** - The type of database
+
+**LOGGER_DB_USERNAME** - Logger's database username
+
+**LOGGER_DB_PASSWORD** - Logger's database password
+
+**LOGGER_DB_HOST** - Logger's database host
+
+**LOGGER_DB_PORT** - Logger's database port
+
+**LOGGER_DB_DATABASE** - Logger's database name
 
 ---
 
 ### 🏗 Choosing a Web Framework
 
 This boilerplate comes with [Fastify](https://github.com/fastify/fastify) out of the box as it offers [performance benefits](https://github.com/nestjs/nest/blob/master/benchmarks/all_output.txt) over Express. But this can be changed to use [Express](https://expressjs.com/) framework instead of Fastify. Please proceed with the steps below to change between the two.
-
-- Replace the following lines of code in the [main.ts file](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/main.ts) with the ones detailed below.
-
-Fastify:
-
-```ts
-// to fastify:
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import * as headers from 'fastify-helmet';
-import * as fastifyRateLimiter from 'fastify-rate-limit';
-const app = await NestFactory.create<NestFastifyApplication>(
-  AppModule,
-  new FastifyAdapter({ logger: console }),
-);
-app.register(headers);
-app.register(fastifyRateLimiter, {
-  max: 100,
-  timeWindow: '1 minute',
-});
-```
-
-Express:
-
-```ts
-// to express:
-import * as headers from 'helmet';
-import * as rateLimiter from 'express-rate-limit';
-const app = await NestFactory.create(AppModule, {
-  logger: console,
-});
-app.use(headers());
-app.use(
-  rateLimiter({
-    windowMs: 60, // 1 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-  }),
-);
-```
-
-**Note**: The boilerplate comes with production dependencies for Fastify.
 
 If you choose to **use Express**, this command will **install all of the Express dependencies**:
 

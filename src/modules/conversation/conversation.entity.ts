@@ -20,23 +20,42 @@ export type ConversationDocument = Conversation & Document;
 @ObjectType()
 @Schema({ ...SchemaOptions, toJSON: { virtuals: true } })
 export class Conversation extends BaseEntity {
+  /**
+   * Title field
+   */
   @Field(() => String)
   @Prop({ required: true })
   title: string;
 
+  /**
+   * Description field
+   */
   @Field(() => String)
   @Prop()
   description: string;
 
+  /**
+   * Members field
+   */
   @Field(() => [Member], { nullable: true })
   @Prop([Member])
   members?: Member[];
 
+  /**
+   * Author field
+   */
   @Field(() => User, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
   author?: User;
 
+  /**
+   * Members counts field
+   */
   readonly members_counts?: Number;
+
+  /**
+   * Members ids field
+   */
   readonly members_ids?: Array<string | Types.ObjectId>;
 }
 

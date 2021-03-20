@@ -18,7 +18,7 @@ export class UserResolver {
   constructor(private readonly service: UserService) {}
 
   /**
-   *
+   * Retrieve users
    * @returns
    */
   @Query((returns) => [User], { name: 'users', nullable: false })

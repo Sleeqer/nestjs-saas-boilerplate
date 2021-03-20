@@ -21,12 +21,16 @@ const config: ConfigService = ConfigService.getInstance();
 
 /**
  * Queue
+ * @type {string}
  */
 export const _QUEUE: string = `${config.get('APPLICATION_NAME')}_entities`;
 
 /**
  * Messages handler
- * @param {unknown} message
+ * @param {unknown} message Message
+ * @param {RedisPropagatorService} propagator Socket propagator
+ * @param {Logger} logger Logger
+ * @returns {Promise<RabbitMQEnum>} Ack event
  */
 const handler = async (
   message: unknown | any,
@@ -52,12 +56,13 @@ const handler = async (
 };
 
 /**
- * Format Response Exception Class
+ * Entity Handler Class
  */
 export class EntityHandler extends MessageHandler {
   /**
-   * Constructor of Format Response Exception Class
+   * Constructor of Entity Handler Class
    * @param {Function} handler Handler of incomming message
+   * @param {RabbitMQOptionInterface} options Options of handler
    */
   constructor(
     handler: (

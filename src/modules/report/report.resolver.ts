@@ -18,7 +18,7 @@ export class ReportResolver {
   constructor(private readonly service: ReportService) {}
 
   /**
-   *
+   * Retrieve reports
    * @returns
    */
   @Query((returns) => [Report], { name: 'reports', nullable: false })

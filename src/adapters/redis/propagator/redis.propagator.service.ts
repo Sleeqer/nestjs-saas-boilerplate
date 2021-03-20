@@ -40,7 +40,7 @@ export class RedisPropagatorService {
 
   /**
    * Inject socket server
-   * @param {Server} server
+   * @param {Server} server Socket server
    */
   public injectSocketServer(server: Server): RedisPropagatorService {
     this.server = server;
@@ -50,7 +50,7 @@ export class RedisPropagatorService {
 
   /**
    * Send event to single client
-   * @param {RedisSend} payload
+   * @param {RedisSend} payload Payload of sending
    */
   private SEND = (payload: RedisSend): void => {
     const { profile, event, data, socket } = payload;
@@ -64,7 +64,7 @@ export class RedisPropagatorService {
 
   /**
    * Send event to all clients
-   * @param {RedisEmit} payload
+   * @param {RedisEmit} payload Payload of emitting
    */
   private EMIT = (payload: RedisEmit): void => {
     this.server.emit(payload.event, payload.data);
@@ -72,7 +72,7 @@ export class RedisPropagatorService {
 
   /**
    * Send event to auth clients
-   * @param {RedisEmit} payload
+   * @param {RedisEmit} payload Payload of emitting
    */
   private AUTH = (payload: RedisEmit): void => {
     const { event, data } = payload;
@@ -81,8 +81,8 @@ export class RedisPropagatorService {
   };
 
   /**
-   *
-   * @param {RedisSend} payload
+   * Propagate event
+   * @param {RedisSend} payload Payload of sending
    */
   public propagate(payload: RedisSend): boolean {
     if (!payload.profile) return false;
@@ -94,7 +94,7 @@ export class RedisPropagatorService {
 
   /**
    * Emitter for auth clients
-   * @param {RedisEmit} payload
+   * @param {RedisEmit} payload Payload of emitting
    */
   public EMIT_AUTH(payload: RedisEmit): boolean {
     this.redis.publish(REDIS_SOCKET_AUTH, payload);
@@ -104,7 +104,7 @@ export class RedisPropagatorService {
 
   /**
    * Emitter for all clients
-   * @param {RedisEmit} payload
+   * @param {RedisEmit} payload Payload of emitting
    */
   public EMIT_ALL(payload: RedisEmit): boolean {
     this.redis.publish(REDIS_SOCKET_EMIT, payload);

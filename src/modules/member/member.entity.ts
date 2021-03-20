@@ -17,6 +17,9 @@ import { User } from '../user/user.entity';
  */
 @ObjectType()
 export class MemberSettings {
+  /**
+   * Notifications field
+   */
   @ApiProperty({
     required: true,
     default: false,
@@ -47,14 +50,23 @@ export type MemberDocument = Member & Document;
 @ObjectType()
 @Schema({ ...SchemaOptions })
 export class Member extends BaseEntity {
+  /**
+   * User field
+   */
   @Field(() => User, { nullable: true })
   @Prop({ type: BaseSchema.Types.ObjectId, ref: User.name })
   user: User;
 
+  /**
+   * Settings field
+   */
   @Field(() => MemberSettings)
   @Prop({ required: false, default: new MemberSettings(false) })
   settings?: MemberSettings;
 
+  /**
+   * Roles field
+   */
   @Field(() => [String], { nullable: true })
   @Prop({
     type: [{ type: String }],

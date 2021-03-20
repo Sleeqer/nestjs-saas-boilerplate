@@ -17,6 +17,10 @@ import { SocketStateService } from './socket.state.service';
  * Redis Propagator Service Class
  */
 interface TokenPayload {
+  /**
+   * Profile of socket
+   * @type {string}
+   */
   readonly profile: string;
 }
 
@@ -24,6 +28,9 @@ interface TokenPayload {
  * Redis Propagator Service Class
  */
 export interface AuthenticatedSocket extends socketio.Socket {
+  /**
+   * Authorization payload
+   */
   auth: TokenPayload;
 }
 

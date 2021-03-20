@@ -26,7 +26,9 @@ export const _QUEUE: string = `${config.get('APPLICATION_NAME')}_users`;
 
 /**
  * Messages handler
- * @param {unknown} message
+ * @param {unknown} message Message
+ * @param {RedisPropagatorService} propagator Socket propagator
+ * @param {Logger} logger
  */
 const handler = async (
   message: unknown | any,
@@ -52,12 +54,13 @@ const handler = async (
 };
 
 /**
- * Format Response Exception Class
+ * User Handler Class
  */
 export class UserHandler extends MessageHandler {
   /**
-   * Constructor of Format Response Exception Class
+   * Constructor of User Handler Class
    * @param {Function} handler Handler of incomming message
+   * @param {RabbitMQOptionInterface} options Options of handler
    */
   constructor(
     handler: (
