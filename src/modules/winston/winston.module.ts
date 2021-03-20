@@ -1,4 +1,8 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
+
+/**
+ * Import local objects
+ */
 import {
   WinstonModuleAsyncOptions,
   WinstonModuleOptions,

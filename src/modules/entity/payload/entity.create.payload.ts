@@ -24,5 +24,5 @@ export class EntityCreatePayload {
   })
   @IsOptional()
   @MaxLength(512)
-  description: string;
+  description: string = '';
 }

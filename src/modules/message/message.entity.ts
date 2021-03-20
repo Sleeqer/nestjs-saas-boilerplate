@@ -1,17 +1,13 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional } from 'class-validator';
 import { Schema as BaseSchema, Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Type } from 'class-transformer';
 
 /**
  * Import local objects
  */
-import { User } from '../user/user.entity';
-import { AppRoles } from '../app/app.roles';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
-import { MessageTypeEnum } from './enum/message.type.enum';
+import { User } from '../user/user.entity';
+import { MessageTypeEnum } from './enum';
 
 /**
  * Message Document

@@ -18,28 +18,26 @@ import {
   Delete,
   Query,
   Req,
-  UseInterceptors,
 } from '@nestjs/common';
 
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { Entity, EntityDocument } from './entity.entity';
+import { FastifyRequestInterface } from '../common';
+import { EntityService } from './entity.service';
+import { ParseIdPipe } from '../common/pipes';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
+import { Loader } from './pipe';
 import {
   EntityCreatePayload,
   EntityReplacePayload,
   EntityUpdatePayload,
 } from './payload';
-import { Loader } from './pipe';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
-import { EntityService } from './entity.service';
-import { Entity, EntityDocument } from './entity.entity';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
 
 /**
  * Entity Paginate Response Class
@@ -55,7 +53,6 @@ export class EntityPaginateResponse extends Pagination<Entity> {
 /**
  * Entity Controller Class
  */
-@UseInterceptors(TransformInterceptor)
 @ApiBearerAuth()
 @ApiTags('entities')
 @Controller('entities')
@@ -104,7 +101,7 @@ export class EntityController extends BaseEntityController<
    */
   @Get(':id')
   @ApiExcludeEndpoint()
-  @ApiOperation({ summary: 'Retrieve Entity By id.' })
+  @ApiOperation({ summary: 'Retrieve Entity By ID.' })
   @ApiResponse({
     status: 200,
     description: 'Entity Retrieve Request Received.',
@@ -133,8 +130,8 @@ export class EntityController extends BaseEntityController<
   @Put(':id')
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Entity By id.',
-    description: '**Inserts** Entity If It does not exists By id.',
+    summary: 'Replace Entity By ID.',
+    description: '**Inserts** Entity If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -190,7 +187,7 @@ export class EntityController extends BaseEntityController<
   @Delete(':id')
   @HttpCode(204)
   @ApiExcludeEndpoint()
-  @ApiOperation({ summary: 'Delete Entity By id.' })
+  @ApiOperation({ summary: 'Delete Entity By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Entity Delete Request Received.',

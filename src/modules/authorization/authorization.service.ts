@@ -1,17 +1,18 @@
+import * as relative from 'dayjs/plugin/relativeTime';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as dayjs from 'dayjs';
 import * as crypto from 'crypto';
-import * as relative from 'dayjs/plugin/relativeTime';
+import * as dayjs from 'dayjs';
 
 dayjs.extend(relative);
 
 /**
  * Import local objects
  */
-import { LoginPayload } from './payload/login.payload';
-import { ConfigService } from '../config/config.service';
-import { ProfileService, Profile } from '../profile';
+import { ProfileService } from '../profile/profile.service';
+import { ConfigService } from '../config';
+import { LoginPayload } from './payload';
+import { Profile } from '../profile';
 
 /**
  * Models a typical Login/Register route return body
@@ -35,7 +36,7 @@ export interface ITokenReturnBody {
  * Authentication Service
  */
 @Injectable()
-export class AuthService {
+export class AuthorizationService {
   /**
    * Time in seconds when the token is to expire
    * @type {string}
@@ -95,7 +96,9 @@ export class AuthService {
   }: Profile): Promise<ITokenReturnBody> {
     return {
       expires: this.expiration,
-      expires_pretty_print: AuthService.prettyPrintSeconds(this.expiration),
+      expires_pretty_print: AuthorizationService.prettyPrintSeconds(
+        this.expiration,
+      ),
       token: this.jwt.sign({
         _id,
         first_name,

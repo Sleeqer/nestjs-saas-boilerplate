@@ -4,8 +4,8 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * Import local objects
  */
-import { RegisterPayload } from '../../authorization/payload/register.payload';
-import { AppRoles } from 'src/modules/app/app.roles';
+import { RegisterPayload } from '../../authorization/payload';
+import { AppRoles } from '../../app/app.roles';
 
 /**
  * Profile Create Payload Class

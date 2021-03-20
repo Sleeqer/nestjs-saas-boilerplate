@@ -1,24 +1,25 @@
-import { Observable } from 'rxjs';
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
 
 /**
  * Import local objects
  */
-import { FastifyRequestInterface } from '../../common/interfaces';
-import { ConversationService } from '../../conversation/conversation.service';
 import { GuardsPropertyObjectInterface } from '../../authorization/guards/decorators';
+import { ConversationService } from '../../conversation/conversation.service';
+import { FastifyRequestInterface } from '../../common/interfaces';
+import { guardor } from '../../common/helpers';
 
 /**
  * Conversation Guards Class
  */
 @Injectable()
 export class ConversationGuards implements CanActivate {
+  /**
+   * Constructor of Conversation Guards Class
+   * @param {Reflector} reflector Reflector
+   * @param {ConversationService} conversation Conversation Service
+   */
   constructor(
     private reflector: Reflector,
     private readonly conversation: ConversationService,
@@ -33,19 +34,13 @@ export class ConversationGuards implements CanActivate {
     request: FastifyRequestInterface,
     shield: GuardsPropertyObjectInterface,
   ): Promise<boolean> {
-    const current = shield?.guards
-      ? this instanceof (shield?.guards as Function)
-      : undefined;
     const evaluation = { scope: false };
     const { user } = request;
-    const location: string =
-      (current ? shield?.location : 'params') || 'params';
-    const field: string = (current ? shield?.property : 'id') || 'id';
-    const params: any = request[location];
+    const { context } = guardor(this, shield, request);
 
     try {
       const conversation = !request.locals.conversation
-        ? await this.conversation.get(params[field])
+        ? await this.conversation.get(context)
         : request.locals.conversation;
 
       request.locals.conversation = conversation;

@@ -1,5 +1,8 @@
 import { RolesBuilder } from 'nest-access-control';
 
+/**
+ * App Roles Enum
+ */
 export enum AppRoles {
   DEFAULT = 'DEFAULT',
   ADMIN = 'ADMIN',
@@ -10,14 +13,15 @@ export enum AppRoles {
  */
 export const roles: RolesBuilder = new RolesBuilder();
 
-// The default app role doesn't have readAny(profiles) because the profile returned comes with a password.
-// To mutate the return body of mongoose queries try editing the ProfileService
+/**
+ * Roles permissions grants
+ */
 roles
   .grant(AppRoles.DEFAULT)
-  .readOwn('profile')
-  .updateOwn('profile')
-  .deleteOwn('profile')
+  .readAny('entity')
+  .updateAny('entity')
+  .deleteAny('entity')
   .grant(AppRoles.ADMIN)
-  .readAny('profiles')
-  .updateAny('profiles')
-  .deleteAny('profiles');
+  .readAny('entity')
+  .updateAny('entity')
+  .deleteAny('entity');

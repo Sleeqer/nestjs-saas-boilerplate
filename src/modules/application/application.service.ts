@@ -6,8 +6,8 @@ import { Model } from 'mongoose';
 /**
  * Import local modules
  */
-import { BaseEntityService } from '../common/entity/service';
 import { Application, ApplicationDocument } from './application.entity';
+import { BaseEntityService } from '../common/entity/service';
 
 /**
  * Application Service Class
@@ -21,8 +21,8 @@ export class ApplicationService extends BaseEntityService<ApplicationDocument> {
 
   /**
    * Constructor of Application Service Class
-   * @param {Model<Application>} repository Application repository
-   * @param {EventEmitter2} emitter Event emitter
+   * @param {Model<Application>} repository Application Repository
+   * @param {EventEmitter2} emitter Event Emitter
    */
   constructor(
     @InjectModel(Application.name)

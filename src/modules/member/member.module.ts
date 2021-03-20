@@ -1,19 +1,18 @@
-import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Module, Global } from '@nestjs/common';
 
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { Member, MemberSchema } from './member.entity';
-import { MemberStrategy } from './strategy/member.strategy';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { MemberListener } from './listener/member.listener';
 import { MemberHandler } from './handler/member.handler';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
+import { Member, MemberSchema } from './member.entity';
 import { MemberController } from './member.controller';
+import { ConversationModule } from '../conversation';
 import { MemberResolver } from './member.resolver';
 import { MemberService } from './member.service';
-import { ConversationModule } from '../conversation';
 
 /**
  * Define module
@@ -26,13 +25,7 @@ import { ConversationModule } from '../conversation';
     RedisPropagatorModule,
     ConversationModule,
   ],
-  providers: [
-    MemberService,
-    MemberListener,
-    MemberResolver,
-    MemberHandler,
-    MemberStrategy,
-  ],
+  providers: [MemberService, MemberListener, MemberResolver, MemberHandler],
   exports: [MemberService],
   controllers: [MemberController],
 })

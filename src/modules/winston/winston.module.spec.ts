@@ -1,6 +1,10 @@
 import { Injectable, Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { expect } from 'chai';
+
+/**
+ * Import local objects
+ */
 import { WINSTON_MODULE_PROVIDER } from './winston.constants';
 import { WinstonModule } from './winston.module';
 

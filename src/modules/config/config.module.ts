@@ -1,6 +1,13 @@
 import { Global, Module } from '@nestjs/common';
+
+/**
+ * Import local objects
+ */
 import { ConfigService } from './config.service';
 
+/**
+ * Declare module
+ */
 @Global()
 @Module({
   providers: [

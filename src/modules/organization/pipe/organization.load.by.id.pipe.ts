@@ -9,11 +9,11 @@ import { OrganizationService } from '../organization.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Organization Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Organization Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {OrganizationService} service Organization Service
    * @param {FastifyRequestInterface} request Request
    */

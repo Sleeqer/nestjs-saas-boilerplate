@@ -1,17 +1,26 @@
-export enum EXCHANGE {
-  CREATED = 'application.created.exchange',
-  UPDATED = 'application.updated.exchange',
-  DELETED = 'application.deleted.exchange',
+/**
+ * EXCHANGE Enum
+ */
+ export enum EXCHANGE {
+  CREATED = 'message.created.exchange',
+  UPDATED = 'message.updated.exchange',
+  DELETED = 'message.deleted.exchange',
 }
 
+/**
+ * QUEUE Enum
+ */
 export enum QUEUE {
-  CREATED = 'application.created.queue',
-  UPDATED = 'application.updated.queue',
-  DELETED = 'application.deleted.queue',
+  CREATED = 'message.created.queue',
+  UPDATED = 'message.updated.queue',
+  DELETED = 'message.deleted.queue',
 }
 
+/**
+ * KEY Enum
+ */
 export enum KEY {
-  CREATED = 'application.created.key',
-  UPDATED = 'application.updated.key',
-  DELETED = 'application.deleted.key',
+  CREATED = 'message.created.key',
+  UPDATED = 'message.updated.key',
+  DELETED = 'message.deleted.key',
 }

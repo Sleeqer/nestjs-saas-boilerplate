@@ -1,19 +1,19 @@
 import { PipeTransform, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { ObjectID } from 'typeorm';
+import { Types } from 'mongoose';
 
 /**
  * Import local objects
  */
 import { ConversationService } from '../conversation.service';
-import { FastifyRequestInterface } from '../../common/interfaces';
+import { FastifyRequestInterface } from '../../common';
 
 /**
- * Conversation Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Conversation Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {ConversationService} service Conversation Service
    * @param {FastifyRequestInterface} request Request
    */
@@ -27,12 +27,12 @@ export class Loader implements PipeTransform {
    * @param {any} value Evaluating
    * @returns {number | string | ObjectID} Value
    */
-  async transform(value: any): Promise<string | number | ObjectID> {
+  async transform(value: any): Promise<string | number | Types.ObjectId> {
     /**
      * Retrieve entity by id , if isn't undefined
      */
-    const { id, organization } = this.request.params as any;
-    const identifier = organization || id;
+    const { id, conversation } = this.request.params as any;
+    const identifier = conversation || id;
     if (!identifier) return value;
     let entity = undefined;
 
@@ -44,7 +44,7 @@ export class Loader implements PipeTransform {
      * Check if entity exists & attach to request locals
      */
     if (!entity) throw this.service._NotFoundException();
-    this.request.locals.organization = entity;
+    this.request.locals.conversation = entity;
     return value;
   }
 }

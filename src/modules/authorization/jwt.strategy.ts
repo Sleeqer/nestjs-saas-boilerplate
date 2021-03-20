@@ -1,9 +1,12 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { ConfigService } from '../config/config.service';
+/**
+ * Import local objects
+ */
 import { ProfileService } from '../profile/profile.service';
+import { ConfigService } from '../config';
 
 /**
  * Jwt Strategy Class
@@ -11,18 +14,18 @@ import { ProfileService } from '../profile/profile.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   /**
-   * Constructor
-   * @param {ConfigService} configService
-   * @param {ProfileService} profileService
+   * Constructor of Jwt Strategy Class
+   * @param {ConfigService} config Config Service
+   * @param {ProfileService} profile Profile Service
    */
   constructor(
-    readonly configService: ConfigService,
-    private readonly profileService: ProfileService,
+    protected readonly config: ConfigService,
+    private readonly profile: ProfileService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('WEBTOKEN_SECRET_KEY'),
+      secretOrKey: config.get('WEBTOKEN_SECRET_KEY'),
     });
   }
 
@@ -33,15 +36,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @returns {Promise<object>} a object to be signed
    */
   async validate({ iat, exp, _id }: any, done: any): Promise<object> {
-    const timeDiff = exp - iat;
-    if (timeDiff <= 0) {
-      throw new UnauthorizedException();
-    }
+    if (exp - iat <= 0) throw new UnauthorizedException();
 
-    const profile = await this.profileService.get(_id);
-    if (!profile) {
-      throw new UnauthorizedException();
-    }
+    const profile = await this.profile.get(_id);
+    if (!profile) throw new UnauthorizedException();
 
     delete profile.password;
     done(null, profile);

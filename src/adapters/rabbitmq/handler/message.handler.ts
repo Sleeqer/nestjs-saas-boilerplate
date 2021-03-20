@@ -7,7 +7,7 @@ import {
   RabbitMQEnum,
   RabbitMQOptionInterface,
 } from '../interface/rabbitmq.option.interface';
-import { RedisPropagatorService } from '../../../adapters/redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../../redis/propagator/redis.propagator.service';
 
 /**
  * Message Handler Class

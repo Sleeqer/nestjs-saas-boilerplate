@@ -20,6 +20,11 @@ export interface GuardsPropertyObjectInterface {
   guards: CanActivate | Function;
 }
 
+/**
+ * Declare guard decorator
+ * @param {GuardsPropertyObjectInterface} payload
+ * @returns
+ */
 export const GuardsProperty = (payload: GuardsPropertyObjectInterface) => {
   const defaults = { guards: undefined, property: 'id', location: 'params' };
   return SetMetadata('guards.property', { ...defaults, ...payload });

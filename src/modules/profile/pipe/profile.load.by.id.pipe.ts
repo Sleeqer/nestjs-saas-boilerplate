@@ -1,19 +1,19 @@
 import { PipeTransform, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { ObjectID } from 'typeorm';
+import { Types } from 'mongoose';
 
 /**
  * Import local objects
  */
+import { FastifyRequestInterface } from '../../common';
 import { ProfileService } from '../profile.service';
-import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Profile Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Profile Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {ProfileService} service Profile Service
    * @param {FastifyRequestInterface} request Request
    */
@@ -27,7 +27,7 @@ export class Loader implements PipeTransform {
    * @param {any} value Evaluating
    * @returns {number | string | ObjectID} Value
    */
-  async transform(value: any): Promise<string | number | ObjectID> {
+  async transform(value: any): Promise<string | number | Types.ObjectId> {
     /**
      * Retrieve entity by id , if isn't undefined
      */

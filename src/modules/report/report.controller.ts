@@ -26,26 +26,26 @@ import {
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { ConversationService } from '../conversation/conversation.service';
+import { ConversationInterceptor } from '../conversation/interceptor';
+import { ApplicationGuard } from '../common/guards/application.guard';
+import { ReportPopulateEnum } from './enum/report.populator.enum';
+import { Report, ReportDocument } from './report.entity';
+import { UserInterceptor } from '../user/interceptor';
+import { FastifyRequestInterface } from '../common';
+import { ReportService } from './report.service';
+import { ParseIdPipe } from '../common/pipes';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import {
   ReportCreatePayload,
   ReportReplacePayload,
   ReportUpdatePayload,
 } from './payload';
 import { Loader } from './pipe';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
-import { ReportService } from './report.service';
-import { ConversationService } from '../conversation';
-import { UserInterceptor } from '../user/interceptor';
-import { Report, ReportDocument } from './report.entity';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { ReportPopulateEnum } from './enum/report.populate.enum';
-import { ApplicationGuard } from '../common/guards/application.guard';
-import { ConversationInterceptor } from '../conversation/interceptor';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
 
 /**
  * Report Paginate Response Class
@@ -110,7 +110,7 @@ export class ReportController extends BaseEntityController<
       ReportPopulateEnum.CONVERSATION,
       ReportPopulateEnum.USER,
       ReportPopulateEnum.CONVERSATION_MEMBERS,
-      ReportPopulateEnum.CONVERSATION_AUTHOR
+      ReportPopulateEnum.CONVERSATION_AUTHOR,
     ];
 
     return this.service.paginate(parameters);
@@ -123,21 +123,20 @@ export class ReportController extends BaseEntityController<
    * @returns {Promise<Report>} Report's object
    */
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'), AuthGuard('application'))
   @ApiExcludeEndpoint()
-  @ApiOperation({ summary: 'Retrieve Report By id.' })
+  @ApiOperation({ summary: 'Retrieve Report By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Report Retrieve Request Received.',
+    description: 'Retrieve Report Request Received.',
     type: Report,
   })
   @ApiResponse({
     status: 400,
-    description: 'Report Retrieve Request Failed.',
+    description: 'Retrieve Report Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Report Retrieve Request Failed (Not found).',
+    description: 'Retrieve Report Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
@@ -155,11 +154,10 @@ export class ReportController extends BaseEntityController<
    * @returns {Promise<Report>} Report's object
    */
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'), AuthGuard('application'))
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Report By id.',
-    description: '**Inserts** Report If It does not exists By id.',
+    summary: 'Replace Report By ID.',
+    description: '**Inserts** Report If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -186,7 +184,6 @@ export class ReportController extends BaseEntityController<
    * @returns {Promise<Report>} Report's object
    */
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'), AuthGuard('application'))
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Update Report by id.' })
   @ApiResponse({
@@ -217,9 +214,8 @@ export class ReportController extends BaseEntityController<
    * @returns {Promise<object>} Empty object
    */
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), AuthGuard('application'))
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Report By id.' })
+  @ApiOperation({ summary: 'Delete Report By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Report Delete Request Received.',

@@ -5,11 +5,9 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import { MessageEvent } from '../event';
+import { RabbitMQService } from '../../../adapters/rabbitmq';
+import { MessageService, Message, MessageEvent } from '../';
 import { MessageEventEnum } from '../enum';
-import { Message } from '../message.entity';
-import { MessageService } from '../message.service';
-import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
 
 /**
  * Message Listener Class
@@ -34,7 +32,6 @@ export class MessageListener {
    */
   @OnEvent(MessageEventEnum.CREATED)
   _created(payload: MessageEvent<Message>): void {
-    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -44,7 +41,6 @@ export class MessageListener {
    */
   @OnEvent(MessageEventEnum.UPDATED)
   _updated(payload: MessageEvent<Message>): void {
-    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -54,7 +50,6 @@ export class MessageListener {
    */
   @OnEvent(MessageEventEnum.DELETED)
   _deleted(payload: MessageEvent<Message>): void {
-    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

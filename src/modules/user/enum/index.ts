@@ -1,4 +1,4 @@
 /**
- * Export Entity Events Enum
+ * Export User Events Enum
  */
 export * from './user.event.enum';

@@ -1,5 +1,5 @@
 /**
- * Export Entity Payloads
+ * Export User Payloads
  */
 export * from './user.create.payload';
 export * from './user.update.payload';

@@ -4,14 +4,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { OrganizationHandler } from './handler/organization.handler';
+import { Organization, OrganizationSchema } from './organization.entity';
 import { OrganizationListener } from './listener/organization.listener';
+import { OrganizationHandler } from './handler/organization.handler';
 import { OrganizationController } from './organization.controller';
 import { OrganizationResolver } from './organization.resolver';
 import { OrganizationService } from './organization.service';
-import { Organization, OrganizationSchema } from './organization.entity';
+import { RedisPropagatorModule } from '../../adapters/redis';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
 
 /**
  * Define module
@@ -38,4 +38,4 @@ import { Organization, OrganizationSchema } from './organization.entity';
 /**
  * Export module
  */
-export class OrganizationModule { }
+export class OrganizationModule {}

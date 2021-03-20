@@ -1,28 +1,29 @@
-import { Observable } from 'rxjs';
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
 
 /**
  * Import local objects
  */
-import { FastifyRequestInterface } from '../../common/interfaces';
-import { OrganizationService } from '../../organization/organization.service';
 import { GuardsPropertyObjectInterface } from './decorators';
+import { OrganizationService } from '../../organization';
+import { FastifyRequestInterface } from '../../common';
+import { guardor } from '../../common/helpers';
 
 /**
  * Organization Guards Class
  */
 @Injectable()
 export class OrganizationGuards implements CanActivate {
+  /**
+   * Constructor of Organization Guards Class
+   * @param {Reflector} reflector Reflector
+   * @param {OrganizationService} organization Organization Service
+   */
   constructor(
     private reflector: Reflector,
     private readonly organization: OrganizationService,
-  ) { }
+  ) {}
 
   /**
    * Retrieve profile & validates token
@@ -33,21 +34,22 @@ export class OrganizationGuards implements CanActivate {
     request: FastifyRequestInterface,
     shield: GuardsPropertyObjectInterface,
   ): Promise<boolean> {
-    const current = this instanceof (shield?.guards as Function);
     const evaluation = { scope: false };
     const { profile } = request;
-    const location: string = ((current) ? shield?.location : 'params') || 'params'
-    const field: string = ((current) ? shield?.property : 'id') || 'id'
-    const params: any = request[location]
+    const { context } = guardor(this, shield, request);
 
     try {
       const organization = !request.organization
-        ? await this.organization.get(params[field])
+        ? await this.organization.get(context)
         : request.organization;
 
       request.organization = organization;
-      const condition = organization.profile.equals(profile._id) || profile.organizations.includes(organization._id)
-      evaluation.scope = organization && condition
+
+      const conditions: boolean =
+        organization.profile.equals(profile._id) ||
+        profile.organizations.includes(organization._id);
+
+      evaluation.scope = organization && conditions;
     } catch {
       evaluation.scope = false;
     }
@@ -66,7 +68,7 @@ export class OrganizationGuards implements CanActivate {
     const property: GuardsPropertyObjectInterface = this.reflector.get(
       'guards.property',
       context.getHandler(),
-    )
+    );
 
     const request: FastifyRequestInterface = context
       .switchToHttp()

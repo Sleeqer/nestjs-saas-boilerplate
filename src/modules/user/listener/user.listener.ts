@@ -5,12 +5,11 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import { UserEvent } from '../event';
+import { RabbitMQService } from '../../../adapters/rabbitmq';
+import { UserService } from '../user.service';
 import { UserEventEnum } from '../enum';
 import { User } from '../user.entity';
-import { UserService } from '../user.service';
-import { EXCHANGE, KEY } from '../handler/user.handler.enum';
-import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
+import { UserEvent } from '../';
 
 /**
  * User Listener Class
@@ -35,7 +34,6 @@ export class UserListener {
    */
   @OnEvent(UserEventEnum.CREATED)
   _created(payload: UserEvent<User>): void {
-    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -45,7 +43,6 @@ export class UserListener {
    */
   @OnEvent(UserEventEnum.UPDATED)
   _updated(payload: UserEvent<User>): void {
-    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -55,7 +52,6 @@ export class UserListener {
    */
   @OnEvent(UserEventEnum.DELETED)
   _deleted(payload: UserEvent<User>): void {
-    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

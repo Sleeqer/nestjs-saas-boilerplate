@@ -3,12 +3,12 @@ import { Routes } from 'nest-router';
 /**
  * Import local objects
  */
-import { MemberModule } from '../member';
-import { MessageModule } from '../message';
-import { ProfileModule } from '../profile';
-import { ApplicationModule } from '../application';
 import { OrganizationModule } from '../organization';
 import { ConversationModule } from '../conversation';
+import { ApplicationModule } from '../application';
+import { MessageModule } from '../message';
+import { ProfileModule } from '../profile';
+import { MemberModule } from '../member';
 
 /**
  * Defining & exporting routes

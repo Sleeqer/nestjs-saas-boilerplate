@@ -5,15 +5,15 @@ import { ObjectID } from 'typeorm';
 /**
  * Import local objects
  */
-import { ApplicationService } from '../application.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
+import { ApplicationService } from '../application.service';
 
 /**
- * Application Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Application Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {ApplicationService} service Application Service
    * @param {FastifyRequestInterface} request Request
    */

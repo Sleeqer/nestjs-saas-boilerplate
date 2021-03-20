@@ -10,7 +10,7 @@ import {
 /**
  * Import local objects
  */
-import { RedisPropagatorService } from '../../redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../../redis/propagator/redis.propagator.service';
 import { SocketStateService } from './socket.state.service';
 
 /**

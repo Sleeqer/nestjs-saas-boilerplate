@@ -1,18 +1,18 @@
+import { JwtService } from '@nestjs/jwt';
+import { Observable } from 'rxjs';
 import {
   Injectable,
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Observable } from 'rxjs';
 
 /**
  * Import local objects
  */
 import { ApplicationService } from '../../application/application.service';
-import { ApplicationSettings } from '../..//application/application.entity';
-import { FastifyRequestInterface } from '../../common/interfaces';
+import { ApplicationSettings } from '../../application';
+import { FastifyRequestInterface } from '../../common';
 import { UserService } from '../../user/user.service';
 
 /**
@@ -23,6 +23,9 @@ type TokenizeResult = {
   user: any;
 };
 
+/**
+ * Application Guard Class
+ */
 @Injectable()
 export class ApplicationGuard implements CanActivate {
   /**

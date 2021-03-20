@@ -1,16 +1,16 @@
-import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Module } from '@nestjs/common';
 
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { EntityHandler } from './handler/entity.handler';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { EntityListener } from './listener/entity.listener';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
+import { EntityHandler } from './handler/entity.handler';
 import { EntityController } from './entity.controller';
-import { EntityService } from './entity.service';
 import { Entity, EntitySchema } from './entity.entity';
+import { EntityService } from './entity.service';
 
 /**
  * Define module

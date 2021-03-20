@@ -1,5 +1,5 @@
 /**
- * Export Entity Payloads
+ * Export Message Payloads
  */
 export * from './message.create.payload';
 export * from './message.update.payload';

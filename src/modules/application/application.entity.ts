@@ -62,8 +62,8 @@ export class Application {
   @Prop({ required: true })
   title: string;
 
-  @Field(() => String)
-  @Prop()
+  @Field(() => String, { nullable: true })
+  @Prop({ required: false })
   description: string;
 
   @Field(() => ApplicationSettings)

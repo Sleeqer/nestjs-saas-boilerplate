@@ -27,7 +27,7 @@ export class ParseIdPipe
   }
 
   /**
-   *
+   * Transformer
    * @param {any} value Evaluating
    * @returns {number | string | ObjectID} Value
    */

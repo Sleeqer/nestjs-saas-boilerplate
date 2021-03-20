@@ -5,10 +5,10 @@ import { Field, ObjectType } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { User } from '../user/user.entity';
-import { ReportReasonEnum } from './enum/report.reason.enum';
-import { Conversation } from '../conversation/conversation.entity';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
+import { Conversation } from '../conversation/conversation.entity';
+import { User } from '../user/user.entity';
+import { ReportReasonEnum } from './enum';
 
 /**
  * Report Document

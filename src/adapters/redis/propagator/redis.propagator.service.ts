@@ -12,7 +12,7 @@ import {
   REDIS_SOCKET_AUTH,
   REDIS_SOCKET_EMIT,
   REDIS_SOCKET_SEND,
-} from './redis.propgator.constants';
+} from './redis.propagator.constants';
 
 /**
  * Redis Propagator Service Class

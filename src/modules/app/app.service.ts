@@ -31,7 +31,7 @@ export class AppService {
    * Retrieve Application Url
    * @returns {string} Application Url
    */
-  root(): string {
+  index(): string {
     const url: string = this.config.get('APPLICATION_URL');
 
     this.logger.info(`${this.log} -> ${url}`);

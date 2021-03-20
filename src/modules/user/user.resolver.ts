@@ -3,13 +3,13 @@ import { Query, Resolver } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { User } from './user.entity';
 import { UserService } from './user.service';
+import { User } from './user.entity';
 
 /**
  * User Resolver Class
  */
-@Resolver((of) => User)
+@Resolver(() => User)
 export class UserResolver {
   /**
    * Constructor of User Resolver Class

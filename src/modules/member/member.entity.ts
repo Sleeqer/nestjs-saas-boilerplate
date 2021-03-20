@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional } from 'class-validator';
 import { Schema as BaseSchema, Document } from 'mongoose';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 /**
  * Import local objects
  */
-import { User } from '../user/user.entity';
-import { AppRoles } from '../app/app.roles';
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
+import { AppRoles } from '../app/app.roles';
+import { User } from '../user/user.entity';
 
 /**
  * Member Settings Class

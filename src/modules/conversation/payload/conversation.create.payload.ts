@@ -5,8 +5,6 @@ import {
   IsOptional,
   MaxLength,
   ArrayUnique,
-  ArrayNotEmpty,
-  ArrayMinSize,
   IsMongoId,
 } from 'class-validator';
 
@@ -33,7 +31,7 @@ export class ConversationCreatePayload {
   })
   @IsOptional()
   @MaxLength(512)
-  readonly description: string;
+  readonly description: string = '';
 
   /**
    * Members field

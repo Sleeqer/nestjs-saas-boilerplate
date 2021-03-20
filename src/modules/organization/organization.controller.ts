@@ -1,4 +1,3 @@
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -25,23 +24,24 @@ import {
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { Organization, OrganizationDocument } from './organization.entity';
+import { GuardsProperty } from '../authorization/guards/decorators';
+import { OrganizationService } from './organization.service';
+import { FastifyRequestInterface } from '../common';
+import { ParseIdPipe } from '../common/pipes';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
+
 import {
   OrganizationCreatePayload,
   OrganizationReplacePayload,
   OrganizationUpdatePayload,
 } from './payload';
 import { Loader } from './pipe';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
-import { OrganizationService } from './organization.service';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { Organization, OrganizationDocument } from './organization.entity';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
-import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Organization Paginate Response Class
@@ -61,8 +61,8 @@ export class OrganizationPaginateResponse extends Pagination<Organization> {
 @ApiTags('organizations')
 @Controller('/')
 export class OrganizationController extends BaseEntityController<
-Organization,
-OrganizationDocument
+  Organization,
+  OrganizationDocument
 > {
   /**
    * Constructor of Organization Controller Class
@@ -109,19 +109,19 @@ OrganizationDocument
   @Get(':id')
   @GuardsProperty({ guards: OrganizationGuards })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Retrieve Organization By id.' })
+  @ApiOperation({ summary: 'Retrieve Organization By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Organization Retrieve Request Received.',
+    description: 'Retrieve Organization Request Received.',
     type: Organization,
   })
   @ApiResponse({
     status: 400,
-    description: 'Organization Retrieve Request Failed.',
+    description: 'Retrieve Organization Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Organization Retrieve Request Failed (Not found).',
+    description: 'Retrieve Organization Request Failed (Not found).',
   })
   async get(
     @Param('id')
@@ -142,8 +142,8 @@ OrganizationDocument
   @UseGuards(ProfileGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Organization By id.',
-    description: '**Inserts** Organization If It does not exists By id.',
+    summary: 'Replace Organization By ID.',
+    description: '**Inserts** Organization If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -202,7 +202,7 @@ OrganizationDocument
   @Delete(':id')
   @UseGuards(ProfileGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Organization By id.' })
+  @ApiOperation({ summary: 'Delete Organization By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Organization Delete Request Received.',
@@ -255,7 +255,7 @@ OrganizationDocument
      * Attach organization to profile
      */
     profile.organizations.addToSet(organization);
-    await profile.save()
+    await profile.save();
 
     return organization;
   }

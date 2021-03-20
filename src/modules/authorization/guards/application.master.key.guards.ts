@@ -4,14 +4,18 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 /**
  * Import local objects
  */
-import { FastifyRequestInterface } from '../../common/interfaces';
 import { ApplicationService } from '../../application/application.service';
+import { FastifyRequestInterface } from '../../common';
 
 /**
- * Application Guards Class
+ * Application Master Key Guards Class
  */
 @Injectable()
 export class ApplicationMasterKeyGuards implements CanActivate {
+  /**
+   * Constructor of Application Master Key Guards Class
+   * @param {ApplicationService} application Application Service
+   */
   constructor(private readonly application: ApplicationService) {}
 
   /**
@@ -21,8 +25,7 @@ export class ApplicationMasterKeyGuards implements CanActivate {
    */
   async applicationer(request: FastifyRequestInterface): Promise<boolean> {
     const evaluation = { scope: false };
-    const { headers } = request;
-    const key: string = headers['x-api-key'] as string;
+    const key: string = request.headers['x-api-key'] as string;
 
     try {
       const application = !request.application

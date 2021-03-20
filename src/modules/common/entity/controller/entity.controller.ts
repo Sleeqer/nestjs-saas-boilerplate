@@ -3,12 +3,12 @@ import { Document } from 'mongoose';
 /**
  * Import local objects
  */
-import { Pagination } from '../pagination';
-import { BaseEntityService } from '../service';
 import { FastifyRequestInterface } from '../../interfaces';
+import { BaseEntityService } from '../service';
+import { Pagination } from '../pagination';
 
 /**
- * Entity Payload Class
+ * Payload Class
  */
 export class Payload {
   /**
@@ -23,7 +23,7 @@ export class Payload {
 export class BaseEntityController<Entity, Base extends Document> {
   /**
    * Constructor of Entity Controller Class
-   * @param {Service} service Entity Service
+   * @param {BaseEntityService} service Base Entity Service
    */
   constructor(protected readonly service: BaseEntityService<Base>) {}
 

@@ -12,11 +12,10 @@ import cors from 'fastify-cors';
 /**
  * Import local objects
  */
-import { ConfigService } from './modules/config/config.service';
-import { SocketStateAdapter } from './adapters/socket/state/socket.state.adapter';
-import { SocketStateService } from './adapters/socket/state/socket.state.service';
-import { RedisPropagatorService } from './adapters/redis/propagator/redis.propgator.service';
-import { FastifyRequestInterface } from './modules/common/interfaces';
+import { SocketStateAdapter, SocketStateService } from './adapters/socket';
+import { FastifyRequestInterface } from './modules/common';
+import { RedisPropagatorService } from './adapters/redis';
+import { ConfigService } from './modules/config';
 
 /**
  * Current config
@@ -49,6 +48,9 @@ export const SWAGGER_API_DESCRIPTION: string = 'API Description';
 export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
 
 (async () => {
+  /**
+   * Core Server
+   */
   const core = new FastifyAdapter({
     logger: true,
     ignoreTrailingSlash: true,
@@ -69,6 +71,9 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
 
   core.register(cors);
 
+  /**
+   * Application
+   */
   const application = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     core,
@@ -97,10 +102,16 @@ export const SWAGGER_API_CURRENT_VERSION: string = '1.0';
   const document = SwaggerModule.createDocument(application, options);
   SwaggerModule.setup(SWAGGER_API_ROOT, application, document);
 
+  /**
+   * Headers
+   */
   application.getHttpAdapter().getInstance().register(headers, {
     contentSecurityPolicy: false,
   });
 
+  /**
+   * Validator
+   */
   application.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

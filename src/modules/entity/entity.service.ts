@@ -6,8 +6,8 @@ import { Model } from 'mongoose';
 /**
  * Import local modules
  */
-import { Entity, EntityDocument } from './entity.entity';
 import { BaseEntityService } from '../common/entity/service';
+import { Entity, EntityDocument } from './entity.entity';
 
 /**
  * Entity Service Class

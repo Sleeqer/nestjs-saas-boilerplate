@@ -1,4 +1,3 @@
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -25,26 +24,26 @@ import {
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { FastifyRequestInterface } from '../common/interfaces';
+import { User, UserDocument } from './user.entity';
+import { ParseIdPipe } from '../common/pipes';
+import { UserService } from './user.service';
 import {
-  UserCreatePayload,
-  UserReplacePayload,
-  UserUpdatePayload,
-} from './payload';
-import { Loader } from './pipe';
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import {
   UserGuards,
   ApplicationKeyGuards,
   ApplicationMasterKeyGuards,
 } from '../authorization/guards';
 import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { UserService } from './user.service';
-import { ParseIdPipe } from '../common/pipes';
-import { User, UserDocument } from './user.entity';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
+  UserCreatePayload,
+  UserReplacePayload,
+  UserUpdatePayload,
+} from './payload';
+import { Loader } from './pipe';
 
 /**
  * User Paginate Response Class
@@ -109,7 +108,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    * @returns {Promise<User>} User's object
    */
   @Get('@me')
-  @UseGuards(ApplicationKeyGuards, UserGuards)
+  // @UseGuards(ApplicationKeyGuards, UserGuards)
   @ApiOperation({ summary: 'Retrieve User.' })
   @ApiResponse({
     status: 200,
@@ -136,19 +135,19 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Get(':id')
   @UseGuards(ApplicationMasterKeyGuards)
-  @ApiOperation({ summary: 'Retrieve User By id.' })
+  @ApiOperation({ summary: 'Retrieve User By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'User Retrieve Request Received.',
+    description: 'Retrieve User Request Received.',
     type: User,
   })
   @ApiResponse({
     status: 400,
-    description: 'User Retrieve Request Failed.',
+    description: 'Retrieve User Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'User Retrieve Request Failed (Not found).',
+    description: 'Retrieve User Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
@@ -169,8 +168,8 @@ export class UserController extends BaseEntityController<User, UserDocument> {
   @UseGuards(ApplicationMasterKeyGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace User By id.',
-    description: '**Inserts** User If It does not exists By id.',
+    summary: 'Replace User By ID.',
+    description: '**Inserts** User If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -228,7 +227,7 @@ export class UserController extends BaseEntityController<User, UserDocument> {
    */
   @Delete(':id')
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete User By id.' })
+  @ApiOperation({ summary: 'Delete User By ID.' })
   @ApiResponse({
     status: 204,
     description: 'User Delete Request Received.',

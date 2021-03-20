@@ -1,9 +1,9 @@
 /**
- * Export Entity Events Enum
+ * Export Conversation Events Enum
  */
 export * from './conversation.event.enum';
 
 /**
- * Export Entity Populator Enum
+ * Export Conversation Populator Enum
  */
  export * from './conversation.populator.enum';

@@ -4,7 +4,6 @@ import {
   ArrayNotEmpty,
   ArrayUnique,
   IsEnum,
-  IsOptional,
   ValidateNested,
   IsObject,
 } from 'class-validator';
@@ -12,8 +11,8 @@ import {
 /**
  * Import local objects
  */
-import { AppRoles } from '../../app/app.roles';
 import { MemberSettings } from '../member.entity';
+import { AppRoles } from '../../app/app.roles';
 
 /**
  * Member Replace Payload Class

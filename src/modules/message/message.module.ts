@@ -4,16 +4,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { Message, MessageSchema } from './message.entity';
-import { MessageStrategy } from './strategy/message.strategy';
 import { MessageListener } from './listener/message.listener';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { MessageHandler } from './handler/message.handler';
+import { Message, MessageSchema } from './message.entity';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
 import { MessageController } from './message.controller';
+import { ConversationModule } from '../conversation';
 import { MessageResolver } from './message.resolver';
 import { MessageService } from './message.service';
-import { ConversationModule } from '../conversation';
 
 /**
  * Define module
@@ -26,13 +25,7 @@ import { ConversationModule } from '../conversation';
     RedisPropagatorModule,
     ConversationModule,
   ],
-  providers: [
-    MessageService,
-    MessageListener,
-    MessageResolver,
-    MessageHandler,
-    MessageStrategy,
-  ],
+  providers: [MessageService, MessageListener, MessageResolver, MessageHandler],
   exports: [MessageService],
   controllers: [MessageController],
 })

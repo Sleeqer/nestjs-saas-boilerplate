@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
- * User Create Payload Class
+ * User Replace Payload Class
  */
 export class UserReplacePayload {
   /**

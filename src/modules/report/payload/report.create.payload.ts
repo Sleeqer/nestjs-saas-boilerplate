@@ -12,8 +12,8 @@ import {
  * Import local objects
  */
 import { Conversation } from '../../conversation/conversation.entity';
-import { ReportReasonEnum } from '../enum/report.reason.enum';
 import { User } from '../../user/user.entity';
+import { ReportReasonEnum } from '../enum';
 
 /**
  * Report Create Payload Class

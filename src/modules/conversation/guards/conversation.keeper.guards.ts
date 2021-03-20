@@ -1,10 +1,10 @@
-import { Observable } from 'rxjs';
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Observable } from 'rxjs';
 
 /**
  * Import local objects
  */
-import { FastifyRequestInterface } from '../../common/interfaces';
+import { FastifyRequestInterface } from '../../common';
 
 /**
  * Conversation Keeper Guards Class

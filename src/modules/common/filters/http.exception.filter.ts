@@ -8,14 +8,13 @@ import {
   ArgumentsHost,
   HttpException,
   Inject,
-  HttpStatus,
   InternalServerErrorException,
 } from '@nestjs/common';
 
 /**
  * Import local objects
  */
-import { ConfigService } from '../../config/config.service';
+import { ConfigService } from '../../config';
 
 /**
  * Current config
@@ -202,7 +201,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     /**
      * Add stack for development
      */
-    if (config.isEnv('dev')) object.stack = (exception as any)?.stack || '';
+    if (config.env('dev')) object.stack = (exception as any)?.stack || '';
 
     /**
      * Log errors , only if required by environment

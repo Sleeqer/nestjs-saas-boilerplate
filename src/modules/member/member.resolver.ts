@@ -3,13 +3,13 @@ import { Query, Resolver } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { Member } from './member.entity';
 import { MemberService } from './member.service';
+import { Member } from './member.entity';
 
 /**
  * Member Resolver Class
  */
-@Resolver((of) => Member)
+@Resolver(() => Member)
 export class MemberResolver {
   /**
    * Constructor of Member Resolver Class

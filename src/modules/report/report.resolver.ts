@@ -9,7 +9,7 @@ import { ReportService } from './report.service';
 /**
  * Report Resolver Class
  */
-@Resolver((of) => Report)
+@Resolver(() => Report)
 export class ReportResolver {
   /**
    * Constructor of Report Resolver Class

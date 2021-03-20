@@ -10,10 +10,11 @@ import {
 /**
  * Import local objects
  */
-import { ConfigService } from '../../config/config.service';
-import { UserService } from '../../user/user.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
-import { ApplicationSettings } from 'src/modules/application/application.entity';
+import { ApplicationSettings } from '../../application';
+import { UserService } from '../../user/user.service';
+import { alive } from '../../common/helpers';
+import { ConfigService } from '../../config';
 
 /**
  * Tokenize Result
@@ -68,20 +69,6 @@ export class UserGuards implements CanActivate {
   }
 
   /**
-   *
-   * @param {any} decoded Decoded token
-   * @returns {any} Initial decoded value
-   */
-  alive(decoded: any): any {
-    const now = Date.now().valueOf() / 1000;
-
-    if (decoded?.exp && decoded.exp < now) throw new Error();
-    if (decoded?.nbf && decoded.nbf > now) throw new Error();
-
-    return decoded;
-  }
-
-  /**
    * Validate token of by application settings
    * @param {ApplicationSettings} settings Application Settings
    * @param {string} token Token to verify
@@ -106,7 +93,7 @@ export class UserGuards implements CanActivate {
      * Validate token
      */
     try {
-      const decoded = this.alive(this.jwt.verify(token, { secret }));
+      const decoded = alive(this.jwt.verify(token, { secret }));
       const field = decoded[property] || '_id';
       const user = await this.user.by(field, this.keyed);
       evaluation.user = user;

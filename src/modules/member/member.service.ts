@@ -7,11 +7,11 @@ import * as crypto from 'crypto';
 /**
  * Import local modules
  */
+import { Conversation } from '../conversation/conversation.entity';
 import { BaseEntityService } from '../common/entity/service';
 import { Member, MemberDocument } from './member.entity';
 import { Payload } from '../common/entity/controller';
 import { AppRoles } from '../app/app.roles';
-import { Conversation } from '../conversation/conversation.entity';
 
 /**
  * Member Service Class

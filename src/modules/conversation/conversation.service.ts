@@ -6,9 +6,9 @@ import { Model } from 'mongoose';
 /**
  * Import local modules
  */
-import { ConversationPopulatorEnum } from './enum';
-import { BaseEntityService } from '../common/entity/service';
 import { Conversation, ConversationDocument } from './conversation.entity';
+import { BaseEntityService } from '../common/entity/service';
+import { ConversationPopulatorEnum } from './enum';
 
 /**
  * Conversation Service Class

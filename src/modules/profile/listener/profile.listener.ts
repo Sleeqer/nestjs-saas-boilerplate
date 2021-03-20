@@ -5,11 +5,10 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import { ProfileEvent } from '../event';
-import { ProfileEventEnum } from '../enum';
-import { Profile } from '../profile.entity';
+import { RabbitMQService } from '../../../adapters/rabbitmq';
 import { ProfileService } from '../profile.service';
-import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
+import { Profile, ProfileEvent } from '../';
+import { ProfileEventEnum } from '../enum';
 
 /**
  * Profile Listener Class
@@ -34,7 +33,6 @@ export class ProfileListener {
    */
   @OnEvent(ProfileEventEnum.CREATED)
   _created(payload: ProfileEvent<Profile>): void {
-    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -44,7 +42,6 @@ export class ProfileListener {
    */
   @OnEvent(ProfileEventEnum.UPDATED)
   _updated(payload: ProfileEvent<Profile>): void {
-    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -54,7 +51,6 @@ export class ProfileListener {
    */
   @OnEvent(ProfileEventEnum.DELETED)
   _deleted(payload: ProfileEvent<Profile>): void {
-    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

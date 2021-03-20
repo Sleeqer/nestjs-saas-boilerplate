@@ -9,11 +9,11 @@ import { ReportService } from '../report.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Report Load By Id Pipe Class
+ * Loader Pipe Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Report Load By Id Pipe Class
+   * Constructor of Loader Pipe Class
    * @param {ReportService} service Report Service
    * @param {FastifyRequestInterface} request Request
    */
@@ -31,8 +31,8 @@ export class Loader implements PipeTransform {
     /**
      * Retrieve entity by id , if isn't undefined
      */
-    const { id, organization } = this.request.params as any;
-    const identifier = organization || id;
+    const { id, report } = this.request.params as any;
+    const identifier = report || id;
     if (!identifier) return value;
     let entity = undefined;
 
@@ -44,7 +44,7 @@ export class Loader implements PipeTransform {
      * Check if entity exists & attach to request locals
      */
     if (!entity) throw this.service._NotFoundException();
-    this.request.locals.organization = entity;
+    this.request.locals.report = entity;
     return value;
   }
 }

@@ -4,15 +4,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
 import { Application, ApplicationSchema } from './application.entity';
-import { ApplicationStrategy } from './strategy/application.strategy';
 import { ApplicationListener } from './listener/application.listener';
 import { ApplicationHandler } from './handler/application.handler';
 import { ApplicationController } from './application.controller';
 import { ApplicationResolver } from './application.resolver';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { ApplicationService } from './application.service';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
 
 /**
  * Define module
@@ -31,7 +30,6 @@ import { ApplicationService } from './application.service';
     ApplicationListener,
     ApplicationResolver,
     ApplicationHandler,
-    ApplicationStrategy,
   ],
   exports: [ApplicationService],
   controllers: [ApplicationController],
@@ -40,4 +38,4 @@ import { ApplicationService } from './application.service';
 /**
  * Export module
  */
-export class ApplicationModule { }
+export class ApplicationModule {}

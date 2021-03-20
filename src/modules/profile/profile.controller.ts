@@ -113,7 +113,7 @@ export class ProfileController extends BaseEntityController<
   @Get(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Retrieve Profile By id.' })
+  @ApiOperation({ summary: 'Retrieve Profile By ID.' })
   @ApiResponse({
     status: 200,
     description: 'Profile Retrieve Request Received.',
@@ -147,8 +147,8 @@ export class ProfileController extends BaseEntityController<
   @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Profile By id.',
-    description: '**Inserts** Profile If It does not exists By id.',
+    summary: 'Replace Profile By ID.',
+    description: '**Inserts** Profile If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -209,7 +209,7 @@ export class ProfileController extends BaseEntityController<
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards, OrganizationKeeperGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Profile By id.' })
+  @ApiOperation({ summary: 'Delete Profile By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Profile Delete Request Received.',

@@ -27,10 +27,10 @@ export class AppController {
   @ApiOperation({ summary: 'Retrive application healthcheck.' })
   @ApiResponse({ status: 200, description: `Request Received.` })
   @ApiResponse({ status: 400, description: 'Request Failed.' })
-  root(): object {
+  index(): object {
     return {
       _id: uuidv4(),
-      url: this.service.root(),
+      url: this.service.index(),
       timestamp: new Date(),
     };
   }

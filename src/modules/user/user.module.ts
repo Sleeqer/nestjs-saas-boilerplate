@@ -4,14 +4,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { UserHandler } from './handler/user.handler';
+import { RedisPropagatorModule } from '../../adapters/redis';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
 import { UserListener } from './listener/user.listener';
+import { UserHandler } from './handler/user.handler';
 import { UserController } from './user.controller';
+import { User, UserSchema } from './user.entity';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { User, UserSchema } from './user.entity';
 
 /**
  * Define module

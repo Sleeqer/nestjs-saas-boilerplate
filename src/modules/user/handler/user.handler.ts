@@ -3,15 +3,15 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import {
-  RabbitMQEnum,
-  RabbitMQExchangeTypeEnum,
-} from '../../../adapters/rabbitmq/interface';
-import { EXCHANGE, KEY, QUEUE } from './user.handler.enum';
-import { ConfigService } from '../../config/config.service';
-import { RedisPropagatorService } from '../../../adapters/redis/propagator/redis.propgator.service';
-import { RabbitMQOptionInterface } from '../../../adapters/rabbitmq/interface/rabbitmq.option.interface';
 import { MessageHandler } from '../../../adapters/rabbitmq/handler/message.handler';
+import { RabbitMQExchangeTypeEnum } from '../../../adapters/rabbitmq/interface';
+import { RedisPropagatorService } from '../../../adapters/redis';
+import { EXCHANGE, KEY, QUEUE } from './user.handler.enum';
+import { ConfigService } from '../../config';
+import {
+  RabbitMQOptionInterface,
+  RabbitMQEnum,
+} from '../../../adapters/rabbitmq';
 
 /**
  * Current config
@@ -22,7 +22,7 @@ const config: ConfigService = ConfigService.getInstance();
 /**
  * Queue
  */
-export const _QUEUE: string = `${config.get('APPLICATION_NAME')}-entities`;
+export const _QUEUE: string = `${config.get('APPLICATION_NAME')}_users`;
 
 /**
  * Messages handler
@@ -45,9 +45,7 @@ const handler = async (
     return RabbitMQEnum.ACK;
   } catch (error) {
     if (logger)
-      logger.error(
-        `[UserHandler] -> Error on handler (${error.message})`,
-      );
+      logger.error(`[UserHandler] -> Error on handler (${error.message})`);
 
     return RabbitMQEnum.NACK;
   }

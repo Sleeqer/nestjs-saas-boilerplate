@@ -1,13 +1,13 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as BaseSchema, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 /**
  * Import local objects
  */
 import { BaseEntity, SchemaOptions } from '../common/entity/entity';
-import { User } from '../user/user.entity';
 import { Member } from '../member/member.entity';
+import { User } from '../user/user.entity';
 
 /**
  * Conversation Document

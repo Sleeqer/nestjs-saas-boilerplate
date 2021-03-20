@@ -21,8 +21,9 @@ export class ApplicationCreatePayload {
    */
   @ApiProperty({
     required: false,
+    default: '',
   })
   @IsOptional()
   @MaxLength(512)
-  description: string;
+  description: string = '';
 }

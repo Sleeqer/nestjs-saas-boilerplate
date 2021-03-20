@@ -1,5 +1,5 @@
 /**
- * Export Entity Payloads
+ * Export Member Payloads
  */
 export * from './member.create.payload';
 export * from './member.update.payload';

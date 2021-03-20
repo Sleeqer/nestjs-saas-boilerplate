@@ -3,13 +3,13 @@ import { Query, Resolver } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { Conversation } from './conversation.entity';
 import { ConversationService } from './conversation.service';
+import { Conversation } from './conversation.entity';
 
 /**
  * Conversation Resolver Class
  */
-@Resolver((of) => Conversation)
+@Resolver(() => Conversation)
 export class ConversationResolver {
   /**
    * Constructor of Conversation Resolver Class
@@ -21,7 +21,10 @@ export class ConversationResolver {
    *
    * @returns
    */
-  @Query((returns) => [Conversation], { name: 'conversations', nullable: false })
+  @Query((returns) => [Conversation], {
+    name: 'conversations',
+    nullable: false,
+  })
   async conversations() {
     return this.service.all();
   }

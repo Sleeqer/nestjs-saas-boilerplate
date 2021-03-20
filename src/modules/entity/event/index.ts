@@ -1,5 +1,4 @@
-import { LeanDocument } from 'mongoose';
-import { ObjectID } from 'typeorm';
+import { LeanDocument, Types } from 'mongoose';
 
 /**
  * Import local objects
@@ -18,16 +17,16 @@ export class EntityEvent<Entity> {
   /**
    * Entity field
    */
-  entity?: Entity | LeanDocument<Entity> | number | string | ObjectID;
+  entity?: Entity | LeanDocument<Entity> | number | string | Types.ObjectId;
 
   /**
    * Constructor of Entity Event Class
    * @param {EntityEventEnum} title
-   * @param {Entity | LeanDocument<Entity> | number | string | ObjectID} entity
+   * @param {Entity | LeanDocument<Entity> | number | string | Types.ObjectId} entity
    */
   constructor(
     title: EntityEventEnum = EntityEventEnum.CREATED,
-    entity?: Entity | LeanDocument<Entity> | number | string | ObjectID,
+    entity?: Entity | LeanDocument<Entity> | number | string | Types.ObjectId,
   ) {
     this.title = title;
     this.entity = entity;

@@ -3,13 +3,13 @@ import { Query, Resolver } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { Message } from './message.entity';
 import { MessageService } from './message.service';
+import { Message } from './message.entity';
 
 /**
  * Message Resolver Class
  */
-@Resolver((of) => Message)
+@Resolver(() => Message)
 export class MessageResolver {
   /**
    * Constructor of Message Resolver Class

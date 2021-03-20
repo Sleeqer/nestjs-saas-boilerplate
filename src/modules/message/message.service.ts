@@ -6,11 +6,11 @@ import { Model, Types } from 'mongoose';
 /**
  * Import local modules
  */
+import { Conversation } from '../conversation/conversation.entity';
 import { BaseEntityService } from '../common/entity/service';
 import { Message, MessageDocument } from './message.entity';
 import { Payload } from '../common/entity/controller';
-import { Conversation } from '../conversation/conversation.entity';
-import { MessagePopulatorEnum } from './enum/message.populator.enum';
+import { MessagePopulatorEnum } from './enum';
 
 /**
  * Message Service Class
@@ -65,7 +65,7 @@ export class MessageService extends BaseEntityService<MessageDocument> {
    * @returns {Message} Message's object
    */
   updater(message: Message, payload: Payload): Message {
-    console.log(payload)
+    console.log(payload);
     message.content = payload.content || message.content;
     return message;
   }

@@ -24,24 +24,23 @@ import {
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { Conversation, ConversationDocument } from './conversation.entity';
+import { ApplicationKeyGuards, UserGuards } from '../authorization/guards';
+import { ConversationService } from './conversation.service';
+import { FastifyRequestInterface } from '../common';
+import { ConversationGuards } from './guards';
+import { ParseIdPipe } from '../common/pipes';
+import { AppRoles } from '../app/app.roles';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import {
   ConversationCreatePayload,
   ConversationReplacePayload,
   ConversationUpdatePayload,
 } from './payload';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { AppRoles } from '../app/app.roles';
-import { ParseIdPipe } from '../common/pipes';
-import { ConversationService } from './conversation.service';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { UserGuards } from '../authorization/guards/user.guards';
-import { Conversation, ConversationDocument } from './conversation.entity';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { ApplicationKeyGuards } from '../authorization/guards/application.key.guards';
-import { ConversationGuards } from './guards';
 
 /**
  * Conversation Paginate Response Class
@@ -115,19 +114,19 @@ export class ConversationController extends BaseEntityController<
    */
   @Get(':id')
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiOperation({ summary: 'Retrieve Conversation By id.' })
+  @ApiOperation({ summary: 'Retrieve Conversation By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Conversation Retrieve Request Received.',
+    description: 'Retrieve Conversation Request Received.',
     type: Conversation,
   })
   @ApiResponse({
     status: 400,
-    description: 'Conversation Retrieve Request Failed.',
+    description: 'Retrieve Conversation Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Conversation Retrieve Request Failed (Not found).',
+    description: 'Retrieve Conversation Request Failed (Not found).',
   })
   async get(
     @Param('id')
@@ -148,8 +147,8 @@ export class ConversationController extends BaseEntityController<
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Conversation By id.',
-    description: '**Inserts** Conversation If It does not exists By id.',
+    summary: 'Replace Conversation By ID.',
+    description: '**Inserts** Conversation If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -208,7 +207,7 @@ export class ConversationController extends BaseEntityController<
   @Delete(':id')
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Conversation By id.' })
+  @ApiOperation({ summary: 'Delete Conversation By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Conversation Delete Request Received.',

@@ -1,5 +1,9 @@
 import { Provider } from '@nestjs/common';
 import { createLogger, LoggerOptions } from 'winston';
+
+/**
+ * Import local objects
+ */
 import {
   WINSTON_MODULE_OPTIONS,
   WINSTON_MODULE_PROVIDER,

@@ -1,19 +1,25 @@
-import { Observable } from 'rxjs';
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
 
 /**
  * Import local objects
  */
-import { FastifyRequestInterface } from '../../common/interfaces';
 import { ApplicationService } from '../../application/application.service';
+import { FastifyRequestInterface } from '../../common/interfaces';
 import { GuardsPropertyObjectInterface } from './decorators';
+import { guardor } from '../../common/helpers';
 
 /**
- * Application Guards Class
+ * Application Key Guards Class
  */
 @Injectable()
 export class ApplicationKeyGuards implements CanActivate {
+  /**
+   * Constructor of Application Key Guards Class
+   * @param {Reflector} reflector Reflector
+   * @param {ApplicationService} application Application
+   */
   constructor(
     private reflector: Reflector,
     private readonly application: ApplicationService,
@@ -28,20 +34,13 @@ export class ApplicationKeyGuards implements CanActivate {
     request: FastifyRequestInterface,
     shield: GuardsPropertyObjectInterface,
   ): Promise<boolean> {
-    const current = shield?.guards
-      ? this instanceof (shield?.guards as Function)
-      : undefined;
     const evaluation = { scope: false };
-    const { headers } = request;
-    const key: string = headers['x-api-key'] as string;
-    const location: string =
-      (current ? shield?.location : 'params') || 'params';
-    const field: string = (current ? shield?.property : 'id') || 'id';
-    const params: any = request[location];
+    const key: string = request.headers['x-api-key'] as string;
+    const { context } = guardor(this, shield, request);
 
     try {
       const application = !request.application
-        ? await this.application.get(key || params[field])
+        ? await this.application.get(key || context)
         : request.application;
 
       request.application = application;

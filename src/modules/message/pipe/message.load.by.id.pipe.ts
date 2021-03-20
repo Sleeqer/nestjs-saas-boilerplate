@@ -9,11 +9,11 @@ import { MessageService } from '../../message';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Member Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Member Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {MessageService} service Member Service
    * @param {FastifyRequestInterface} request Request
    */

@@ -10,9 +10,10 @@ import {
 /**
  * Import local objects
  */
-import { ConfigService } from '../../config/config.service';
 import { ProfileService } from '../../profile/profile.service';
-import { FastifyRequestInterface } from '../../common/interfaces';
+import { FastifyRequestInterface } from '../../common';
+import { ConfigService } from '../../config';
+import { alive } from '../../common/helpers';
 
 /**
  * Profile Guards Class
@@ -53,32 +54,17 @@ export class ProfileGuards implements CanActivate {
   }
 
   /**
-   *
-   * @param {any} decoded Decoded token
-   * @returns {any} Initial decoded value
-   */
-  alive(decoded: any): any {
-    const now = Date.now().valueOf() / 1000;
-
-    if (decoded?.exp && decoded.exp < now) throw new Error();
-    if (decoded?.nbf && decoded.nbf > now) throw new Error();
-
-    return decoded;
-  }
-
-  /**
    * Retrieve profile & validates token
    * @param {FastifyRequestInterface} request Request
    * @returns {Promise<boolean>} Scope
    */
   async memberer(request: FastifyRequestInterface): Promise<boolean> {
     const evaluation = { scope: false };
-    const { headers } = request;
-    const authorization: string = headers['authorization'] as string;
+    const authorization: string = request.headers['authorization'] as string;
     const token = authorization?.replace('Bearer', '')?.trim() || '';
 
     try {
-      const decoded = this.alive(this.jwt.decode(token));
+      const decoded = alive(this.jwt.decode(token));
       const profile = !request.profile
         ? await this.profile.get(decoded?._id)
         : request.profile;

@@ -12,7 +12,7 @@ import {
  * Import local objects
  */
 import { AuthenticatedSocket } from '../../socket/state/socket.state.adapter';
-import { RedisPropagatorService } from './redis.propgator.service';
+import { RedisPropagatorService } from './redis.propagator.service';
 
 /**
  * Redis Propagator Interceptor Class

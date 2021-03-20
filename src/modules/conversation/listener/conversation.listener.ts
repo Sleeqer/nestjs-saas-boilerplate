@@ -5,12 +5,11 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import { ConversationEvent } from '../event';
-import { ConversationEventEnum } from '../enum';
-import { Conversation } from '../conversation.entity';
 import { ConversationService } from '../conversation.service';
-import { EXCHANGE, KEY } from '../handler/conversation.handler.enum';
-import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
+import { RabbitMQService } from '../../../adapters/rabbitmq';
+import { Conversation } from '../conversation.entity';
+import { ConversationEventEnum } from '../enum';
+import { ConversationEvent } from '../';
 
 /**
  * Conversation Listener Class
@@ -35,7 +34,6 @@ export class ConversationListener {
    */
   @OnEvent(ConversationEventEnum.CREATED)
   _created(payload: ConversationEvent<Conversation>): void {
-    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -45,7 +43,6 @@ export class ConversationListener {
    */
   @OnEvent(ConversationEventEnum.UPDATED)
   _updated(payload: ConversationEvent<Conversation>): void {
-    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -55,7 +52,6 @@ export class ConversationListener {
    */
   @OnEvent(ConversationEventEnum.DELETED)
   _deleted(payload: ConversationEvent<Conversation>): void {
-    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

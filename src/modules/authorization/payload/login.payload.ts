@@ -13,7 +13,7 @@ export class LoginPayload {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  readonly email: string;
 
   /**
    * Password field
@@ -23,5 +23,5 @@ export class LoginPayload {
   })
   @IsNotEmpty()
   @MinLength(8)
-  password: string;
+  readonly password: string;
 }

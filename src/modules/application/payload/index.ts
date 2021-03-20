@@ -1,5 +1,5 @@
 /**
- * Export Entity Payloads
+ * Export Application Payloads
  */
 export * from './application.create.payload';
 export * from './application.update.payload';

@@ -4,13 +4,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
-import { Profile, ProfileSchema } from './profile.entity';
-import { ProfileStrategy } from './strategy/profile.strategy';
 import { ProfileListener } from './listener/profile.listener';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { ProfileHandler } from './handler/profile.handler';
 import { ProfileController } from './profile.controller';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
+import { Profile, ProfileSchema } from './profile.entity';
 import { ProfileResolver } from './profile.resolver';
 import { ProfileService } from './profile.service';
 
@@ -20,19 +19,11 @@ import { ProfileService } from './profile.service';
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Profile.name, schema: ProfileSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Profile.name, schema: ProfileSchema }]),
     RabbitMQModule,
     RedisPropagatorModule,
   ],
-  providers: [
-    ProfileService,
-    ProfileListener,
-    ProfileResolver,
-    ProfileHandler,
-    ProfileStrategy,
-  ],
+  providers: [ProfileService, ProfileListener, ProfileResolver, ProfileHandler],
   exports: [ProfileService],
   controllers: [ProfileController],
 })
@@ -40,4 +31,4 @@ import { ProfileService } from './profile.service';
 /**
  * Export module
  */
-export class ProfileModule { }
+export class ProfileModule {}

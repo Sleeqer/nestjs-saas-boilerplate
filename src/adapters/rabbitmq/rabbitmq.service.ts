@@ -13,7 +13,7 @@ import {
 import subscriptions from './handler';
 import { connection } from './rabbitmq.connect';
 import { ConfigService } from '../../modules/config/config.service';
-import { RedisPropagatorService } from '../../adapters/redis/propagator/redis.propgator.service';
+import { RedisPropagatorService } from '../redis/propagator/redis.propagator.service';
 
 /**
  * Current config

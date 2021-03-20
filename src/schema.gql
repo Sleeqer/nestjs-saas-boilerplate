@@ -4,7 +4,7 @@
 
 type Application {
   _id: String!
-  description: String!
+  description: String
   edited_timestamp: DateTime
   key: String!
   organization: String!

@@ -5,15 +5,15 @@ import { JwtModule } from '@nestjs/jwt';
 /**
  * Import local objects
  */
+import { AuthorizationController } from './authorization.controller';
+import { AuthorizationService } from './authorization.service';
+import { ConfigModule, ConfigService } from '../config';
 import { JwtStrategy } from './jwt.strategy';
-import { AuthService } from './authorization.service';
-import { UserModule } from '../user/user.module';
-import { AuthController } from './authorization.controller';
-import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
-import { ApplicationStrategy } from './strategy/application.strategy';
-import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
+import { UserModule } from '../user';
 
+/**
+ * Declare module
+ */
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -25,10 +25,10 @@ import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
           signOptions: {
             ...(configService.get('WEBTOKEN_EXPIRATION_TIME')
               ? {
-                expiresIn: Number(
-                  configService.get('WEBTOKEN_EXPIRATION_TIME'),
-                ),
-              }
+                  expiresIn: Number(
+                    configService.get('WEBTOKEN_EXPIRATION_TIME'),
+                  ),
+                }
               : {}),
           },
         };
@@ -38,12 +38,12 @@ import { ApplicationKeyStrategy } from './strategy/application.key.strategy';
     ConfigModule,
     UserModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, ApplicationStrategy, ApplicationKeyStrategy],
+  controllers: [AuthorizationController],
+  providers: [AuthorizationService, JwtStrategy],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' })],
 })
 
 /**
  * Export module
  */
-export class AuthModule { }
+export class AuthModule {}

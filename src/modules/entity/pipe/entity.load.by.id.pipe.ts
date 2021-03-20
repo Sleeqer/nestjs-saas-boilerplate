@@ -9,11 +9,11 @@ import { EntityService } from '../entity.service';
 import { FastifyRequestInterface } from '../../common/interfaces';
 
 /**
- * Entity Load By Id Pipe Class
+ * Loader Class
  */
 export class Loader implements PipeTransform {
   /**
-   * Constructor of Entity Load By Id Pipe Class
+   * Constructor of Loader Class
    * @param {EntityService} service Entity Service
    * @param {FastifyRequestInterface} request Request
    */

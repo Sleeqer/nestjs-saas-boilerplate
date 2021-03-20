@@ -75,6 +75,7 @@
     "@compodoc/compodoc": "1.1.11",
     "@nestjs/testing": "7.6.13",
     "@types/amqplib": "^0.5.17",
+    "@types/chai": "^4.2.15",
     "@types/dotenv": "8.2.0",
     "@types/gravatar": "1.8.1",
     "@types/hapi__joi": "17.1.6",

@@ -22,19 +22,19 @@ import {
 /**
  * Import local objects
  */
-import { MessageCreatePayload, MessageUpdatePayload } from './payload';
-import { Loader } from './pipe';
-import { Pagination } from '../common/entity/pagination';
-import { QueryPagination } from './query';
-import { MessageService } from './message.service';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { Message, MessageDocument } from './message.entity';
 import { BaseEntityController } from '../common/entity/controller/entity.controller';
 import { ApplicationKeyGuards, UserGuards } from '../authorization/guards';
+import { ConversationService } from '../conversation/conversation.service';
+import { MessageCreatePayload, MessageUpdatePayload } from './payload';
 import { GuardsProperty } from '../authorization/guards/decorators';
+import { Message, MessageDocument } from './message.entity';
 import { ConversationGuards } from '../conversation/guards';
-import { UserService } from '../user';
-import { ConversationService } from '../conversation';
+import { Pagination } from '../common/entity/pagination';
+import { FastifyRequestInterface } from '../common';
+import { MessageService } from './message.service';
+import { UserService } from '../user/user.service';
+import { QueryPagination } from './query';
+import { Loader } from './pipe';
 
 /**
  * Message Paginate Response Class
@@ -122,19 +122,19 @@ export class MessageController extends BaseEntityController<
   @Get(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiOperation({ summary: 'Retrieve Message By id.' })
+  @ApiOperation({ summary: 'Retrieve Message By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Message Retrieve Request Received.',
+    description: 'Retrieve Message Request Received.',
     type: Message,
   })
   @ApiResponse({
     status: 400,
-    description: 'Message Retrieve Request Failed.',
+    description: 'Retrieve Message Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Message Retrieve Request Failed (Not found).',
+    description: 'Retrieve Message Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
@@ -202,7 +202,7 @@ export class MessageController extends BaseEntityController<
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Message By id.' })
+  @ApiOperation({ summary: 'Delete Message By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Message Delete Request Received.',

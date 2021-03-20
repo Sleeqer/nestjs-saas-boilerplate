@@ -1,4 +1,4 @@
-import { ObjectID } from 'typeorm';
+import { Types } from 'mongoose';
 
 /**
  * Import local objects
@@ -15,17 +15,18 @@ export class MessageEvent<Message> {
   title: MessageEventEnum;
 
   /**
-   * Message field
+   * Entity field
    */
-  entity?: Message | number | string | ObjectID;
+  entity?: Message | number | string | Types.ObjectId;
 
   /**
-   * Constructor of Message Created Event Class
-   * @param {Message} entity
+   * Constructor of Message Event Class
+   * @param {MessageEventEnum} title Event's title
+   * @param {Message} entity Event's entity
    */
   constructor(
     title: MessageEventEnum = MessageEventEnum.CREATED,
-    entity?: Message | number | string | ObjectID,
+    entity?: Message | number | string | Types.ObjectId,
   ) {
     this.title = title;
     this.entity = entity;

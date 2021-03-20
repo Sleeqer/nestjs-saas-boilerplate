@@ -1,5 +1,5 @@
-import { parse } from 'dotenv';
 import * as joi from '@hapi/joi';
+import { parse } from 'dotenv';
 import * as fs from 'fs';
 
 /**
@@ -115,6 +115,34 @@ export class ConfigService {
   }
 
   /**
+   * Fetches database configuration uri
+   * @returns {string} Database configuration uri
+   */
+  database(): string {
+    const username = this.get('DB_USERNAME');
+    const password = this.get('DB_PASSWORD');
+
+    return `${this.get('DB_TYPE')}://${
+      username && password ? `${username}:${password}@` : ``
+    }${this.get('DB_HOST')}:${this.get('DB_PORT')}/${this.get('DB_DATABASE')}`;
+  }
+
+  /**
+   * Fetches logger configuration uri
+   * @returns {string} Logger configuration uri
+   */
+  logger(): string {
+    const username = this.get('LOGGER_USERNAME');
+    const password = this.get('LOGGER_PASSWORD');
+
+    return `${this.get('LOGGER_TYPE')}://${
+      username && password ? `${username}:${password}@` : ``
+    }${this.get('LOGGER_HOST')}:${this.get('LOGGER_PORT')}/${this.get(
+      'LOGGER_DATABASE',
+    )}`;
+  }
+
+  /**
    * Fetches the key from the configuration file
    * @param {string} key
    * @param {string} defaults Default to value
@@ -129,7 +157,7 @@ export class ConfigService {
    * @param {string} env
    * @returns {boolean} Whether or not the environment variable matches the application environment
    */
-  isEnv(env: string): boolean {
+  env(env: string): boolean {
     return this.envConfig.APPLICATION_ENV === env;
   }
 }

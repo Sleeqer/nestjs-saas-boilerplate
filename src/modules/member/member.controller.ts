@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -20,32 +21,31 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { ApplicationKeyGuards, UserGuards } from '../authorization/guards';
+import { ConversationService } from '../conversation/conversation.service';
+import { GuardsProperty } from '../authorization/guards/decorators';
+import { ConversationGuards } from '../conversation/guards';
+import { Member, MemberDocument } from './member.entity';
+import { FastifyRequestInterface } from '../common';
+import { UserService } from '../user/user.service';
+import { MemberService } from './member.service';
+import { AppRoles } from '../app/app.roles';
+import { User } from '../user/user.entity';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import {
   MemberCreatePayload,
   MemberReplacePayload,
   MemberUpdatePayload,
 } from './payload';
 import { Loader } from './pipe';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
-import { MemberService } from './member.service';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { Member, MemberDocument } from './member.entity';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { ApplicationKeyGuards, UserGuards } from '../authorization/guards';
-import { GuardsProperty } from '../authorization/guards/decorators';
-import { ConversationGuards } from '../conversation/guards';
-import { UserService, User } from '../user';
-import { ConversationService } from '../conversation';
-import { AppRoles } from '../app/app.roles';
 
 /**
  * Member Paginate Response Class
@@ -125,19 +125,19 @@ export class MemberController extends BaseEntityController<
   @Get(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiOperation({ summary: 'Retrieve Member By id.' })
+  @ApiOperation({ summary: 'Retrieve Member By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Member Retrieve Request Received.',
+    description: 'Retrieve Member Request Received.',
     type: Member,
   })
   @ApiResponse({
     status: 400,
-    description: 'Member Retrieve Request Failed.',
+    description: 'Retrieve Member Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Member Retrieve Request Failed (Not found).',
+    description: 'Retrieve Member Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
@@ -171,8 +171,8 @@ export class MemberController extends BaseEntityController<
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Member By id.',
-    description: '**Inserts** Member If It does not exists By id.',
+    summary: 'Replace Member By ID.',
+    description: '**Inserts** Member If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
@@ -256,7 +256,7 @@ export class MemberController extends BaseEntityController<
   @Post(':id')
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
-  @ApiOperation({ summary: 'Create Member By id.' })
+  @ApiOperation({ summary: 'Create Member By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Create Member Request Received.',
@@ -297,7 +297,7 @@ export class MemberController extends BaseEntityController<
   @GuardsProperty({ guards: ConversationGuards, property: 'conversation' })
   @UseGuards(ApplicationKeyGuards, UserGuards, ConversationGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Member By id.' })
+  @ApiOperation({ summary: 'Delete Member By ID.' })
   @ApiResponse({
     status: 204,
     description: 'Member Delete Request Received.',

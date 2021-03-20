@@ -24,23 +24,23 @@ import {
 /**
  * Import local objects
  */
+import { BaseEntityController } from '../common/entity/controller/entity.controller';
+import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
+import { Application, ApplicationDocument } from './application.entity';
+import { GuardsProperty } from '../authorization/guards/decorators';
+import { FastifyRequestInterface } from '../common/interfaces';
+import { ApplicationService } from './application.service';
+import { ParseIdPipe } from '../common/pipes';
+import {
+  Pagination,
+  Query as QueryPagination,
+} from '../common/entity/pagination';
 import {
   ApplicationCreatePayload,
   ApplicationReplacePayload,
   ApplicationUpdatePayload,
 } from './payload';
 import { Loader } from './pipe';
-import {
-  Pagination,
-  Query as QueryPagination,
-} from '../common/entity/pagination';
-import { ParseIdPipe } from '../common/pipes';
-import { ApplicationService } from './application.service';
-import { FastifyRequestInterface } from '../common/interfaces';
-import { Application, ApplicationDocument } from './application.entity';
-import { BaseEntityController } from '../common/entity/controller/entity.controller';
-import { OrganizationGuards, ProfileGuards } from '../authorization/guards';
-import { GuardsProperty } from '../authorization/guards/decorators';
 
 /**
  * Application Paginate Response Class
@@ -60,8 +60,8 @@ export class ApplicationPaginateResponse extends Pagination<Application> {
 @ApiTags('applications')
 @Controller('/')
 export class ApplicationController extends BaseEntityController<
-Application,
-ApplicationDocument
+  Application,
+  ApplicationDocument
 > {
   /**
    * Constructor of Application Controller Class
@@ -113,19 +113,19 @@ ApplicationDocument
   @Get(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Retrieve Application By id.' })
+  @ApiOperation({ summary: 'Retrieve Application By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Application Retrieve Request Received.',
+    description: 'Retrieve Application By ID Request Received.',
     type: Application,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Retrieve Request Failed.',
+    description: 'Retrieve Application By ID Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Retrieve Request Failed (Not found).',
+    description: 'Retrieve Application By ID Request Failed (Not found).',
   })
   async get(
     @Param('id', Loader)
@@ -147,17 +147,17 @@ ApplicationDocument
   @UseGuards(ProfileGuards, OrganizationGuards)
   @ApiExcludeEndpoint()
   @ApiOperation({
-    summary: 'Replace Application By id.',
-    description: '**Inserts** Application If It does not exists By id.',
+    summary: 'Replace Application By ID.',
+    description: '**Inserts** Application If It does not exists By ID.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Application Replace Request Received.',
+    description: 'Replace Application By ID Request Received.',
     type: Application,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Replace Request Failed.',
+    description: 'Replace Application By ID Request Failed.',
   })
   async replace(
     @Param('id', ParseIdPipe) id: number | string,
@@ -177,19 +177,19 @@ ApplicationDocument
   @Patch(':id')
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
-  @ApiOperation({ summary: 'Update Application by id.' })
+  @ApiOperation({ summary: 'Update Application By ID.' })
   @ApiResponse({
     status: 200,
-    description: 'Application Update Request Received.',
+    description: 'Update Application By ID Request Received.',
     type: Application,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Update Request Failed.',
+    description: 'Update Application By ID Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Update Request Failed (Not found).',
+    description: 'Update Application By ID Request Failed (Not found).',
   })
   async update(
     @Param('id', Loader) id: number | string,
@@ -209,19 +209,19 @@ ApplicationDocument
   @GuardsProperty({ guards: OrganizationGuards, property: 'organization' })
   @UseGuards(ProfileGuards, OrganizationGuards)
   @HttpCode(204)
-  @ApiOperation({ summary: 'Delete Application By id.' })
+  @ApiOperation({ summary: 'Delete Application By ID.' })
   @ApiResponse({
     status: 204,
-    description: 'Application Delete Request Received.',
+    description: 'Delete Application By ID Request Received.',
     type: Object,
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Delete Request Failed.',
+    description: 'Delete Application By ID Request Failed.',
   })
   @ApiResponse({
     status: 404,
-    description: 'Application Delete Request Failed (Not found).',
+    description: 'Delete Application By ID Request Failed (Not found).',
   })
   async destroy(
     @Param('id', Loader) id: number | string,
@@ -244,11 +244,11 @@ ApplicationDocument
   @ApiOperation({ summary: 'Create Application.' })
   @ApiResponse({
     status: 201,
-    description: 'Application Create Request Received.',
+    description: 'Create Application Request Received.',
   })
   @ApiResponse({
     status: 400,
-    description: 'Application Create Request Failed.',
+    description: 'Create Application Request Failed.',
   })
   async create(
     @Body() payload: ApplicationCreatePayload,

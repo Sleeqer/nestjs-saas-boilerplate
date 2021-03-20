@@ -1,7 +1,7 @@
 import { MongooseModule, MongooseModuleAsyncOptions } from '@nestjs/mongoose';
+import * as DailyRotateFile from 'winston-daily-rotate-file';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AccessControlModule } from 'nest-access-control';
-import * as DailyRotateFile from 'winston-daily-rotate-file';
 import * as WinstonMongoDB from 'winston-mongodb';
 import { GraphQLModule } from '@nestjs/graphql';
 import { RouterModule } from 'nest-router';
@@ -13,26 +13,27 @@ import { join } from 'path';
 /**
  * Import local objects
  */
-import { routes } from './app.routes';
-import { roles } from './app.roles';
-import { AppService } from './app.service';
-import { UserModule } from '../user/user.module';
-import { AuthModule } from '../authorization';
-import { AppController } from './app.controller';
-import { OrganizationModule } from '../organization';
-import { EntityModule } from '../entity/entity.module';
-import { ReportModule } from '../report/report.module';
-import { ConfigModule } from '../config/config.module';
+import { ConfigModule, ConfigService } from '../config';
 import { HttpExceptionFilter } from '../common/filters';
-import { ConfigService } from '../config/config.service';
-import { WinstonModule } from '../winston/winston.module';
+import { OrganizationModule } from '../organization';
 import { SharedModule } from '../../adapters/shared';
-import { ApplicationModule } from '../application';
 import { ConversationModule } from '../conversation';
+import { ApplicationModule } from '../application';
+import { AuthModule } from '../authorization';
+import { routes, AppController } from './';
+import { AppService } from './app.service';
+import { WinstonModule } from '../winston';
 import { ProfileModule } from '../profile';
-import { MemberModule } from '../member';
 import { MessageModule } from '../message';
+import { EntityModule } from '../entity';
+import { ReportModule } from '../report';
+import { MemberModule } from '../member';
+import { UserModule } from '../user';
+import { roles } from './app.roles';
 
+/**
+ * Declare module
+ */
 @Module({
   imports: [
     RouterModule.forRoutes(routes),
@@ -41,13 +42,7 @@ import { MessageModule } from '../message';
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         ({
-          uri: `${config.get('DB_TYPE')}://${
-            config.get('DB_USERNAME') && config.get('DB_PASSWORD')
-              ? `${config.get('DB_USERNAME')}:${config.get('DB_PASSWORD')}@`
-              : ``
-          }${config.get('DB_HOST')}:${config.get('DB_PORT')}/${config.get(
-            'DB_DATABASE',
-          )}`,
+          uri: `${config.database()}`,
           useNewUrlParser: true,
           useUnifiedTopology: true,
         } as MongooseModuleAsyncOptions),
@@ -56,26 +51,17 @@ import { MessageModule } from '../message';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        return config.isEnv('dev')
+        return config.env('dev')
           ? {
               level: 'info',
               format: winston.format.json(),
-              defaultMeta: { service: 'user-service' },
+              defaultMeta: { service: 'default-service' },
               transports: [
                 new winston.transports.Console({
                   format: winston.format.simple(),
                 }),
                 new WinstonMongoDB.MongoDB({
-                  db: `mongodb://${
-                    config.get('LOGGER_DB_USERNAME') &&
-                    config.get('LOGGER_DB_PASSWORD')
-                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
-                          'LOGGER_DB_PASSWORD',
-                        )}@`
-                      : ``
-                  }${config.get('LOGGER_DB_HOST')}:${config.get(
-                    'LOGGER_DB_PORT',
-                  )}/${config.get('LOGGER_DB_DATABASE')}`,
+                  db: `${config.logger()}`,
                 }),
               ],
             }
@@ -102,35 +88,19 @@ import { MessageModule } from '../message';
                   options: {
                     includeIds: true,
                   },
-                  db: `mongodb://${
-                    config.get('LOGGER_DB_USERNAME') &&
-                    config.get('LOGGER_DB_PASSWORD')
-                      ? `${config.get('LOGGER_DB_USERNAME')}:${config.get(
-                          'LOGGER_DB_PASSWORD',
-                        )}@`
-                      : ``
-                  }${config.get('LOGGER_DB_HOST')}:${config.get(
-                    'LOGGER_DB_PORT',
-                  )}/${config.get('LOGGER_DB_DATABASE')}`,
+                  db: `${config.logger()}`,
                 }),
               ],
             };
       },
     }),
     EventEmitterModule.forRoot({
-      // Set this to `true` to use wildcards
       wildcard: false,
-      // The delimiter used to segment namespaces
       delimiter: '.',
-      // Set this to `true` if you want to emit the newListener event
       newListener: false,
-      // Set this to `true` if you want to emit the removeListener event
       removeListener: false,
-      // The maximum amount of listeners that can be assigned to an event
       maxListeners: 10,
-      // Show event name in memory leak message when more than maximum amount of listeners is assigned
       verboseMemoryLeak: false,
-      // Disable throwing uncaughtException if an error event is emitted and it has no listeners
       ignoreErrors: false,
     }),
     AccessControlModule.forRoles(roles),

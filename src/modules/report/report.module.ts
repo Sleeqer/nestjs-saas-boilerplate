@@ -4,9 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 /**
  * Import local objects
  */
-import { RedisPropagatorModule } from '../../adapters/redis/propagator/redis.propagator.module';
-import { RabbitMQModule } from '../../adapters/rabbitmq/rabbitmq.module';
+import { RedisPropagatorModule } from '../../adapters/redis';
 import { ReportListener } from './listener/report.listener';
+import { RabbitMQModule } from '../../adapters/rabbitmq';
 import { ReportHandler } from './handler/report.handler';
 import { ReportController } from './report.controller';
 import { Report, ReportSchema } from './report.entity';

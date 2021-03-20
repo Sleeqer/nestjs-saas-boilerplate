@@ -1,15 +1,15 @@
 import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectID } from 'mongodb';
+import { Types } from 'mongoose';
 
 /**
- * Application Create Payload Class
+ * Application Replace Payload Class
  */
 export class ApplicationReplacePayload {
   /**
    * Id field
    */
-  _id: number | string | ObjectID;
+  _id: number | string | Types.ObjectId;
 
   /**
    * Title field

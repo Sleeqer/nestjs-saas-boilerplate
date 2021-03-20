@@ -5,12 +5,9 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
-import { OrganizationEvent } from '../event';
+import { OrganizationService, Organization, OrganizationEvent } from '../';
+import { RabbitMQService } from '../../../adapters/rabbitmq';
 import { OrganizationEventEnum } from '../enum';
-import { Organization } from '../organization.entity';
-import { OrganizationService } from '../organization.service';
-import { EXCHANGE, KEY } from '../handler/organization.handler.enum';
-import { RabbitMQService } from '../../../adapters/rabbitmq/rabbitmq.service';
 
 /**
  * Organization Listener Class
@@ -35,7 +32,6 @@ export class OrganizationListener {
    */
   @OnEvent(OrganizationEventEnum.CREATED)
   _created(payload: OrganizationEvent<Organization>): void {
-    // this.rabbit.send(payload, KEY.CREATED, EXCHANGE.CREATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -45,7 +41,6 @@ export class OrganizationListener {
    */
   @OnEvent(OrganizationEventEnum.UPDATED)
   _updated(payload: OrganizationEvent<Organization>): void {
-    // this.rabbit.send(payload, KEY.UPDATED, EXCHANGE.UPDATED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 
@@ -55,7 +50,6 @@ export class OrganizationListener {
    */
   @OnEvent(OrganizationEventEnum.DELETED)
   _deleted(payload: OrganizationEvent<Organization>): void {
-    // this.rabbit.send(payload, KEY.DELETED, EXCHANGE.DELETED);
     this.logger.info(`[${payload.title}] -> ${JSON.stringify(payload)}`);
   }
 }

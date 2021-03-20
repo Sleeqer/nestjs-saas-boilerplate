@@ -1,4 +1,4 @@
-import { ObjectID } from 'typeorm';
+import { Types } from 'mongoose';
 
 /**
  * Import local objects
@@ -15,17 +15,18 @@ export class UserEvent<User> {
   title: UserEventEnum;
 
   /**
-   * User field
+   * Entity field
    */
-  entity?: User | number | string | ObjectID;
+  entity?: User | number | string | Types.ObjectId;
 
   /**
-   * Constructor of User Created Event Class
-   * @param {User} entity
+   * Constructor of User Event Class
+   * @param {UserEventEnum} title Event's title
+   * @param {User} entity Event's entity
    */
   constructor(
     title: UserEventEnum = UserEventEnum.CREATED,
-    entity?: User | number | string | ObjectID,
+    entity?: User | number | string | Types.ObjectId,
   ) {
     this.title = title;
     this.entity = entity;

@@ -3,13 +3,13 @@ import { Query, Resolver } from '@nestjs/graphql';
 /**
  * Import local objects
  */
-import { Profile } from './profile.entity';
 import { ProfileService } from './profile.service';
+import { Profile } from './profile.entity';
 
 /**
  * Profile Resolver Class
  */
-@Resolver((of) => Profile)
+@Resolver(() => Profile)
 export class ProfileResolver {
   /**
    * Constructor of Profile Resolver Class

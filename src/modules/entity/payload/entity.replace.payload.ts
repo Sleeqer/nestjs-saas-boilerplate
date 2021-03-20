@@ -1,9 +1,8 @@
 import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectID } from 'mongodb';
 
 /**
- * Entity Create Payload Class
+ * Entity Replace Payload Class
  */
 export class EntityReplacePayload {
   /**

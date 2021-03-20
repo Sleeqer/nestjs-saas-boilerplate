@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ObjectID } from 'mongodb';
 
 /**
- * Organization Create Payload Class
+ * Organization Replace Payload Class
  */
 export class OrganizationReplacePayload {
   /**
