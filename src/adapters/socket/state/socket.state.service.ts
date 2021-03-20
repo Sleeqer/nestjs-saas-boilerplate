@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
+/**
+ * Socket State Service Class
+ */
 @Injectable()
 export class SocketStateService {
   /**

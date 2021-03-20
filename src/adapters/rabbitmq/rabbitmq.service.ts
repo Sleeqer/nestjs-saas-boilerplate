@@ -5,15 +5,15 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
+import { RedisPropagatorService } from '../redis/propagator/redis.propagator.service';
+import { ConfigService } from '../../modules/config';
+import { connection } from './rabbitmq.connect';
+import subscriptions from './handler';
 import {
   RabbitMQOptionInterface,
   RabbitMQResponseType,
   RabbitMQEnum,
 } from './interface';
-import subscriptions from './handler';
-import { connection } from './rabbitmq.connect';
-import { ConfigService } from '../../modules/config/config.service';
-import { RedisPropagatorService } from '../redis/propagator/redis.propagator.service';
 
 /**
  * Current config

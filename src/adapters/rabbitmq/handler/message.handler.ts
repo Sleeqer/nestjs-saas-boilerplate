@@ -3,11 +3,11 @@ import { Logger } from 'winston';
 /**
  * Import local objects
  */
+import { RedisPropagatorService } from '../../redis/propagator/redis.propagator.service';
 import {
   RabbitMQEnum,
   RabbitMQOptionInterface,
 } from '../interface/rabbitmq.option.interface';
-import { RedisPropagatorService } from '../../redis/propagator/redis.propagator.service';
 
 /**
  * Message Handler Class

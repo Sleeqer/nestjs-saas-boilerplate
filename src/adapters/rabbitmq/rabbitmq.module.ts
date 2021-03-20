@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 /**
  * Import local objects
  */
-import { RabbitMQService } from './rabbitmq.service';
 import { RedisPropagatorModule } from '../redis/propagator/redis.propagator.module';
+import { RabbitMQService } from './rabbitmq.service';
 
 /**
  * Define module

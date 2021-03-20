@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 /**
  * Import local objects
  */
-import { RedisService } from './redis.service';
 import { RedisProviders } from './redis.providers';
+import { RedisService } from './redis.service';
 
 /**
  * Define module
