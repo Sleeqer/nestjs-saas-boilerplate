@@ -202,7 +202,7 @@ $ npm run typedocs
 
 Out of the box, the web app comes with Swagger; an [open api specification](https://swagger.io/specification/), that is used to describe RESTful APIs. Nest provides a [dedicated module to work with it](https://docs.nestjs.com/recipes/swagger).
 
-The configuration for Swagger can be found at this [location](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/main.ts#L12-L61).
+The configuration for Swagger can be found at this [location](https://github.com/Sleeqer/nestjs-saas-boilerplate/blob/master/src/main.ts#L12-L61).
 
 ---
 
@@ -210,13 +210,13 @@ The configuration for Swagger can be found at this [location](https://github.com
 
 Mongoose provides a straight-forward, schema-based solution to model your application data. It includes built-in type casting, validation, query building, business logic hooks and more, out of the box. Please view the [documentation](https://mongoosejs.com) for further details.
 
-The configuration for Mongoose can be found in the [app module](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/modules/app/app.module.ts#L17).
+The configuration for Mongoose can be found in the [app module](https://github.com/Sleeqer/nestjs-saas-boilerplate/blob/master/src/modules/app/app.module.ts#L17).
 
 ---
 
 ### 🔊 Logs
 
-This boilerplate comes with a Winston module for logging, the configurations for Winston can be found in the [app module](https://github.com/Sleeqer/nestjs-boilerplate/blob/master/src/modules/app/app.module.ts#L34-L71).
+This boilerplate comes with a Winston module for logging, the configurations for Winston can be found in the [app module](https://github.com/Sleeqer/nestjs-saas-boilerplate/blob/master/src/modules/app/app.module.ts#L34-L71).
 
 ---
 
@@ -224,7 +224,7 @@ This boilerplate comes with a Winston module for logging, the configurations for
 
 |                                                Branches | Status |
 | ------------------------------------------------------: | :----- |
-| [Master](https://github.com/Sleeqer/nestjs-boilerplate) | ✅     |
+| [Master](https://github.com/Sleeqer/nestjs-saas-boilerplate) | ✅     |
 
 ---
 
